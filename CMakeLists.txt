@@ -1,0 +1,97 @@
+cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
+# Main CMake
+
+#
+# Debugging Options
+#
+if (CMAKE_BUILD_TYPE STREQUAL "Debug") 
+    SET (CMAKE_VERBOSE_MAKEFILE 1) # Use 1 for debugging, 0 for release
+ENDIF()
+
+#Build Cmake Environment
+SET(PKG_CONFIG_USE_CMAKE_PREFIX_PATH TRUE)
+find_package(PkgConfig)
+include(CheckCXXCompilerFlag)
+include(ExternalProject)
+include(CheckTypeSize)
+include(CheckIncludeFiles)
+
+## Use the variable PROJECT_NAME for changing the target name
+SET ( PROJECT_NAME "AutomationServer" )
+
+
+PROJECT(${PROJECT_NAME}) ## Not Able to use CXX because C files are not compiled
+
+MESSAGE(STATUS "Try Build ${PROJECT_NAME}")
+message(STATUS "Compiler ${CMAKE_CXX_COMPILER_ID}")
+message(STATUS "Building on ${CMAKE_SYSTEM_NAME}")
+MESSAGE(STATUS "Build for ${TARGET}")
+
+#
+# Project Output Paths
+#
+SET (MAINFOLDER ${PROJECT_SOURCE_DIR})
+IF("${TARGET}" STREQUAL "")
+   message(WARNING "TARGET not set please add -DTRAGET to command line Suported Target are Linux,PI (crosscompile)")
+   SET(TARGET ${CMAKE_SYSTEM_NAME})
+ENDIF()
+
+IF("${CMAKE_EXPORT_COMPILE_COMMANDS}" STREQUAL "")
+   SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+ENDIF()
+
+SET (EXECUTABLE_OUTPUT_PATH "${MAINFOLDER}/bin/${TARGET}")
+SET (LIBRARY_OUTPUT_PATH "${MAINFOLDER}/lib/${TARGET}")
+SET (LIBS_DIR ${PROJECT_SOURCE_DIR}/libs/${TARGET})
+
+MESSAGE(STATUS "Build to ${EXECUTABLE_OUTPUT_PATH}")
+
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
+
+CHECK_CXX_COMPILER_FLAG("-std=c++17" COMPILER_SUPPORTS_CXX11)
+IF(COMPILER_SUPPORTS_CXX11)
+   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+ELSE()
+   message(ERROR "we need c++17 to build")
+ENDIF()
+
+CHECK_INCLUDE_FILE_CXX("time.h" HAVE_TIME_H)
+check_type_size("time_t" SIZEOF_TIME_T LANGUAGE CXX)
+
+SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -DDEBUG")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSIZEOF_TIME_T=${SIZEOF_TIME_T}")
+
+IF(CMAKE_COMPILER_IS_GNUCXX)
+  SET ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-psabi -DELPP_THREAD_SAFE -DELPP_FEATURE_PERFORMANCE_TRACKING -DELPP_NO_DEFAULT_LOG_FILE -DELPP_STACKTRACE_ON_CRASH")
+  #-DELPP_STACKTRACE_ON_CRASH only on linux with gcc
+ENDIF(CMAKE_COMPILER_IS_GNUCXX)
+
+MESSAGE(STATUS "Compiler Flags are ${CMAKE_CXX_FLAGS}")
+#
+# Add Build Targets
+#
+#set(THREADS_PREFER_PTHREAD_FLAG ON)
+#FIND_PACKAGE(Threads REQUIRED)
+
+FIND_PACKAGE(LibHttpServer REQUIRED)
+FIND_PACKAGE(SQLite3 REQUIRED)
+FIND_PACKAGE(CURL REQUIRED)
+FIND_PACKAGE(Libmosquitto REQUIRED)
+
+MESSAGE(STATUS "CURL ${CURL_INCLUDE_DIR} ${CURL_LIBRARIES}")
+MESSAGE(STATUS "mosquitto ${LIBMOSQUITTO_INCLUDE_DIRS} ${LIBMOSQUITTO_LIBRARIES}")
+
+ADD_SUBDIRECTORY(src)
+# ADD_SUBDIRECTORY(tests)
+
+OPTION(ENABLE_CPPCHECK "Enable cppcheck linter while compiling." ON)
+if(ENABLE_CPPCHECK)
+    include(cppcheckhelper)
+    MESSAGE(STATUS "CMAKE_CXX_CPPCHECK ${CMAKE_CXX_CPPCHECK}")
+    IF (NOT CMAKE_CXX_CPPCHECK)
+        MESSAGE(FATAL_ERROR "please install CPPCHECK for better code :)")
+    ENDIF()
+ELSE()
+    unset(CMAKE_CXX_CPPCHECK CACHE)
+endif()
+

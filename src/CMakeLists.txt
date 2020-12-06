@@ -1,0 +1,4 @@
+MESSAGE(STATUS "working on src dir Http server ${LIBHTTPSERVER_FOUND}")
+
+ADD_SUBDIRECTORY(common)
+ADD_SUBDIRECTORY(IoBackend)
