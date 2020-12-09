@@ -24,6 +24,8 @@ https://shelly-api-docs.shelly.cloud
 
 ## Links
 https://www.systutorials.com/docs/linux/man/3-libmosquitto/
+https://github.com/warmcat/libwebsockets
+https://github.com/adamrehn/websocket-server-demo
 
 ## Test Commands
 mosquitto_pub -h 192.168.2.99 -t "test/message" -m "Hello, from Desktop"
