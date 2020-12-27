@@ -26,6 +26,10 @@ https://shelly-api-docs.shelly.cloud
 https://www.systutorials.com/docs/linux/man/3-libmosquitto/
 https://github.com/warmcat/libwebsockets
 https://github.com/adamrehn/websocket-server-demo
+https://www.heise.de/developer/artikel/Kommunikation-ueber-MQTT-3238975.html
+https://www.kohlenklau.de/mqtt-auf-raspberry-pi-installieren/
+https://www.sophos.com/en-us/medialibrary/PDFs/documentation/UTMonAWS/Sophos-UTM-RESTful-API.pdf
+https://www.waveshare.com/wiki/2.13inch_e-Paper_HAT
 
 ## Test Commands
 mosquitto_pub -h 192.168.2.99 -t "test/message" -m "Hello, from Desktop"
