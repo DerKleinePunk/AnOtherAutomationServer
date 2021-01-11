@@ -30,6 +30,7 @@ https://www.heise.de/developer/artikel/Kommunikation-ueber-MQTT-3238975.html
 https://www.kohlenklau.de/mqtt-auf-raspberry-pi-installieren/
 https://www.sophos.com/en-us/medialibrary/PDFs/documentation/UTMonAWS/Sophos-UTM-RESTful-API.pdf
 https://www.waveshare.com/wiki/2.13inch_e-Paper_HAT
+https://www.waveshare.com/w/upload/d/d8/2.13inch_e-Paper_%28B%29_V3_Specification.pdf
 
 ## Test Commands
 mosquitto_pub -h 192.168.2.99 -t "test/message" -m "Hello, from Desktop"
