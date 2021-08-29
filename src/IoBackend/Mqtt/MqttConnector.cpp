@@ -27,10 +27,11 @@ void my_connect_callback(struct mosquitto *mosq, void *userdata, int result)
     }
 }
 
-MqttConnector::MqttConnector():
+MqttConnector::MqttConnector(const Config* config):
     _mosq(nullptr)
 {
     el::Loggers::getLogger(ELPP_DEFAULT_LOGGER);
+    _config = config;
 }
 
 MqttConnector::~MqttConnector()
@@ -39,7 +40,7 @@ MqttConnector::~MqttConnector()
 
 bool MqttConnector::Init()
 {
-    std::string host = "192.168.2.99";
+    const auto host = _config->GetMqttServer();
     int port = 1883;
     int keepalive = 60;
     bool clean_session = true;

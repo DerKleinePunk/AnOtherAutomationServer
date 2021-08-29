@@ -1,4 +1,4 @@
-project("AutoIoBackend" CXX)
+project("SimpelIoBackend" CXX)
 
 MESSAGE(STATUS "Try Build ${PROJECT_NAME}")
 
