@@ -17,9 +17,11 @@ using json = nlohmann::json;
 
 void to_json(json& j, const ConfigFile& p)
 {
-    j = json{
-        { "MqttServer", p.MqttServer },
-        { "ServerPort", p.ServerPort },
+    j = json{ 
+        { "MqttServer", p.MqttServer }, 
+        { "ServerPort", p.ServerPort }, 
+        { "ApiKey", p.ApiKey }, 
+        { "WatchTopics", p.WatchTopics } 
     };
 }
 
@@ -41,9 +43,16 @@ void from_json(const json& j, ConfigFile& p)
 
     it_value = j.find("ApiKey");
     if(it_value != j.end()) {
-        p.ApiKey = j.at("ApiKey").get<uint16_t>();
+        p.ApiKey = j.at("ApiKey").get<std::string>();
     } else {
         p.ApiKey = "12345678";
+    }
+
+    it_value = j.find("WatchTopics");
+    if(it_value != j.end()) {
+        p.WatchTopics = j.at("WatchTopics").get<std::vector<std::string>>();
+    } else {
+        p.WatchTopics.push_back("devices/#");
     }
 }
 
@@ -83,6 +92,7 @@ void Config::Load()
         _configFile.MqttServer = "192.168.2.99";
         _configFile.ServerPort = 8080;
         _configFile.ApiKey = "12345678";
+        _configFile.WatchTopics.push_back("devices/#");
         std::ofstream o(_filenameConfig);
         const json jConfig = _configFile;
         o << std::setw(4) << jConfig << std::endl;
@@ -111,4 +121,9 @@ std::string Config::GetMqttServer() const
 std::string Config::GetApiKey() const
 {
     return _configFile.ApiKey;
+}
+
+std::vector<std::string> Config::GetWatchTopics() const
+{
+    return _configFile.WatchTopics;
 }

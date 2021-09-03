@@ -34,3 +34,10 @@ https://www.waveshare.com/w/upload/d/d8/2.13inch_e-Paper_%28B%29_V3_Specificatio
 
 ## Test Commands
 mosquitto_pub -h 192.168.2.99 -t "test/message" -m "Hello, from Desktop"
+
+mosquitto_pub -h 192.168.2.99 -t "devices/wb-adc/controls/text" -m "Hello, from Desktop"
+
+whatch all
+mosquitto_sub -h 192.168.2.99 -t \# -d
+
+mosquitto_sub -h 192.168.2.99 -t devices/# -d

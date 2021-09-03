@@ -14,5 +14,6 @@ public:
     bool Init();
     void Deinit();
     void Connected();
+    void OnMessage(const struct mosquitto_message *message);
 };
 

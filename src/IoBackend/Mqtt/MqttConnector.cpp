@@ -37,6 +37,12 @@ void my_connect_callback(struct mosquitto* mosq, void* userdata, int result)
     }
 }
 
+void my_message_callback(struct mosquitto* mosq, void* userdata, const struct mosquitto_message* message)
+{
+    const auto connector = (MqttConnector*)userdata;
+    connector->OnMessage(message);
+}
+
 MqttConnector::MqttConnector(const Config* config) : _mosq(nullptr)
 {
     el::Loggers::getLogger(ELPP_DEFAULT_LOGGER);
@@ -68,6 +74,7 @@ bool MqttConnector::Init()
 
     mosquitto_log_callback_set(_mosq, my_log_callback);
     mosquitto_connect_callback_set(_mosq, my_connect_callback);
+    mosquitto_message_callback_set(_mosq, my_message_callback);
 
     auto result = mosquitto_connect(_mosq, host.c_str(), port, keepalive);
     if(result != MOSQ_ERR_SUCCESS) {
@@ -105,4 +112,24 @@ void MqttConnector::Deinit()
 void MqttConnector::Connected()
 {
     LOG(INFO) << "Mqtt Conneted";
+    const auto topics = _config->GetWatchTopics();
+    for( const auto &topic : topics)
+    {
+        if(mosquitto_subscribe(_mosq, NULL, topic.c_str(), 2) != MOSQ_ERR_SUCCESS) {
+            LOG(ERROR) << topic << " subscribe failed";
+        } else {
+            LOG(DEBUG) << topic << " subscribed";
+        }
+    }
+}
+
+void MqttConnector::OnMessage(const struct mosquitto_message* message)
+{
+    bool match = 0;
+    printf("got message '%.*s' for topic '%s'\n", message->payloadlen, (char*)message->payload, message->topic);
+
+    mosquitto_topic_matches_sub("/devices/wb-adc/controls/+", message->topic, &match);
+    if(match) {
+        printf("got message for ADC topic\n");
+    }
 }
