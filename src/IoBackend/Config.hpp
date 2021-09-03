@@ -6,6 +6,7 @@ struct ConfigFile
 {
     std::string MqttServer;
     uint16_t ServerPort;
+    std::string ApiKey;
 };
 
 class Config
@@ -22,4 +23,5 @@ public:
 
     std::string GetMqttServer() const;
     uint16_t GetServerPort() const;
+    std::string GetApiKey() const;
 };

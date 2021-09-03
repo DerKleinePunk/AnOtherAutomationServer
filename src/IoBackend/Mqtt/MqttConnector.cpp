@@ -8,27 +8,36 @@
 #include "MqttConnector.h"
 #include "../../common/easylogging/easylogging++.h"
 
-//https://www.systutorials.com/docs/linux/man/3-libmosquitto/
+// https://www.systutorials.com/docs/linux/man/3-libmosquitto/
 
-void my_log_callback(struct mosquitto *mosq, void *userdata, int level, const char *str)
+void my_log_callback(struct mosquitto* mosq, void* userdata, int level, const char* str)
 {
-    /* Pring all log messages regardless of level. */
-    printf("%s\n", str);
-    LOG(DEBUG) << str;
-}
-
-void my_connect_callback(struct mosquitto *mosq, void *userdata, int result)
-{
-    if(!result){
-        /* Subscribe to broker information topics on successful connect. */
-        mosquitto_subscribe(mosq, NULL, "$SYS/#", 2);
-    }else{
-        fprintf(stderr, "Connect failed\n");
+    if(level == MOSQ_LOG_WARNING) {
+        LOG(WARNING) << str;
+    } else if(level == MOSQ_LOG_ERR) {
+        LOG(ERROR) << str;
+    } else {
+        LOG(DEBUG) << str;
     }
 }
 
-MqttConnector::MqttConnector(const Config* config):
-    _mosq(nullptr)
+void my_connect_callback(struct mosquitto* mosq, void* userdata, int result)
+{
+    if(!result) {
+        /* Subscribe to broker information topics on successful connect. */
+        if(mosquitto_subscribe(mosq, NULL, "$SYS/#", 2) != MOSQ_ERR_SUCCESS) {
+            LOG(ERROR) << "subscribe sys failed failed";
+        } else {
+            const auto connector = (MqttConnector*)userdata;
+            connector->Connected();
+        }
+
+    } else {
+        LOG(ERROR) << "Connect failed";
+    }
+}
+
+MqttConnector::MqttConnector(const Config* config) : _mosq(nullptr)
 {
     el::Loggers::getLogger(ELPP_DEFAULT_LOGGER);
     _config = config;
@@ -46,12 +55,17 @@ bool MqttConnector::Init()
     bool clean_session = true;
 
     mosquitto_lib_init();
-    _mosq = mosquitto_new(nullptr, clean_session, nullptr);
-    if(_mosq == nullptr){
+
+    int major, minor, revision = 0;
+    mosquitto_lib_version(&major, &minor, &revision);
+    LOG(DEBUG) << "MOSQUITTO LIB Version " << major << "." << minor << "." << revision;
+
+    _mosq = mosquitto_new("MiNeSimpleIoBackend", clean_session, this);
+    if(_mosq == nullptr) {
         LOG(ERROR) << "mosquitto_new return null";
         return false;
     }
-    
+
     mosquitto_log_callback_set(_mosq, my_log_callback);
     mosquitto_connect_callback_set(_mosq, my_connect_callback);
 
@@ -82,8 +96,13 @@ void MqttConnector::Deinit()
     result = mosquitto_loop_stop(_mosq, false);
     if(result != MOSQ_ERR_SUCCESS) {
         LOG(ERROR) << "Unable to stop loop " << std::to_string(result);
-    } 
+    }
 
     mosquitto_destroy(_mosq);
     mosquitto_lib_cleanup();
+}
+
+void MqttConnector::Connected()
+{
+    LOG(INFO) << "Mqtt Conneted";
 }

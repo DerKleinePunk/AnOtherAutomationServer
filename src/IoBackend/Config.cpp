@@ -8,17 +8,18 @@
 #include <fstream>
 #include <iomanip>
 
-#include "Config.hpp"
 #include "../common/easylogging/easylogging++.h"
-#include "../common/utils/commonutils.h"
 #include "../common/json/json.hpp"
+#include "../common/utils/commonutils.h"
+#include "Config.hpp"
 
 using json = nlohmann::json;
 
 void to_json(json& j, const ConfigFile& p)
 {
-    j = json{ { "MqttServer", p.MqttServer },
-              { "ServerPort", p.ServerPort },
+    j = json{
+        { "MqttServer", p.MqttServer },
+        { "ServerPort", p.ServerPort },
     };
 }
 
@@ -33,9 +34,16 @@ void from_json(const json& j, ConfigFile& p)
 
     it_value = j.find("ServerPort");
     if(it_value != j.end()) {
-        p.MqttServer = j.at("ServerPort").get<uint16_t>();
+        p.ServerPort = j.at("ServerPort").get<uint16_t>();
     } else {
-        p.MqttServer = "8080";
+        p.ServerPort = 8080;
+    }
+
+    it_value = j.find("ApiKey");
+    if(it_value != j.end()) {
+        p.ApiKey = j.at("ApiKey").get<uint16_t>();
+    } else {
+        p.ApiKey = "12345678";
     }
 }
 
@@ -74,6 +82,7 @@ void Config::Load()
         LOG(DEBUG) << "Create new config file";
         _configFile.MqttServer = "192.168.2.99";
         _configFile.ServerPort = 8080;
+        _configFile.ApiKey = "12345678";
         std::ofstream o(_filenameConfig);
         const json jConfig = _configFile;
         o << std::setw(4) << jConfig << std::endl;
@@ -97,4 +106,9 @@ uint16_t Config::GetServerPort() const
 std::string Config::GetMqttServer() const
 {
     return _configFile.MqttServer;
+}
+
+std::string Config::GetApiKey() const
+{
+    return _configFile.ApiKey;
 }

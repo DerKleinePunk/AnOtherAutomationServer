@@ -13,5 +13,6 @@ public:
 
     bool Init();
     void Deinit();
+    void Connected();
 };
 
