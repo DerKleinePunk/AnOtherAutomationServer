@@ -21,8 +21,8 @@ sudo apt install libmosquitto-dev
 
 https://shelly-api-docs.shelly.cloud
 
-
 ## Links
+
 https://www.systutorials.com/docs/linux/man/3-libmosquitto/
 https://github.com/warmcat/libwebsockets
 https://github.com/adamrehn/websocket-server-demo
@@ -33,6 +33,7 @@ https://www.waveshare.com/wiki/2.13inch_e-Paper_HAT
 https://www.waveshare.com/w/upload/d/d8/2.13inch_e-Paper_%28B%29_V3_Specification.pdf
 
 ## Test Commands
+
 mosquitto_pub -h 192.168.2.99 -t "test/message" -m "Hello, from Desktop"
 
 mosquitto_pub -h 192.168.2.99 -t "devices/wb-adc/controls/text" -m "Hello, from Desktop"
@@ -41,3 +42,14 @@ whatch all
 mosquitto_sub -h 192.168.2.99 -t \# -d
 
 mosquitto_sub -h 192.168.2.99 -t devices/# -d
+
+## mDNS
+
+https://www.megunolink.com/documentation/connecting/mdns-browser/
+
+## http  Websocket
+
+MHD_ALLOW_SUSPEND_RESUME
+
+https://github.com/mnisjk/cppWebSockets
+https://git.gnunet.org/libmicrohttpd.git/tree/src/examples/websocket_chatserver_example.c
