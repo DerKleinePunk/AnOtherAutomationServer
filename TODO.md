@@ -53,3 +53,9 @@ MHD_ALLOW_SUSPEND_RESUME
 
 https://github.com/mnisjk/cppWebSockets
 https://git.gnunet.org/libmicrohttpd.git/tree/src/examples/websocket_chatserver_example.c
+
+## Victron
+
+https://www.victronenergy.com/live/vedirect_protocol:faq
+https://github.com/karioja/vedirect
+https://github.com/cterwilliger/VeDirectFrameHandler
