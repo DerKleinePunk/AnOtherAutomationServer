@@ -74,4 +74,6 @@ namespace utils
 	// Initialize the static member.
 	template <typename Ret, typename... Params>
 	std::function<Ret(Params...)> Callback<Ret(Params...)>::func;
+
+	
 }

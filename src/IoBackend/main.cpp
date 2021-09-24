@@ -7,6 +7,7 @@
 #include "resources/MqttResource.h"
 #include "resources/HtmlPageResource.hpp"
 #include "GlobalFunctions.hpp"
+#include "WebServer/WebServer.hpp"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -89,6 +90,8 @@ int main(int argc, char** argv)
     config->Load();
     GlobalFunctions globalFunctions(config);
 
+    const auto ownWebServer = new WebServer(&globalFunctions);
+
     httpserver::webserver ws = httpserver::create_webserver(config->GetServerPort())
                                .log_access(custom_access_log)
                                .log_error(custom_error_log)
@@ -110,7 +113,11 @@ int main(int argc, char** argv)
     ws.register_resource("/ui/{arg1}", &htmlPageResource);
 
     if(ws.start(false)) {
-        LOG(INFO) << "WebServer Running";
+        LOG(INFO) << "LipHttp WebServer Running";
+    }
+
+    if(ownWebServer->Start()) {
+        LOG(INFO) << "Own WebServer Running";
     }
 
     std::cout << "Enter q to Stop" << std::endl;
@@ -124,6 +131,9 @@ int main(int argc, char** argv)
     }
     
     ws.stop();
+
+    ownWebServer->Deinit();
+    delete ownWebServer;
     
     connector->Deinit();
     delete connector;

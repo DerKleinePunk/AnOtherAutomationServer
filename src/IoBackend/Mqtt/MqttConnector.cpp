@@ -78,13 +78,13 @@ bool MqttConnector::Init()
 
     auto result = mosquitto_connect(_mosq, host.c_str(), port, keepalive);
     if(result != MOSQ_ERR_SUCCESS) {
-        LOG(ERROR) << "Unable to connect " << std::to_string(result);
+        LOG(ERROR) << "Unable to connect ErrorCode " << std::to_string(result);
         return false;
     }
 
     result = mosquitto_loop_start(_mosq);
     if(result != MOSQ_ERR_SUCCESS) {
-        LOG(ERROR) << "Unable to start loop " << std::to_string(result);
+        LOG(ERROR) << "Unable to start loop ErrorCode " << std::to_string(result);
         return false;
     }
 
@@ -97,7 +97,7 @@ void MqttConnector::Deinit()
 
     auto result = mosquitto_disconnect(_mosq);
     if(result != MOSQ_ERR_SUCCESS) {
-        LOG(ERROR) << "Unable to disconnect" << std::to_string(result);
+        LOG(ERROR) << "Unable to disconnect ErrorCode " << std::to_string(result);
     }
 
     result = mosquitto_loop_stop(_mosq, false);
