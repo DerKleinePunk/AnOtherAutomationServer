@@ -53,3 +53,6 @@ MHD_ALLOW_SUSPEND_RESUME
 
 https://github.com/mnisjk/cppWebSockets
 https://git.gnunet.org/libmicrohttpd.git/tree/src/examples/websocket_chatserver_example.c
+
+## Automatik Build
+https://medium.com/swlh/how-to-create-an-automated-build-pipeline-for-your-arduino-project-1df9826f2a5e
