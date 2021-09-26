@@ -9,7 +9,7 @@
 #include "../../common/easylogging/easylogging++.h"
 #include "../../common/utils/commonutils.h"
 #include <functional>
-
+#include "WebSocketProtokoll.hpp"
 
 // 0 for unlimited
 #define MAX_BUFFER_SIZE 0
@@ -92,12 +92,13 @@ static const struct lws_http_mount basemount = {
 
 
 static struct lws_protocols protocols[] = {
-    {
-        "/WebSocket",
-        callback_main,
-        0, // user data struct not used
+    { "http", lws_callback_http_dummy, 0, 0, 0, NULL, 0 },
+    { "websocket",
+        callback_websocket,
+        sizeof(per_session_data__minimal),
         MAX_BUFFER_SIZE,
-    },{ NULL, NULL, 0, 0 } // terminator
+    },
+    { NULL, NULL, 0, 0 } /* terminator */
 };
 
 bool WebServer::Start() {
@@ -123,7 +124,7 @@ bool WebServer::Start() {
 
     info.port = _serverPort;
     info.iface = NULL;
-    //info.protocols = protocols;
+    info.protocols = protocols;
     info.mounts = &basemount;
 
 /*#ifndef LWS_NO_EXTENSIONS
