@@ -6,3 +6,5 @@ https://gist.github.com/martinsik/3654228
 https://www.freva.com/assign-fixed-usb-port-names-to-your-raspberry-pi/
 
 https://wolles-elektronikkiste.de/ads1115
+
+https://medium.datadriveninvestor.com/how-to-quickly-embed-python-in-your-c-application-23c19694813
