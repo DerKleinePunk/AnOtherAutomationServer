@@ -7,4 +7,7 @@ https://www.freva.com/assign-fixed-usb-port-names-to-your-raspberry-pi/
 
 https://wolles-elektronikkiste.de/ads1115
 
+Python in C++
 https://medium.datadriveninvestor.com/how-to-quickly-embed-python-in-your-c-application-23c19694813
+https://docs.python.org/3/extending/embedding.html
+https://github.com/matusnovak/python-embedded-example-project
