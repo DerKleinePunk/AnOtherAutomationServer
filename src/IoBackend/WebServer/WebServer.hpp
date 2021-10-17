@@ -26,5 +26,5 @@ public:
     void Deinit();
 
     //Internal Use Only
-    int MainCallBack(struct lws *wsi, enum lws_callback_reasons reason, void *in, size_t len);
+    int MainCallBack(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len);
 };

@@ -8,12 +8,16 @@
 <body>
   <header>
     <h1>Test Page for Server</h1>
-    <textarea id=r readonly cols=40 rows=10></textarea><br>
-		<br>
-		... and a publisher ws connection sends the string<br>
-		in the box below to the broker when you press Send.<br>
-		<input type="text" id=m cols=40 rows=1>
-		<button id=b>Send</button>
   </header>
+  <textarea id=r readonly cols=40 rows=10></textarea><br>
+  <br>
+  ... and a publisher ws connection sends the string<br>
+  in the box below to the broker when you press Send.<br>
+  <input type="text" id=m cols=40 rows=1>
+  <button id=b>Send</button><br>
+
+  <textarea id=getResponse readonly cols=40 rows=10></textarea><br>
+  <button type="button" id=dataButton >Request data</button>
+  <button type="button" id=dataButton2 >Post data</button>
 </body>
 </html>

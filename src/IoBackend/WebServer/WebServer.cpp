@@ -51,20 +51,16 @@ WebServer::~WebServer()
     _run = false;
 }
 
-static int callback_main(   struct lws *wsi,
-                            enum lws_callback_reasons reason,
-                            void *user,
-                            void *in,
-                            size_t len )
+static int callback_main( struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len )
 {
     /*int fd;
     unsigned char buf[LWS_SEND_BUFFER_PRE_PADDING + 512 + LWS_SEND_BUFFER_POST_PADDING];
     unsigned char *p = &buf[LWS_SEND_BUFFER_PRE_PADDING];*/
     
-    auto* webServer = (WebServer*) user;
+    auto* webServer = (WebServer*) lws_context_user(lws_get_context(wsi));
 
     if(webServer){
-        return webServer->MainCallBack(wsi, reason, in, len);
+        return webServer->MainCallBack(wsi, reason, user, in, len);
     }
 
     return 0;
@@ -92,7 +88,7 @@ static const struct lws_http_mount basemount = {
 
 
 static struct lws_protocols protocols[] = {
-    { "http", lws_callback_http_dummy, 0, 0, 0, NULL, 0 },
+    { "http", callback_main, 0, 0, 0, NULL, 0 },//{ "http", lws_callback_http_dummy, 0, 0, 0, NULL, 0 },
     { "websocket",
         callback_websocket,
         sizeof(per_session_data__minimal),
@@ -109,13 +105,13 @@ bool WebServer::Start() {
     auto version = lws_get_library_version();
     LOG(INFO) << "LibWebSocket Version " << version;
 
-    int logs = LLL_ERR | LLL_WARN | LLL_NOTICE
+    int logs = LLL_ERR | LLL_WARN | LLL_NOTICE | LLL_USER | LLL_INFO | LLL_PARSER
 			/* for LLL_ verbosity above NOTICE to be built into lws,
 			 * lws must have been configured and built with
 			 * -DCMAKE_BUILD_TYPE=DEBUG instead of =RELEASE */
-			/* | LLL_INFO */ /* | LLL_PARSER */ /* | LLL_HEADER */
+			/* |  */ /* | LLL_PARSER */ /* | LLL_HEADER */
 			/* | LLL_EXT */ /* | LLL_CLIENT */ /* | LLL_LATENCY */
-			/* | LLL_DEBUG LLL_USER*/;
+			/* | LLL_DEBUG */;
 
     utils::Callback<void(int,const char *)>::func = std::bind(&WebServer::LogCallBack, this, std::placeholders::_1, std::placeholders::_2);
     log_emit_function func = static_cast<log_emit_function>(utils::Callback<void(int,const char *)>::callback);
@@ -180,7 +176,21 @@ void WebServer::Deinit()
     _context = nullptr;
 }
 
-int WebServer::MainCallBack(struct lws *wsi, enum lws_callback_reasons reason, void *in, size_t len)
+int WebServer::MainCallBack(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len)
 {
-    return 0;//lws_callback_http_dummy(wsi, reason, nullptr, in, len);
+    char buf[512];
+    switch (reason) {
+        case LWS_CALLBACK_HTTP:
+            if (lws_hdr_copy(wsi, buf, sizeof(buf), WSI_TOKEN_GET_URI) > 0) {
+                LOG(INFO) << "Get Url " << buf;
+            } else if(lws_hdr_copy(wsi, buf, sizeof(buf), WSI_TOKEN_POST_URI) > 0) {
+                LOG(INFO) << "Post Url " << buf;
+            }
+            break;
+        default:
+            //Noting todo
+            break;
+    }
+    
+    return lws_callback_http_dummy(wsi, reason, user, in, len);
 }

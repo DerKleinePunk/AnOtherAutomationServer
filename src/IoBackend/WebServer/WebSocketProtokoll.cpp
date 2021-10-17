@@ -12,9 +12,7 @@ __minimal_destroy_message(void* _msg)
 	msg->len = 0;
 }
 
-int
-callback_websocket(struct lws *wsi, enum lws_callback_reasons reason,
-			void *user, void *in, size_t len)
+int callback_websocket(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len)
 {
 	struct per_session_data__minimal *pss =
 			(struct per_session_data__minimal *)user;
