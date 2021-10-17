@@ -176,15 +176,32 @@ void WebServer::Deinit()
     _context = nullptr;
 }
 
+bool RegisterResource(const std::string& resourceString, HttpResource* resourceClass)
+{
+    return false;
+}
+
 int WebServer::MainCallBack(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len)
 {
     char buf[512];
     switch (reason) {
         case LWS_CALLBACK_HTTP:
+            lws_get_peer_simple(wsi, buf, sizeof(buf));
+            LOG(INFO) << "peer_simple " << buf;
+		    //lwsl_notice("%s: HTTP: connection %s, path %s\n", __func__,	(const char *)buf, pss->path);
+
             if (lws_hdr_copy(wsi, buf, sizeof(buf), WSI_TOKEN_GET_URI) > 0) {
-                LOG(INFO) << "Get Url " << buf;
+                LOG(INFO) << "GET Url " << buf;
             } else if(lws_hdr_copy(wsi, buf, sizeof(buf), WSI_TOKEN_POST_URI) > 0) {
-                LOG(INFO) << "Post Url " << buf;
+                LOG(INFO) << "POST Url " << buf;
+            } else if(lws_hdr_copy(wsi, buf, sizeof(buf), WSI_TOKEN_PATCH_URI) > 0) {
+                LOG(INFO) << "PATCH Url " << buf;                
+            } else if(lws_hdr_copy(wsi, buf, sizeof(buf), WSI_TOKEN_PUT_URI) > 0) {
+                LOG(INFO) << "PUT Url " << buf;
+            } else if(lws_hdr_copy(wsi, buf, sizeof(buf), WSI_TOKEN_DELETE_URI) > 0) {
+                LOG(INFO) << "DELETE Url " << buf;
+            } else {
+                LOG(WARNING) << "Unkown Url Type";
             }
             break;
         default:

@@ -4,6 +4,7 @@
 #include <string>
 #include <thread>
 #include "../GlobalFunctions.hpp"
+#include "HttpResource.hpp"
 
 class WebServer
 {
@@ -24,6 +25,8 @@ public:
 
     bool Start();
     void Deinit();
+
+    bool RegisterResource(const std::string& resourceString, HttpResource* resourceClass);
 
     //Internal Use Only
     int MainCallBack(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len);
