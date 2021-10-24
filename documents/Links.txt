@@ -14,3 +14,6 @@ https://github.com/matusnovak/python-embedded-example-project
 
 Multi UART
 https://forum-raspberrypi.de/forum/thread/48521-wie-verwende-ich-zusaetzliche-uart-ports/
+
+STM32
+https://docs.platformio.org/en/latest/tutorials/ststm32/stm32cube_debugging_unit_testing.html#tutorial-stm32cube-debugging-unit-testing
