@@ -186,6 +186,7 @@ int WebServer::MainCallBack(struct lws *wsi, enum lws_callback_reasons reason, v
     char buf[512];
     switch (reason) {
         case LWS_CALLBACK_HTTP:
+            //This Code ist Called when no File for Url is Found
             lws_get_peer_simple(wsi, buf, sizeof(buf));
             LOG(INFO) << "peer_simple " << buf;
 		    //lwsl_notice("%s: HTTP: connection %s, path %s\n", __func__,	(const char *)buf, pss->path);

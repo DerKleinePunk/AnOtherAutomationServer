@@ -17,3 +17,7 @@ https://forum-raspberrypi.de/forum/thread/48521-wie-verwende-ich-zusaetzliche-ua
 
 STM32
 https://docs.platformio.org/en/latest/tutorials/ststm32/stm32cube_debugging_unit_testing.html#tutorial-stm32cube-debugging-unit-testing
+https://www.freertos.org/FreeRTOS-Plus/BSP_Solutions/ST/downloading_bsp_driver_pack.html
+
+STM32 C++
+https://www.microconsult.de/blog/2018/03/tb_stm32cubemx-c-cpp/
