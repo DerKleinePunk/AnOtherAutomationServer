@@ -6,6 +6,7 @@
 #include "Mqtt/MqttConnector.h"
 #include "resources/MqttResource.h"
 #include "resources/HtmlPageResource.hpp"
+#include "resources/TestResource.hpp"
 #include "GlobalFunctions.hpp"
 #include "WebServer/WebServer.hpp"
 
@@ -114,6 +115,10 @@ int main(int argc, char** argv)
 
     if(ws.start(false)) {
         LOG(INFO) << "LipHttp WebServer Running";
+    }
+
+    if(!ownWebServer->RegisterResource("/dynpage", new TestResource())){
+        LOG(ERROR) << "RegisterResource failed";
     }
 
     if(ownWebServer->Start()) {

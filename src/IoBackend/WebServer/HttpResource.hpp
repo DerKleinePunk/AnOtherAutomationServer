@@ -1,12 +1,14 @@
 #pragma once
+#include "HttpRequest.hpp"
 
 class HttpResource
 {
 private:
     /* data */
 public:
-    HttpResource(/* args */);
-    ~HttpResource();
+    virtual ~HttpResource() = default;
+
+    virtual void Process(HttpRequest& request) = 0;
 };
 
 

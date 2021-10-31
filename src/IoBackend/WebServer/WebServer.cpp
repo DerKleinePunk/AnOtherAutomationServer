@@ -14,6 +14,22 @@
 // 0 for unlimited
 #define MAX_BUFFER_SIZE 0
 
+/*
+ * Unlike ws, http is a stateless protocol.  This pss only exists for the
+ * duration of a single http transaction.  With http/1.1 keep-alive and http/2,
+ * that is unrelated to (shorter than) the lifetime of the network connection.
+ */
+struct httpSesssionData {
+
+    httpSesssionData() {
+        response = nullptr;
+    }
+	char path[128];
+    char responseData[2048];
+    HttpResponse* response;
+};
+
+
 typedef void (*log_emit_function)(int,const char *);
 
 void WebServer::LogCallBack(int level, const char *line)
@@ -36,6 +52,26 @@ void WebServer::MainLoop()
         }
     }
     LOG(DEBUG) << "WebServer Main Loop leaved";
+}
+
+HttpResponse* WebServer::HandleResource(struct lws *wsi, const std::string& url)
+{
+    const auto resource = _httpResources.find(url);
+    if( resource == _httpResources.end()) {
+        return nullptr;
+    }
+
+    HttpRequest request(wsi);
+    try
+    {
+        resource->second->Process(request);
+        return new HttpResponse();
+    }
+    catch(const std::exception& exp)
+    {
+        LOG(ERROR) << exp.what();
+        return nullptr;
+    }
 }
 
 WebServer::WebServer(GlobalFunctions* globalFunctions)
@@ -88,7 +124,7 @@ static const struct lws_http_mount basemount = {
 
 
 static struct lws_protocols protocols[] = {
-    { "http", callback_main, 0, 0, 0, NULL, 0 },//{ "http", lws_callback_http_dummy, 0, 0, 0, NULL, 0 },
+    { "http", callback_main, sizeof(struct httpSesssionData), 0, 0, NULL, 0 },//{ "http", lws_callback_http_dummy, 0, 0, 0, NULL, 0 },
     { "websocket",
         callback_websocket,
         sizeof(per_session_data__minimal),
@@ -105,7 +141,7 @@ bool WebServer::Start() {
     auto version = lws_get_library_version();
     LOG(INFO) << "LibWebSocket Version " << version;
 
-    int logs = LLL_ERR | LLL_WARN | LLL_NOTICE | LLL_USER | LLL_INFO | LLL_PARSER
+    int logs = LLL_ERR | LLL_WARN | LLL_NOTICE | LLL_USER | LLL_INFO 
 			/* for LLL_ verbosity above NOTICE to be built into lws,
 			 * lws must have been configured and built with
 			 * -DCMAKE_BUILD_TYPE=DEBUG instead of =RELEASE */
@@ -176,39 +212,119 @@ void WebServer::Deinit()
     _context = nullptr;
 }
 
-bool RegisterResource(const std::string& resourceString, HttpResource* resourceClass)
+bool WebServer::RegisterResource(const std::string& resourceString, HttpResource* resourceClass)
 {
-    return false;
+    if(_httpResources.find(resourceString) != _httpResources.end()) {
+        return false;
+    }
+
+    _httpResources.insert(std::pair<const std::string, HttpResource*>(resourceString, resourceClass));
+
+    return true;
 }
 
 int WebServer::MainCallBack(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len)
 {
-    char buf[512];
+    auto found = false;
+    char textBuffer[512];
+    struct httpSesssionData *pss = (struct httpSesssionData *)user;
+    
+    //Todo Understand
+    uint8_t buf[LWS_PRE + 2048], *start = &buf[LWS_PRE], *p = start, *end = &buf[sizeof(buf) - LWS_PRE - 1];
+
     switch (reason) {
         case LWS_CALLBACK_HTTP:
             //This Code ist Called when no File for Url is Found
-            lws_get_peer_simple(wsi, buf, sizeof(buf));
-            LOG(INFO) << "peer_simple " << buf;
+            /*
+            * In contains the url part after the place the mount was
+            * positioned at, eg, if positioned at "/dyn" and given
+            * "/dyn/mypath", in will contain /mypath
+            */
+		    lws_snprintf(pss->path, sizeof(pss->path), "%s",(const char *)in);
+
+            lws_get_peer_simple(wsi, textBuffer, sizeof(textBuffer));
+            LOG(INFO) << "peer_simple " << textBuffer;
 		    //lwsl_notice("%s: HTTP: connection %s, path %s\n", __func__,	(const char *)buf, pss->path);
 
-            if (lws_hdr_copy(wsi, buf, sizeof(buf), WSI_TOKEN_GET_URI) > 0) {
-                LOG(INFO) << "GET Url " << buf;
-            } else if(lws_hdr_copy(wsi, buf, sizeof(buf), WSI_TOKEN_POST_URI) > 0) {
-                LOG(INFO) << "POST Url " << buf;
-            } else if(lws_hdr_copy(wsi, buf, sizeof(buf), WSI_TOKEN_PATCH_URI) > 0) {
-                LOG(INFO) << "PATCH Url " << buf;                
-            } else if(lws_hdr_copy(wsi, buf, sizeof(buf), WSI_TOKEN_PUT_URI) > 0) {
-                LOG(INFO) << "PUT Url " << buf;
-            } else if(lws_hdr_copy(wsi, buf, sizeof(buf), WSI_TOKEN_DELETE_URI) > 0) {
-                LOG(INFO) << "DELETE Url " << buf;
+            
+            if (lws_hdr_copy(wsi, textBuffer, sizeof(textBuffer), WSI_TOKEN_GET_URI) > 0) {
+                LOG(INFO) << "GET Url " << textBuffer;
+                found = true;
+            } else if(lws_hdr_copy(wsi, textBuffer, sizeof(textBuffer), WSI_TOKEN_POST_URI) > 0) {
+                LOG(INFO) << "POST Url " << textBuffer;
+                found = true;
+            } else if(lws_hdr_copy(wsi, textBuffer, sizeof(textBuffer), WSI_TOKEN_PATCH_URI) > 0) {
+                LOG(INFO) << "PATCH Url " << textBuffer;
+                found = true;                
+            } else if(lws_hdr_copy(wsi, textBuffer, sizeof(textBuffer), WSI_TOKEN_PUT_URI) > 0) {
+                LOG(INFO) << "PUT Url " << textBuffer;
+                found = true;
+            } else if(lws_hdr_copy(wsi, textBuffer, sizeof(textBuffer), WSI_TOKEN_DELETE_URI) > 0) {
+                LOG(INFO) << "DELETE Url " << textBuffer;
+                found = true;
             } else {
                 LOG(WARNING) << "Unkown Url Type";
             }
             break;
+
+        case LWS_CALLBACK_HTTP_WRITEABLE:
+    		if (!pss || pss->response == nullptr)
+			    break;
+            {
+                auto protState = LWS_WRITE_HTTP;
+                if(pss->response->GetNextBlock(pss->responseData)) {
+                    protState = LWS_WRITE_HTTP_FINAL;
+                }
+
+                p += lws_snprintf((char *)p, lws_ptr_diff_size_t(end, p), pss->responseData);
+
+                if (lws_write(wsi, (uint8_t *)start, lws_ptr_diff_size_t(p, start), protState) != lws_ptr_diff(p, start)) {
+                    //Error
+                    return 1;
+                }
+
+                /*
+                * HTTP/1.0 no keepalive: close network connection
+                * HTTP/1.1 or HTTP1.0 + KA: wait / process next transaction
+                * HTTP/2: stream ended, parent connection remains up
+                */
+                if (protState == LWS_WRITE_HTTP_FINAL) {
+                    if (lws_http_transaction_completed(wsi))
+                    return -1;
+                } else
+                    lws_callback_on_writable(wsi);
+
+                return 0;
+            }
         default:
             //Noting todo
             break;
     }
     
+    if(found) {
+        const auto response = HandleResource(wsi, textBuffer);
+        if(response != nullptr)
+        {
+            pss->response = response;
+            if (lws_add_http_common_headers(wsi, HTTP_STATUS_OK, response->GetContentType().c_str(), LWS_ILLEGAL_HTTP_CONTENT_LEN, /* no content len */ &p, end))
+            {
+                return 1;
+            }
+
+            if (lws_finalize_write_http_header(wsi, start, &p, end))
+            {
+			    return 1;
+            }
+
+            //Todo other Things for response Session init
+            //https://github.com/warmcat/libwebsockets/blob/v4.2-stable/minimal-examples/http-server/minimal-http-server-dynamic/minimal-http-server-dynamic.c
+
+            /* write the body separately */
+            lws_callback_on_writable(wsi);
+
+            return 0;
+        }
+    }
+
     return lws_callback_http_dummy(wsi, reason, user, in, len);
 }

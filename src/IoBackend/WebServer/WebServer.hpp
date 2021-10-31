@@ -3,8 +3,10 @@
 #include <libwebsockets.h>
 #include <string>
 #include <thread>
+#include <map>
 #include "../GlobalFunctions.hpp"
 #include "HttpResource.hpp"
+#include "HttpResponse.hpp"
 
 class WebServer
 {
@@ -12,13 +14,15 @@ private:
     GlobalFunctions* _globalFunctions;
     lws_context* _context;
     int _serverPort;
-    std::string _certPath;
+    std::string _certPath;  
     std::string _keyPath;
     std::thread _loopThread;
     bool _run;
+    std::map<const std::string , HttpResource*> _httpResources;
 
     void LogCallBack(int level, const char *line);
     void MainLoop();
+    HttpResponse* HandleResource(struct lws *wsi, const std::string& url);
 public:
     WebServer(GlobalFunctions* globalFunctions);
     ~WebServer();
