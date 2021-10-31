@@ -11,6 +11,10 @@ Python in C++
 https://medium.datadriveninvestor.com/how-to-quickly-embed-python-in-your-c-application-23c19694813
 https://docs.python.org/3/extending/embedding.html
 https://github.com/matusnovak/python-embedded-example-project
+https://stackoverflow.com/questions/68579336/cmake-fail-to-compile-cant-find-python-h-flutter-dartffi
+https://codereview.stackexchange.com/questions/196891/embedding-python-into-c-program
+https://www.codeproject.com/articles/820116/embedding-python-program-in-a-c-cplusplus-code
+https://docs.python.org/3/extending/embedding.html
 
 Multi UART
 https://forum-raspberrypi.de/forum/thread/48521-wie-verwende-ich-zusaetzliche-uart-ports/

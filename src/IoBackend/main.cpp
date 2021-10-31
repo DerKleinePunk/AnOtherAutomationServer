@@ -9,6 +9,7 @@
 #include "resources/TestResource.hpp"
 #include "GlobalFunctions.hpp"
 #include "WebServer/WebServer.hpp"
+#include "PythonRunner/PythonRunner.hpp"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -117,6 +118,9 @@ int main(int argc, char** argv)
         LOG(INFO) << "LipHttp WebServer Running";
     }
 
+    auto runner = new PythonRunner();
+    runner->Init();
+
     if(!ownWebServer->RegisterResource("/dynpage", new TestResource())){
         LOG(ERROR) << "RegisterResource failed";
     }
@@ -134,6 +138,9 @@ int main(int argc, char** argv)
         if(input == "t") {
             ownWebServer->SendWebSocketBroadcast("Hello from Server");
         }
+        if(input == "r") {
+            runner->RunScript("sample.py");
+        }
         std::cout << "Enter q to Stop" << std::endl;
         std::cin >> input;
     }
@@ -142,6 +149,9 @@ int main(int argc, char** argv)
 
     ownWebServer->Deinit();
     delete ownWebServer;
+
+    runner->DeInit();
+    delete runner;
     
     connector->Deinit();
     delete connector;

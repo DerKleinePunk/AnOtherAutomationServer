@@ -15,11 +15,12 @@ endif()
 
 INCLUDE_DIRECTORIES(${LIBHTTPSERVER_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${LIBMOSQUITTO_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(${Python_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(libwebsockets)
 
 add_executable(${project_BIN} ${SRCS} ${easylogging_SRCS} ${common_utils_SRCS})
 
-TARGET_LINK_LIBRARIES(${project_BIN} ${LIBHTTPSERVER_LIBRARIES} ${LIBMOSQUITTO_LIBRARIES} )
+TARGET_LINK_LIBRARIES(${project_BIN} ${LIBHTTPSERVER_LIBRARIES} ${LIBMOSQUITTO_LIBRARIES} ${Python_LIBRARIES})
 TARGET_LINK_LIBRARIES(${project_BIN} websockets)
 TARGET_LINK_LIBRARIES(${project_BIN} "stdc++fs" "uuid")
 
@@ -39,4 +40,10 @@ set(MAINFONTSOURCE "${MAINFOLDER}/src/IoBackend/webpage/scripts/websocket.js")
 add_custom_command(TARGET ${project_BIN} POST_BUILD # Adds a post-build event to MyTest
                     COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
                     "${MAINFONTSOURCE}"      # <--this is in-file
-                    $<TARGET_FILE_DIR:${project_BIN}>/webpage/scripts/websocket.js)   
+                    $<TARGET_FILE_DIR:${project_BIN}>/webpage/scripts/websocket.js)
+                    
+set(MAINFONTSOURCE "${MAINFOLDER}/src/IoBackend/PythonRunner/sample.py")
+add_custom_command(TARGET ${project_BIN} POST_BUILD # Adds a post-build event to MyTest
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
+                    "${MAINFONTSOURCE}"      # <--this is in-file
+                    $<TARGET_FILE_DIR:${project_BIN}>/sample.py)   
