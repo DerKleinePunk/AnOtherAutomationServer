@@ -11,6 +11,11 @@ public:
     HttpResponse(/* args */);
     ~HttpResponse();
 
+    //Getter
     const std::string& GetContentType();
     bool GetNextBlock(char* buffer);
+
+    //Setter
+    void SetContent(const std::string& type, const std::string& content);
+
 };

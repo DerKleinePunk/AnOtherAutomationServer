@@ -1,5 +1,6 @@
 #pragma once
 #include "HttpRequest.hpp"
+#include "HttpResponse.hpp"
 
 class HttpResource
 {
@@ -8,7 +9,7 @@ private:
 public:
     virtual ~HttpResource() = default;
 
-    virtual void Process(HttpRequest& request) = 0;
+    virtual HttpResponse* Process(HttpRequest& request) = 0;
 };
 
 

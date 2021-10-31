@@ -10,6 +10,6 @@ public:
     TestResource(/* args */);
     ~TestResource();
 
-    void Process(HttpRequest& request);
+    HttpResponse* Process(HttpRequest& request);
 };
 

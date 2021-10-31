@@ -1,4 +1,6 @@
 #include "WebSocketProtokoll.hpp"
+#include "WebServer.hpp"
+#include <string>
 
 /* destroys the message when everyone has had a copy of it */
 
@@ -14,16 +16,14 @@ __minimal_destroy_message(void* _msg)
 
 int callback_websocket(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len)
 {
-	struct per_session_data__minimal *pss =
-			(struct per_session_data__minimal *)user;
-	struct per_vhost_data__minimal *vhd =
-			(struct per_vhost_data__minimal *)
-			lws_protocol_vh_priv_get(lws_get_vhost(wsi),
-					lws_get_protocol(wsi));
+	struct per_session_data__minimal *pss = (struct per_session_data__minimal *)user;
+	struct per_vhost_data__minimal *vhd = (struct per_vhost_data__minimal *) lws_protocol_vh_priv_get(lws_get_vhost(wsi), lws_get_protocol(wsi));
 	const struct msg *pmsg;
 	struct msg amsg;
 	char buf[32];
 	int n, m;
+
+	auto* webServer = (WebServer*) lws_context_user(lws_get_context(wsi));
 
 	switch (reason) {
 	case LWS_CALLBACK_PROTOCOL_INIT:
@@ -34,10 +34,11 @@ int callback_websocket(struct lws *wsi, enum lws_callback_reasons reason, void *
 		vhd->protocol = lws_get_protocol(wsi);
 		vhd->vhost = lws_get_vhost(wsi);
 
-		vhd->ring = lws_ring_create(sizeof(struct msg), 8,
-					    __minimal_destroy_message);
-		if (!vhd->ring)
+		vhd->ring = lws_ring_create(sizeof(struct msg), 8, __minimal_destroy_message);
+		if (!vhd->ring){
 			return 1;
+		}
+		webServer->WebSocketInitDone(vhd);
 		break;
 
 	case LWS_CALLBACK_PROTOCOL_DESTROY:
@@ -49,9 +50,11 @@ int callback_websocket(struct lws *wsi, enum lws_callback_reasons reason, void *
 		pss->wsi = wsi;
 		if (lws_hdr_copy(wsi, buf, sizeof(buf), WSI_TOKEN_GET_URI) > 0)
 			pss->publishing = !strcmp(buf, "/publisher");
-		if (!pss->publishing)
+		if (!pss->publishing) {
 			/* add subscribers to the list of live pss held in the vhd */
 			lws_ll_fwd_insert(pss, pss_list, vhd->pss_list);
+			webServer->NewWebSocketClient();
+		}
 		break;
 
 	case LWS_CALLBACK_CLOSED:
@@ -118,6 +121,8 @@ int callback_websocket(struct lws *wsi, enum lws_callback_reasons reason, void *
 			lwsl_user("OOM: dropping\n");
 			break;
 		}
+
+		webServer->WebSocketClientMessage(std::string((char*) in, len));
 
 		memcpy((char *)amsg.payload + LWS_PRE, in, len);
 		if (!lws_ring_insert(vhd->ring, &amsg, 1)) {

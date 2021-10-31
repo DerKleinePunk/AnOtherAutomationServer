@@ -25,3 +25,9 @@ bool HttpResponse::GetNextBlock(char* buffer)
 
     return true;
 }
+
+void HttpResponse::SetContent(const std::string& type, const std::string& content)
+{
+    _contentType = type;
+    _content = content;
+}

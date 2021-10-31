@@ -131,6 +131,9 @@ int main(int argc, char** argv)
     std::cin >> input;
 
     while(input != "q") {
+        if(input == "t") {
+            ownWebServer->SendWebSocketBroadcast("Hello from Server");
+        }
         std::cout << "Enter q to Stop" << std::endl;
         std::cin >> input;
     }

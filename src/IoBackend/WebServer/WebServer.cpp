@@ -9,7 +9,6 @@
 #include "../../common/easylogging/easylogging++.h"
 #include "../../common/utils/commonutils.h"
 #include <functional>
-#include "WebSocketProtokoll.hpp"
 
 // 0 for unlimited
 #define MAX_BUFFER_SIZE 0
@@ -49,6 +48,7 @@ void WebServer::MainLoop()
     while(_run){
         if( lws_service(_context, 0) < 0 ) {
             LOG(ERROR) << "Error polling for socket activity.";
+            break;
         }
     }
     LOG(DEBUG) << "WebServer Main Loop leaved";
@@ -64,8 +64,7 @@ HttpResponse* WebServer::HandleResource(struct lws *wsi, const std::string& url)
     HttpRequest request(wsi);
     try
     {
-        resource->second->Process(request);
-        return new HttpResponse();
+        return resource->second->Process(request);
     }
     catch(const std::exception& exp)
     {
@@ -80,6 +79,7 @@ WebServer::WebServer(GlobalFunctions* globalFunctions)
     _globalFunctions = globalFunctions;
     _serverPort = 8081;
     _run = true;
+    _webSocketVhostData = nullptr;
 }
 
 WebServer::~WebServer()
@@ -203,6 +203,7 @@ void WebServer::Deinit()
     _run = false;
     
     LOG(INFO) << "Waiting Shutdown Webserver";
+    lws_cancel_service(_context);
 
     if(_loopThread.joinable()) {
         _loopThread.join();
@@ -221,6 +222,34 @@ bool WebServer::RegisterResource(const std::string& resourceString, HttpResource
     _httpResources.insert(std::pair<const std::string, HttpResource*>(resourceString, resourceClass));
 
     return true;
+}
+
+void WebServer::SendWebSocketBroadcast(const std::string& message)
+{
+    if(_webSocketVhostData == nullptr) return;
+
+    msg amsg;
+    amsg.len = message.size();
+    amsg.payload = malloc(LWS_PRE + amsg.len); // Now new because protokoll impemention is C
+
+    memcpy((char *)amsg.payload + LWS_PRE, message.c_str(), amsg.len);
+    if (!lws_ring_insert(_webSocketVhostData->ring, &amsg, 1)) {
+        /*__minimal_destroy_message(&amsg);
+        lwsl_user("dropping 2!\n");
+        break;*/
+        free(amsg.payload);
+        LOG(ERROR) << "no free buffer in ring";
+        return;
+    }
+
+     /* let every subscriber know we want to write something
+        * on them as soon as they are ready
+        */
+    lws_start_foreach_llp(struct per_session_data__minimal **,
+                    ppss, _webSocketVhostData->pss_list) {
+        if (!(*ppss)->publishing)
+            lws_callback_on_writable((*ppss)->wsi);
+    } lws_end_foreach_llp(ppss, pss_list);
 }
 
 int WebServer::MainCallBack(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len)
@@ -296,6 +325,14 @@ int WebServer::MainCallBack(struct lws *wsi, enum lws_callback_reasons reason, v
 
                 return 0;
             }
+        case LWS_CALLBACK_CLOSED_CLIENT_HTTP:
+        case LWS_CALLBACK_HTTP_DROP_PROTOCOL:
+            /* called when our wsi user_space is going to be destroyed */
+            if (pss->response != nullptr) {
+                delete pss->response;
+                pss->response = nullptr;
+            }
+		    break;
         default:
             //Noting todo
             break;
@@ -327,4 +364,19 @@ int WebServer::MainCallBack(struct lws *wsi, enum lws_callback_reasons reason, v
     }
 
     return lws_callback_http_dummy(wsi, reason, user, in, len);
+}
+
+void WebServer::NewWebSocketClient()
+{
+    LOG(INFO) << "NewWebSocketClient";
+}
+
+void WebServer::WebSocketClientMessage(const std::string& message)
+{
+    LOG(INFO) << "WebSocketClientMessage " << message;
+}
+
+void WebServer::WebSocketInitDone(per_vhost_data__minimal* webSocketVhostData)
+{
+    _webSocketVhostData = webSocketVhostData;
 }
