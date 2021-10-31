@@ -42,7 +42,7 @@ void WebServer::LogCallBack(int level, const char *line)
 
 void WebServer::MainLoop()
 {
-    el::Helpers::setThreadName("WebServer MainLoop");
+    el::Helpers::setThreadName("WebServer WorkerThread");
     LOG(DEBUG) << "WebServer Main Loop running";
 
     while(_run){

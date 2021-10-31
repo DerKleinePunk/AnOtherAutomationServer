@@ -82,7 +82,7 @@ int main(int argc, char** argv)
         el::Loggers::setDefaultConfigurations(conf, true);
     }
 
-    el::Helpers::setThreadName("Main");
+    el::Helpers::setThreadName("MainThread");
 
     LOG(INFO) << "Starting";
 
