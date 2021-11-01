@@ -3,3 +3,4 @@ python3-pil
 python3-numpy
 libwebsockets-dev
 libmicrohttpd-dev
+libnm-dev
