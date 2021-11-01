@@ -64,8 +64,8 @@ bool PythonRunner::Init()
     _connector = new PythonConnector();
     bool init_signal_handlers = false;
     bool add_program_dir_to_path = true;
-    int argc = 1;
-    const char *const empty_argv[]{".\0"};
+    int argc = 2;
+    const char *const empty_argv[]{"/home/punky/develop/AnOtherAutomationServer/bin/Linux/SimpelIoBackend.bin", "Parameter1"};
 
     if(!_connector->Init()){
         return false;
@@ -76,19 +76,19 @@ bool PythonRunner::Init()
     Py_SetPythonHome(const_cast<wchar_t*>(pythonRunTimeHomeDir.data()));*/
 
     //static std::wstring pythonPrgName = L"/home/punky/develop/AnOtherAutomationServer/bin/Linux/SimpelIoBackend.bin";
-    static std::wstring pythonPrgName = L"/home/punky/develop/AnOtherAutomationServer/bin/Linux";
-    const auto prg = Py_DecodeLocale("/home/punky/develop/AnOtherAutomationServer/bin/Linux/SimpelIoBackend.bin",nullptr);
+    //static std::wstring pythonPrgName = L"/home/punky/develop/AnOtherAutomationServer/bin/Linux";
+    //const auto prg = Py_DecodeLocale("/home/punky/develop/AnOtherAutomationServer/bin/Linux/SimpelIoBackend",nullptr);
     //const auto pythonHome = Py_DecodeLocale("/home/punky/.local/lib/python3.7",nullptr);
     //Py_SetProgramName(prg);
 
     //Py_SetPythonHome(pythonHome);
     Py_InitializeEx(init_signal_handlers ? 1 : 0);
 
-    PyObject *sysmodule = PyImport_ImportModule("sys");
+    /*PyObject *sysmodule = PyImport_ImportModule("sys");
     PyObject *path = PyObject_GetAttrString(sysmodule, "path");
-    PyList_Append(path, PyUnicode_FromString("/home/punky/develop/AnOtherAutomationServer/bin/Linux"));
+    PyList_Append(path, PyUnicode_FromString("/home/punky/develop/AnOtherAutomationServer/bin/Linux"));*/
 
-    /*auto argv_size = static_cast<size_t>(argc);
+    auto argv_size = static_cast<size_t>(argc);
     std::unique_ptr<wchar_t *[]> widened_argv(new wchar_t *[argv_size]);
     std::vector<std::unique_ptr<wchar_t[], wide_char_arg_deleter>> widened_argv_entries;
     widened_argv_entries.reserve(argv_size);
@@ -105,7 +105,7 @@ bool PythonRunner::Init()
 
     auto pysys_argv = widened_argv.get();
 
-    PySys_SetArgvEx(argc, pysys_argv, static_cast<int>(add_program_dir_to_path));*/
+    PySys_SetArgvEx(argc, pysys_argv, static_cast<int>(add_program_dir_to_path));
 
     return true;
 }
