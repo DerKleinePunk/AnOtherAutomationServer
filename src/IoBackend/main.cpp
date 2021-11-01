@@ -2,6 +2,7 @@
 #include <iostream>
 #include "../common/easylogging/easylogging++.h"
 #include "../common/utils/commonutils.h"
+#include "../common/utils/CommandLineArgs.h"
 #include "Config.hpp"
 #include "Mqtt/MqttConnector.h"
 #include "resources/MqttResource.h"
@@ -93,6 +94,9 @@ int main(int argc, char** argv)
 
     el::Helpers::setThreadName("MainThread");
 
+    utils::CommandLineArgs commandLineArgs;
+    commandLineArgs.Pharse(argc, argv);
+
     LOG(INFO) << "Starting";
 
     Config* config = new Config();
@@ -126,7 +130,7 @@ int main(int argc, char** argv)
         LOG(INFO) << "LipHttp WebServer Running";
     }
 
-    auto runner = new PythonRunner();
+    auto runner = new PythonRunner(commandLineArgs.GetBasePath() + "/SimpelIoBackend.bin");
     runner->Init();
 
     if(!ownWebServer->RegisterResource("/dynpage", new TestResource())){

@@ -53,9 +53,10 @@ void PythonRunner::PrintTotalRefCount()
 #endif
 }
 
-PythonRunner::PythonRunner(/* args */)
+PythonRunner::PythonRunner(const std::string& appName)
 {
     el::Loggers::getLogger(ELPP_DEFAULT_LOGGER);
+    _appName = appName;
 }
 
 PythonRunner::~PythonRunner()
@@ -76,7 +77,7 @@ bool PythonRunner::Init()
 
     //First Argument must be the Calling becase it is path to Find the local scripts
     int argc = 2;
-    const char *const empty_argv[]{"/home/punky/develop/AnOtherAutomationServer/bin/Linux/SimpelIoBackend.bin", "Parameter1"};
+    const char *const empty_argv[]{_appName.c_str(), "Parameter1"};
 
     if(!_connector->Init()){
         return false;

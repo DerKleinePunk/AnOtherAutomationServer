@@ -7,10 +7,10 @@ class PythonRunner
 {
 private:
     PythonConnector* _connector;
-
+    std::string _appName;
     void PrintTotalRefCount();
 public:
-    PythonRunner(/* args */);
+    PythonRunner(const std::string& appName);
     ~PythonRunner();
 
     bool Init();
