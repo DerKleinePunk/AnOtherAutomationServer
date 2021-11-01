@@ -71,6 +71,13 @@ void PreRollOutCallback(const char* fullPath, std::size_t s)
     rename(fullPath, newPath);
 }
 
+void WriteFunktionText()
+{
+    std::cout << "q Exit" << std::endl;
+    std::cout << "t send WebSocket Broadcast" << std::endl;
+    std::cout << "r run sample.py" << std::endl;
+}
+
 int main(int argc, char** argv)
 {
     std::cout << "Starting Simple IO Backend Server" << std::endl;
@@ -129,7 +136,7 @@ int main(int argc, char** argv)
         LOG(INFO) << "Own WebServer Running";
     }
 
-    std::cout << "Enter q to Stop" << std::endl;
+    WriteFunktionText();
 
     std::string input;
     std::cin >> input;
@@ -138,10 +145,12 @@ int main(int argc, char** argv)
         if(input == "t") {
             ownWebServer->SendWebSocketBroadcast("Hello from Server");
         }
-        if(input == "r") {
-            runner->RunScript("sample.py");
+        else if(input == "r") {
+            runner->RunScript("sample");
+        } else {
+            std::cout << input << " command not found" << std::endl;
         }
-        std::cout << "Enter q to Stop" << std::endl;
+        WriteFunktionText();
         std::cin >> input;
     }
     

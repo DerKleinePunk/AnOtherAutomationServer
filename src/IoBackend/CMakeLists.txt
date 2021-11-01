@@ -20,9 +20,10 @@ INCLUDE_DIRECTORIES(libwebsockets)
 
 add_executable(${project_BIN} ${SRCS} ${easylogging_SRCS} ${common_utils_SRCS})
 
-TARGET_LINK_LIBRARIES(${project_BIN} ${LIBHTTPSERVER_LIBRARIES} ${LIBMOSQUITTO_LIBRARIES} ${Python_LIBRARIES})
-TARGET_LINK_LIBRARIES(${project_BIN} websockets)
-TARGET_LINK_LIBRARIES(${project_BIN} "stdc++fs" "uuid")
+TARGET_LINK_LIBRARIES(${project_BIN} PRIVATE ${Python_LIBRARIES})
+TARGET_LINK_LIBRARIES(${project_BIN} PRIVATE ${LIBHTTPSERVER_LIBRARIES} ${LIBMOSQUITTO_LIBRARIES} )
+TARGET_LINK_LIBRARIES(${project_BIN} PRIVATE websockets)
+TARGET_LINK_LIBRARIES(${project_BIN} PRIVATE "stdc++fs" "uuid")
 
 set(MAINFONTSOURCE "${MAINFOLDER}/src/IoBackend/loggerIoBackend.conf")
 add_custom_command(TARGET ${project_BIN} POST_BUILD # Adds a post-build event to MyTest
