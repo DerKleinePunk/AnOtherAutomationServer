@@ -76,6 +76,7 @@ void WriteFunktionText()
     std::cout << "q Exit" << std::endl;
     std::cout << "t send WebSocket Broadcast" << std::endl;
     std::cout << "r run sample.py" << std::endl;
+    std::cout << "r1 run sample.py Function simpleFunc" << std::endl;
 }
 
 int main(int argc, char** argv)
@@ -144,9 +145,10 @@ int main(int argc, char** argv)
     while(input != "q") {
         if(input == "t") {
             ownWebServer->SendWebSocketBroadcast("Hello from Server");
-        }
-        else if(input == "r") {
+        } else if(input == "r") {
             runner->RunScript("sample");
+        } else if(input == "r1") {
+            runner->RunScript("sample", "simpleFunc");
         } else {
             std::cout << input << " command not found" << std::endl;
         }

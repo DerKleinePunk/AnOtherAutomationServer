@@ -44,6 +44,15 @@ inline wchar_t *widen_chars(const char *safe_arg) {
 
 //End Stolen
 
+void PythonRunner::PrintTotalRefCount()
+{
+#ifdef Py_REF_DEBUG
+    PyObject* refCount = PyObject_CallObject(PySys_GetObject((char*)"gettotalrefcount"), NULL);
+    std::clog << "total refcount = " << PyInt_AsSsize_t(refCount) << std::endl;
+    Py_DECREF(refCount);
+#endif
+}
+
 PythonRunner::PythonRunner(/* args */)
 {
     el::Loggers::getLogger(ELPP_DEFAULT_LOGGER);
@@ -64,6 +73,8 @@ bool PythonRunner::Init()
     _connector = new PythonConnector();
     bool init_signal_handlers = false;
     bool add_program_dir_to_path = true;
+
+    //First Argument must be the Calling becase it is path to Find the local scripts
     int argc = 2;
     const char *const empty_argv[]{"/home/punky/develop/AnOtherAutomationServer/bin/Linux/SimpelIoBackend.bin", "Parameter1"};
 
@@ -71,22 +82,7 @@ bool PythonRunner::Init()
         return false;
     }
     
-    //setenv("PYTHONPATH",".",1);
-    /*static std::wstring pythonRunTimeHomeDir = L"/usr/lib/python3.7";
-    Py_SetPythonHome(const_cast<wchar_t*>(pythonRunTimeHomeDir.data()));*/
-
-    //static std::wstring pythonPrgName = L"/home/punky/develop/AnOtherAutomationServer/bin/Linux/SimpelIoBackend.bin";
-    //static std::wstring pythonPrgName = L"/home/punky/develop/AnOtherAutomationServer/bin/Linux";
-    //const auto prg = Py_DecodeLocale("/home/punky/develop/AnOtherAutomationServer/bin/Linux/SimpelIoBackend",nullptr);
-    //const auto pythonHome = Py_DecodeLocale("/home/punky/.local/lib/python3.7",nullptr);
-    //Py_SetProgramName(prg);
-
-    //Py_SetPythonHome(pythonHome);
     Py_InitializeEx(init_signal_handlers ? 1 : 0);
-
-    /*PyObject *sysmodule = PyImport_ImportModule("sys");
-    PyObject *path = PyObject_GetAttrString(sysmodule, "path");
-    PyList_Append(path, PyUnicode_FromString("/home/punky/develop/AnOtherAutomationServer/bin/Linux"));*/
 
     auto argv_size = static_cast<size_t>(argc);
     std::unique_ptr<wchar_t *[]> widened_argv(new wchar_t *[argv_size]);
@@ -112,6 +108,8 @@ bool PythonRunner::Init()
 
 void PythonRunner::DeInit()
 {
+    PrintTotalRefCount();
+
     if (Py_FinalizeEx() < 0) {
         LOG(WARNING) << "Py_FinalizeEx Failed";
     }
@@ -134,6 +132,17 @@ bool PythonRunner::RunScript(const std::string& scriptFile, const std::string& f
 
     if(functionToCall.size() > 0) {
         pFunc = PyObject_GetAttrString(pModule, functionToCall.c_str());
+        if (pFunc && PyCallable_Check(pFunc)) {
+            PyObject* pArgs = nullptr;
+
+            //pValue = 
+            PyObject_CallObject(pFunc, pArgs);
+
+        } else {
+            Py_DECREF(pFunc);
+            PyErr_Print();
+        }
+        Py_XDECREF(pFunc);
     }
 
     Py_DECREF(pModule);

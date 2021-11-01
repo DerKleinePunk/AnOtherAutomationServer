@@ -7,6 +7,8 @@ class PythonRunner
 {
 private:
     PythonConnector* _connector;
+
+    void PrintTotalRefCount();
 public:
     PythonRunner(/* args */);
     ~PythonRunner();
