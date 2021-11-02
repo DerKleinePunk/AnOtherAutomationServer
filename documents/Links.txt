@@ -31,6 +31,7 @@ STM32 C++
 https://www.microconsult.de/blog/2018/03/tb_stm32cubemx-c-cpp/
 http://stefanfrings.de/stm32/cube_ide.html
 
-WLAN
+WLAN / NetworkManager
 https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/blob/main/examples/C/glib/get-ap-info-libnm.c
 https://github.com/liugang/NetworkManager/blob/master/wifi-scan.c
+https://github.com/ohwgiles/NetworkManager-f5vpn

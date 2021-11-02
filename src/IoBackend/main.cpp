@@ -11,6 +11,7 @@
 #include "GlobalFunctions.hpp"
 #include "WebServer/WebServer.hpp"
 #include "PythonRunner/PythonRunner.hpp"
+#include "SystemFunktions/NetworkManager.hpp"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -78,6 +79,7 @@ void WriteFunktionText()
     std::cout << "t send WebSocket Broadcast" << std::endl;
     std::cout << "r run sample.py" << std::endl;
     std::cout << "r1 run sample.py Function simpleFunc" << std::endl;
+    std::cout << "s ScanAccessPoints" << std::endl;
 }
 
 int main(int argc, char** argv)
@@ -141,6 +143,8 @@ int main(int argc, char** argv)
         LOG(INFO) << "Own WebServer Running";
     }
 
+    auto networkManager = new NetworkManager();
+
     WriteFunktionText();
 
     std::string input;
@@ -153,6 +157,9 @@ int main(int argc, char** argv)
             runner->RunScript("sample");
         } else if(input == "r1") {
             runner->RunScript("sample", "simpleFunc");
+        } else if(input == "s") {
+            const json result = networkManager->ScanAccessPoints();
+             std::cout << result.dump() << std::endl;
         } else {
             std::cout << input << " command not found" << std::endl;
         }
@@ -161,6 +168,8 @@ int main(int argc, char** argv)
     }
     
     ws.stop();
+
+    delete networkManager;
 
     ownWebServer->Deinit();
     delete ownWebServer;
