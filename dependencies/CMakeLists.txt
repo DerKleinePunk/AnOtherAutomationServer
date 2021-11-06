@@ -8,10 +8,15 @@ FetchContent_Declare(libwebsockets
 message("Fetching libwebsockets...")
 
 set(LWS_WITH_SHARED OFF)
-set(LWS_WITHOUT_TESTAPPS ON)
-set(LWS_WITHOUT_TEST_SERVER ON)
+set(LWS_WITHOUT_TESTAPPS OFF)
+set(LWS_WITHOUT_TEST_SERVER OFF)
 set(LWS_WITHOUT_TEST_SERVER_EXTPOLL ON)
 set(LWS_WITHOUT_TEST_PING ON)
 set(LWS_WITHOUT_TEST_CLIENT ON)
+set(LWS_WITH_HTTP_PROXY ON)
+
+set(LWS_WITH_THREADPOOL ON) # good ?
+set(LWS_WITH_MINIMAL_EXAMPLES ON) # Later Off Build Time
+
 
 FetchContent_MakeAvailable(libwebsockets)

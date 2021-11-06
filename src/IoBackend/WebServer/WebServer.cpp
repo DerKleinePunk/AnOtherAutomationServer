@@ -102,8 +102,28 @@ static int callback_main( struct lws *wsi, enum lws_callback_reasons reason, voi
     return 0;
 }
 
+static const struct lws_http_mount proxymount = {
+	/* .mount_next */		NULL,		/* linked-list "next" */
+	/* .mountpoint */		"/ha/",		/* mountpoint URL */
+	/* .origin */			"localhost:7681/", /* serve from dir */
+	/* .def */			    "index.html",	/* default filename */
+	/* .protocol */			    NULL,
+	/* .cgienv */			    NULL,
+	/* .extra_mimetypes */		NULL,
+	/* .interpret */		    NULL,
+	/* .cgi_timeout */		    0,
+	/* .cache_max_age */		0,
+	/* .auth_mask */		    0,
+	/* .cache_reusable */		0,
+	/* .cache_revalidate */		0,
+	/* .cache_intermediaries */	0,
+	/* .origin_protocol */		LWSMPRO_HTTP,	/* files in a dir */
+	/* .mountpoint_len */		4,		/* char count */
+	/* .basic_auth_login_file */	NULL,
+};
+
 static const struct lws_http_mount basemount = {
-	/* .mount_next */		    NULL,		/* linked-list "next" */
+	/* .mount_next */		    &proxymount,		/* linked-list "next" */
 	/* .mountpoint */		    "/",		/* mountpoint URL */
 	/* .origin */			    "./webpage", /* serve from dir */
 	/* .def */			        "index.html",	/* default filename */
@@ -156,8 +176,9 @@ bool WebServer::Start() {
 
     info.port = _serverPort;
     info.iface = NULL;
-    info.protocols = protocols;
-    info.mounts = &basemount;
+    //info.protocols = protocols;
+    //info.mounts = &basemount;
+    info.mounts = &proxymount;
 
 /*#ifndef LWS_NO_EXTENSIONS
     info.extensions = lws_get_internal_extensions( );
@@ -177,7 +198,7 @@ bool WebServer::Start() {
     info.gid = -1;
     info.uid = -1;
     //info.error_document_404 = "/404.html";
-    info.options = LWS_SERVER_OPTION_HTTP_HEADERS_SECURITY_BEST_PRACTICES_ENFORCE;
+    info.options = LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT | LWS_SERVER_OPTION_HTTP_HEADERS_SECURITY_BEST_PRACTICES_ENFORCE;
     info.user = this;
 
     // keep alive
