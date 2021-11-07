@@ -76,6 +76,8 @@ document.addEventListener("DOMContentLoaded", function() {
 	document.getElementById("b").addEventListener("click", sendmsg);
 	document.getElementById("dataButton").addEventListener("click", loadDoc);
 	document.getElementById("dataButton2").addEventListener("click", updateDoc);
+	document.getElementById("dataButton3").addEventListener("click", updateDocNo);
+	document.getElementById("dataButton4").addEventListener("click", updateDocNoBody);
 
 }, false);
 
@@ -89,7 +91,8 @@ function loadDoc() {
 			document.getElementById("getResponse").innerHTML = "Not Found";
 		}
 	};
-	xhttp.open("GET", "sampleResult", true);
+	xhttp.open("GET", "/api/sampleResult", true);
+	xhttp.setRequestHeader("X-API-KEY", "12345678");
 	xhttp.send();
 }
 
@@ -97,9 +100,45 @@ function updateDoc() {
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
-		document.getElementById("getResponse").innerHTML = this.responseText;
+			document.getElementById("getResponse").innerHTML = this.responseText;
+		}
+		if (this.readyState == 4 && this.status == 201) {
+			document.getElementById("getResponse").innerHTML = this.responseText;
 		}
 	};
-	xhttp.open("POST", "samplePost", true);
+	xhttp.open("POST", "/api/samplePost", true);
+	xhttp.setRequestHeader("X-API-KEY", "12345678");
+	xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+	xhttp.send('{ "param" : "value" }');
+}
+
+function updateDocNo() {
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			document.getElementById("getResponse").innerHTML = this.responseText;
+		}
+		if (this.readyState == 4 && this.status == 401) {
+			document.getElementById("getResponse").innerHTML = "nicht erlaubt";
+		}
+	};
+	xhttp.open("POST", "/api/samplePost", true);
+	xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+	xhttp.send('{ "param" : "value" }');
+}
+
+function updateDocNoBody() {
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			document.getElementById("getResponse").innerHTML = this.responseText;
+		}
+		if (this.readyState == 4 && this.status == 201) {
+			document.getElementById("getResponse").innerHTML = this.responseText;
+		}
+	};
+	xhttp.open("POST", "/api/samplePost", true);
+	xhttp.setRequestHeader("X-API-KEY", "12345678");
+	xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 	xhttp.send();
 }

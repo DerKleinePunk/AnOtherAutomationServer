@@ -35,6 +35,7 @@ namespace utils
 	std::string str_toupper(std::string data);
 	bool FileExists(const std::string &Filename);
 	bool hasEnding(std::string const &fullString, std::string const &ending);
+	bool hasBegining(std::string const& fullString, std::string const& begining);
 	std::string getFileName(std::string const &pathString);
 	std::string exec(const char* cmd, int& resultCode);
 	FILE *MNFmemopen(const void *buffer, size_t size, const char* mode);

@@ -6,6 +6,7 @@ class HttpResponse
 private:
     std::string _contentType;
     std::string _content;
+    unsigned int _code;
 
 public: 
     HttpResponse(/* args */);
@@ -17,5 +18,9 @@ public:
 
     //Setter
     void SetContent(const std::string& type, const std::string& content);
+    void SetCode(unsigned int code);
+
+    //Getter
+    unsigned int GetCode();
 
 };

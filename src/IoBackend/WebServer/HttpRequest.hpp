@@ -11,5 +11,6 @@ public:
     ~HttpRequest();
 
     std::string GetParameter(const std::string& name);
+    std::string GetHeader(const std::string& name);
 };
 

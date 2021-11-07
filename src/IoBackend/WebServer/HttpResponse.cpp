@@ -1,10 +1,11 @@
 #include "HttpResponse.hpp"
-#include "cstring"
+#include <libwebsockets.h>
 
 HttpResponse::HttpResponse(/* args */)
 {
     _contentType = "text/html";
-    _content = "<!DOCTYPE html><html lang=\"de\"><head><meta charset=\"utf-8\"><title>DynPage Simple</title></head><body></body></html>";
+    _content = "<!DOCTYPE html><html lang=\"de\"><head><meta charset=\"utf-8\"><title>empty content</title></head><body></body></html>";
+    _code = HTTP_STATUS_OK;
 }
 
 HttpResponse::~HttpResponse()
@@ -30,4 +31,14 @@ void HttpResponse::SetContent(const std::string& type, const std::string& conten
 {
     _contentType = type;
     _content = content;
+}
+
+void HttpResponse::SetCode(unsigned int code)
+{
+    _code = code;
+}
+
+unsigned int HttpResponse::GetCode() 
+{
+    return _code;
 }

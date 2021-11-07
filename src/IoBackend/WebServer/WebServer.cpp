@@ -22,10 +22,17 @@ struct httpSesssionData {
 
     httpSesssionData() {
         response = nullptr;
+        body = nullptr;
+        bodyLength = 0;
+        method = nullptr;
+        url = nullptr;
     }
-	char path[128];
     char responseData[2048];
     HttpResponse* response;
+    std::string* body;
+    int bodyLength;
+    std::string* method;
+    std::string* url;
 };
 
 
@@ -54,17 +61,31 @@ void WebServer::MainLoop()
     LOG(DEBUG) << "WebServer Main Loop leaved";
 }
 
-HttpResponse* WebServer::HandleResource(struct lws *wsi, const std::string& url)
+HttpResponse* WebServer::HandleResource(struct lws *wsi, const std::string& url, const std::string& method)
 {
-    const auto resource = _httpResources.find(url);
-    if( resource == _httpResources.end()) {
-        return nullptr;
+    HttpResource* resource = nullptr;
+
+    auto resourceIter = _httpResources.find(url);
+    if( resourceIter == _httpResources.end()) {
+        for(auto entry : _httpResources) {
+            if(entry.second.EndWildcard && utils::hasBegining(url, entry.first)) {
+                resource = entry.second.Implementation;
+                LOG(DEBUG) << "Implementation found over begining";
+                break;
+            }
+        }
+        if(resource == nullptr)
+        {
+            return nullptr;
+        }
+    } else {
+        resource = resourceIter->second.Implementation;
     }
 
     HttpRequest request(wsi);
     try
     {
-        return resource->second->Process(request);
+        return resource->Process(request, url, method);
     }
     catch(const std::exception& exp)
     {
@@ -236,11 +257,22 @@ void WebServer::Deinit()
 
 bool WebServer::RegisterResource(const std::string& resourceString, HttpResource* resourceClass)
 {
-    if(_httpResources.find(resourceString) != _httpResources.end()) {
-        return false;
+    auto resourceUrl = resourceString;
+    HttpResourceInfo info;
+
+    if(utils::hasEnding(resourceUrl, "/*"))
+    {
+        resourceUrl = resourceUrl.substr(0, resourceUrl.length() - 2);
+        info.EndWildcard = true;
     }
 
-    _httpResources.insert(std::pair<const std::string, HttpResource*>(resourceString, resourceClass));
+    if(_httpResources.find(resourceUrl) != _httpResources.end()) {
+        return false;
+    }
+    
+    info.Implementation = resourceClass;
+    
+    _httpResources.insert(std::pair<const std::string, HttpResourceInfo>(resourceUrl, info));
 
     return true;
 }
@@ -275,10 +307,13 @@ void WebServer::SendWebSocketBroadcast(const std::string& message)
 
 int WebServer::MainCallBack(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len)
 {
-    auto found = false;
+    auto weHandleIt = false;
+    auto readyToHandle = false;
+
     char textBuffer[512];
+    char textBuffer2[512];
     struct httpSesssionData *pss = (struct httpSesssionData *)user;
-    
+        
     //Todo Understand
     uint8_t buf[LWS_PRE + 2048], *start = &buf[LWS_PRE], *p = start, *end = &buf[sizeof(buf) - LWS_PRE - 1];
 
@@ -289,9 +324,9 @@ int WebServer::MainCallBack(struct lws *wsi, enum lws_callback_reasons reason, v
             * In contains the url part after the place the mount was
             * positioned at, eg, if positioned at "/dyn" and given
             * "/dyn/mypath", in will contain /mypath
+            * lws_snprintf(pss->path, sizeof(pss->path), "%s",(const char *)in);
             */
-		    lws_snprintf(pss->path, sizeof(pss->path), "%s",(const char *)in);
-
+		    
             lws_get_peer_simple(wsi, textBuffer, sizeof(textBuffer));
             LOG(INFO) << "peer_simple " << textBuffer;
 		    //lwsl_notice("%s: HTTP: connection %s, path %s\n", __func__,	(const char *)buf, pss->path);
@@ -299,24 +334,50 @@ int WebServer::MainCallBack(struct lws *wsi, enum lws_callback_reasons reason, v
             
             if (lws_hdr_copy(wsi, textBuffer, sizeof(textBuffer), WSI_TOKEN_GET_URI) > 0) {
                 LOG(INFO) << "GET Url " << textBuffer;
-                found = true;
+                pss->method = new std::string("GET");
+                pss->url = new std::string(textBuffer);
+                weHandleIt = true;
+                readyToHandle = true;
             } else if(lws_hdr_copy(wsi, textBuffer, sizeof(textBuffer), WSI_TOKEN_POST_URI) > 0) {
-                LOG(INFO) << "POST Url " << textBuffer;
-                found = true;
+                if(lws_hdr_copy(wsi, textBuffer2, sizeof(textBuffer2), WSI_TOKEN_HTTP_CONTENT_LENGTH) > 0) {
+                    pss->bodyLength = atoi(textBuffer2);
+                    LOG(INFO) << "POST Url " << textBuffer << " content-length " << textBuffer2;
+                } else {
+                    LOG(INFO) << "POST Url " << textBuffer;
+                }
+                pss->method = new std::string("POST");
+                pss->url = new std::string(textBuffer);
+                weHandleIt = true;
             } else if(lws_hdr_copy(wsi, textBuffer, sizeof(textBuffer), WSI_TOKEN_PATCH_URI) > 0) {
                 LOG(INFO) << "PATCH Url " << textBuffer;
-                found = true;                
+                pss->method = new std::string("PATCH");
+                pss->url = new std::string(textBuffer);
+                weHandleIt = true;                
             } else if(lws_hdr_copy(wsi, textBuffer, sizeof(textBuffer), WSI_TOKEN_PUT_URI) > 0) {
                 LOG(INFO) << "PUT Url " << textBuffer;
-                found = true;
+                pss->method = new std::string("PUT");
+                pss->url = new std::string(textBuffer);
+                weHandleIt = true;
             } else if(lws_hdr_copy(wsi, textBuffer, sizeof(textBuffer), WSI_TOKEN_DELETE_URI) > 0) {
                 LOG(INFO) << "DELETE Url " << textBuffer;
-                found = true;
+                pss->method = new std::string("DELETE");
+                pss->url = new std::string(textBuffer);
+                weHandleIt = true;
             } else {
                 LOG(WARNING) << "Unkown Url Type";
             }
             break;
-
+        case LWS_CALLBACK_HTTP_BODY:
+            weHandleIt = true;
+            if(pss->body == nullptr) {
+                pss->body = new std::string();
+            }
+            pss->body->append((char*)in,len);
+            break;
+        case LWS_CALLBACK_HTTP_BODY_COMPLETION:
+            weHandleIt = true;
+            readyToHandle = true;
+            break;
         case LWS_CALLBACK_HTTP_WRITEABLE:
     		if (!pss || pss->response == nullptr)
 			    break;
@@ -353,43 +414,73 @@ int WebServer::MainCallBack(struct lws *wsi, enum lws_callback_reasons reason, v
                 delete pss->response;
                 pss->response = nullptr;
             }
+            if (pss->body != nullptr) {
+                delete pss->body;
+                pss->body = nullptr;
+            }
+            if(pss->method != nullptr) {
+                delete pss->method;
+                pss->method = nullptr;
+            }
+            if(pss->url != nullptr) {
+                delete pss->method;
+                pss->url = nullptr;
+            }
 		    break;
         default:
             //Noting todo
             break;
     }
     
-    if(found) {
-        const auto response = HandleResource(wsi, textBuffer);
-        if(response != nullptr)
-        {
-            pss->response = response;
-            if (lws_add_http_common_headers(wsi, HTTP_STATUS_OK, response->GetContentType().c_str(), LWS_ILLEGAL_HTTP_CONTENT_LEN, /* no content len */ &p, end))
+    if(weHandleIt) {
+        if(readyToHandle) {
+            const auto response = HandleResource(wsi, (*pss->url), (*pss->method));
+            if(response != nullptr)
             {
-                return 1;
+                pss->response = response;
+                if (lws_add_http_common_headers(wsi, response->GetCode(), response->GetContentType().c_str(), LWS_ILLEGAL_HTTP_CONTENT_LEN, /* no content len */ &p, end))
+                {
+                    return 1;
+                }
+
+                if (lws_finalize_write_http_header(wsi, start, &p, end))
+                {
+                    return 1;
+                }
+
+                //Todo other Things for response Session init
+                //https://github.com/warmcat/libwebsockets/blob/v4.2-stable/minimal-examples/http-server/minimal-http-server-dynamic/minimal-http-server-dynamic.c
+
+                /* write the body separately */
+                lws_callback_on_writable(wsi);
+
+                return 0;
+            } else {
+                
+                if (lws_add_http_common_headers(wsi, HTTP_STATUS_INTERNAL_SERVER_ERROR, response->GetContentType().c_str(), 0, &p, end))
+                {
+                    return 1;
+                }
+                
+                if (lws_finalize_write_http_header(wsi, start, &p, end))
+                {
+                    return 1;
+                }
+
+                lws_callback_on_writable(wsi);
+
+                return 0;
             }
-
-            if (lws_finalize_write_http_header(wsi, start, &p, end))
-            {
-			    return 1;
-            }
-
-            //Todo other Things for response Session init
-            //https://github.com/warmcat/libwebsockets/blob/v4.2-stable/minimal-examples/http-server/minimal-http-server-dynamic/minimal-http-server-dynamic.c
-
-            /* write the body separately */
-            lws_callback_on_writable(wsi);
-
-            return 0;
         }
+        return 0;
     }
 
     return lws_callback_http_dummy(wsi, reason, user, in, len);
 }
 
-void WebServer::NewWebSocketClient()
+void WebServer::NewWebSocketClient(bool consumer)
 {
-    LOG(INFO) << "NewWebSocketClient";
+    LOG(INFO) << "NewWebSocketClient " << consumer;
 }
 
 void WebServer::WebSocketClientMessage(const std::string& message)
@@ -400,4 +491,9 @@ void WebServer::WebSocketClientMessage(const std::string& message)
 void WebServer::WebSocketInitDone(per_vhost_data__minimal* webSocketVhostData)
 {
     _webSocketVhostData = webSocketVhostData;
+}
+
+void WebServer::RemoveWebSocketClient(bool consumer)
+{
+    LOG(INFO) << "RemoveWebSocketClient " << consumer;
 }

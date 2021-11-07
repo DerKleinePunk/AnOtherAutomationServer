@@ -2,13 +2,13 @@
 #include "../WebServer/HttpRequest.hpp"
 #include "../WebServer/HttpResource.hpp"
 
-class TestResource : public HttpResource
+class ApiResource : public HttpResource
 {
 private:
     /* data */
 public:
-    TestResource(/* args */);
-    ~TestResource();
+    ApiResource(/* args */);
+    ~ApiResource();
 
     HttpResponse* Process(HttpRequest& request, const std::string& url, const std::string& method);
 };

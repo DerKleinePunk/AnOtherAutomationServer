@@ -14,7 +14,7 @@ public:
     ~PythonRunner();
 
     bool Init();
-    void DeInit();
+    void Deinit();
 
     bool RunScript(const std::string& scriptFile, const std::string& functionToCall = "");
 };

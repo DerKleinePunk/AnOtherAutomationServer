@@ -53,14 +53,15 @@ int callback_websocket(struct lws *wsi, enum lws_callback_reasons reason, void *
 		if (!pss->publishing) {
 			/* add subscribers to the list of live pss held in the vhd */
 			lws_ll_fwd_insert(pss, pss_list, vhd->pss_list);
-			webServer->NewWebSocketClient();
 		}
+		webServer->NewWebSocketClient(!pss->publishing);
 		break;
 
 	case LWS_CALLBACK_CLOSED:
 		/* remove our closing pss from the list of live pss */
 		lws_ll_fwd_remove(struct per_session_data__minimal, pss_list,
 				  pss, vhd->pss_list);
+		webServer->RemoveWebSocketClient(!pss->publishing);
 		break;
 
 	case LWS_CALLBACK_SERVER_WRITEABLE:

@@ -8,10 +8,12 @@
 #include "resources/MqttResource.h"
 #include "resources/HtmlPageResource.hpp"
 #include "resources/TestResource.hpp"
+#include "resources/ApiResource.hpp"
 #include "GlobalFunctions.hpp"
 #include "WebServer/WebServer.hpp"
 #include "PythonRunner/PythonRunner.hpp"
 #include "SystemFunktions/NetworkManager.hpp"
+#include "ServiceEvents/ServiceEventManager.hpp"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -139,11 +141,18 @@ int main(int argc, char** argv)
         LOG(ERROR) << "RegisterResource failed";
     }
 
+    if(!ownWebServer->RegisterResource("/api/*", new ApiResource())){
+        LOG(ERROR) << "RegisterResource failed";
+    }
+
     if(ownWebServer->Start()) {
         LOG(INFO) << "Own WebServer Running";
     }
 
     auto networkManager = new NetworkManager();
+    auto eventManager = new ServiceEventManager();
+
+    eventManager->Init();
 
     WriteFunktionText();
 
@@ -169,12 +178,15 @@ int main(int argc, char** argv)
     
     ws.stop();
 
+    eventManager->Deinit();
+    delete eventManager;
+
     delete networkManager;
 
     ownWebServer->Deinit();
     delete ownWebServer;
 
-    runner->DeInit();
+    runner->Deinit();
     delete runner;
     
     connector->Deinit();
