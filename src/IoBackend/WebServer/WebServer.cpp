@@ -104,7 +104,7 @@ static int callback_main( struct lws *wsi, enum lws_callback_reasons reason, voi
 
 static const struct lws_http_mount proxymount = {
 	/* .mount_next */		NULL,		/* linked-list "next" */
-	/* .mountpoint */		"/ha/",		/* mountpoint URL */
+	/* .mountpoint */		"/ha",		/* mountpoint URL */
 	/* .origin */			"localhost:7681/", /* serve from dir */
 	/* .def */			    "index.html",	/* default filename */
 	/* .protocol */			    NULL,
@@ -118,7 +118,7 @@ static const struct lws_http_mount proxymount = {
 	/* .cache_revalidate */		0,
 	/* .cache_intermediaries */	0,
 	/* .origin_protocol */		LWSMPRO_HTTP,	/* files in a dir */
-	/* .mountpoint_len */		4,		/* char count */
+	/* .mountpoint_len */		3,		/* char count */
 	/* .basic_auth_login_file */	NULL,
 };
 
@@ -176,9 +176,9 @@ bool WebServer::Start() {
 
     info.port = _serverPort;
     info.iface = NULL;
-    //info.protocols = protocols;
-    //info.mounts = &basemount;
-    info.mounts = &proxymount;
+    info.protocols = protocols;
+    info.mounts = &basemount;
+    //info.mounts = &proxymount;
 
 /*#ifndef LWS_NO_EXTENSIONS
     info.extensions = lws_get_internal_extensions( );
@@ -186,8 +186,8 @@ bool WebServer::Start() {
     if( !_certPath.empty( ) && !_keyPath.empty( ) )
     {
         LOG(DEBUG) << "Using SSL certPath=" + _certPath + ". keyPath=" + _keyPath + ".";
-        info.ssl_cert_filepath        = _certPath.c_str( );
-        info.ssl_private_key_filepath = _keyPath.c_str( );
+        info.ssl_cert_filepath        = _certPath.c_str();
+        info.ssl_private_key_filepath = _keyPath.c_str();
     }
     else
     {
