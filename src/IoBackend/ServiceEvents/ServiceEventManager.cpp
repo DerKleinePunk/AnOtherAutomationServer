@@ -25,5 +25,10 @@ bool ServiceEventManager::Init()
     
 void ServiceEventManager::Deinit()
 {
-    
+
+}
+
+void ServiceEventManager::FireNewEvent(const std::string& name, const std::string& parameter)
+{
+
 }

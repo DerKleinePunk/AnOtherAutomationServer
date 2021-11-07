@@ -9,9 +9,10 @@
 #include "../common/utils/commonutils.h"
 #include "GlobalFunctions.hpp"
 
-GlobalFunctions::GlobalFunctions(Config* config)
+GlobalFunctions::GlobalFunctions(Config* config, ServiceEventManager* serviceEventManager)
 {
     _config = config;
+    _serviceEventManager = serviceEventManager;
 }
 
 GlobalFunctions::~GlobalFunctions()
@@ -41,4 +42,9 @@ const std::string GlobalFunctions::GetContentTypeFromFileName(const std::string&
 uint16_t GlobalFunctions::GetServerPort() const
 {
     return _config->GetServerPort();
+}
+
+void GlobalFunctions::FireNewEvent(const std::string& name, const std::string& parameter)
+{
+    _serviceEventManager->FireNewEvent(name, parameter); 
 }

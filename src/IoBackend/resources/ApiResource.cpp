@@ -9,9 +9,10 @@
 #include "../../common/easylogging/easylogging++.h"
 #include "../../common/utils/commonutils.h"
 
-ApiResource::ApiResource(/* args */)
+ApiResource::ApiResource(GlobalFunctions* globalFunctions)
 {
     el::Loggers::getLogger(ELPP_DEFAULT_LOGGER);
+    _globalFunctions = globalFunctions;
 }
 
 ApiResource::~ApiResource()
@@ -26,7 +27,7 @@ HttpResponse* ApiResource::Process(HttpRequest& request, const std::string& url,
 
     LOG(DEBUG) << "Api Call Get with " << arg << " apiKey " << apiKey;
 
-    if(apiKey != "12345678") 
+    if(!_globalFunctions->IsApiKeyOk(apiKey)) 
     {
         result->SetContent("application/json", "{\"error\" : \"UNAUTHORIZED\"}");
         result->SetCode(HTTP_STATUS_UNAUTHORIZED);

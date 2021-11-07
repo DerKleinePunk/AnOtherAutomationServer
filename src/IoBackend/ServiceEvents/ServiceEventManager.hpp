@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 class ServiceEventManager
 {
@@ -10,4 +11,6 @@ public:
 
     bool Init();
     void Deinit();
+
+    void FireNewEvent(const std::string& name, const std::string& parameter);
 };

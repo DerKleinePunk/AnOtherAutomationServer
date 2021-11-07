@@ -71,9 +71,13 @@ int main(int argc, char** argv)
     LOG(INFO) << "Starting";
 
     Config* config = new Config();
-
     config->Load();
-    GlobalFunctions globalFunctions(config);
+
+    auto networkManager = new NetworkManager();
+    auto eventManager = new ServiceEventManager();
+    eventManager->Init();
+    
+    GlobalFunctions globalFunctions(config, eventManager);
 
     const auto ownWebServer = new WebServer(&globalFunctions);
 
@@ -91,18 +95,13 @@ int main(int argc, char** argv)
         LOG(ERROR) << "RegisterResource failed";
     }
 
-    if(!ownWebServer->RegisterResource("/api/*", new ApiResource())){
+    if(!ownWebServer->RegisterResource("/api/*", new ApiResource(&globalFunctions))){
         LOG(ERROR) << "RegisterResource failed";
     }
 
     if(ownWebServer->Start()) {
         LOG(INFO) << "Own WebServer Running";
     }
-
-    auto networkManager = new NetworkManager();
-    auto eventManager = new ServiceEventManager();
-
-    eventManager->Init();
 
     WriteFunktionText();
 
