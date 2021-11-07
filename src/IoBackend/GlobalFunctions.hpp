@@ -12,5 +12,6 @@ public:
 
     bool IsApiKeyOk(const std::string& value);
     const std::string GetContentTypeFromFileName(const std::string& fileName) const;
+    uint16_t GetServerPort() const;
 };
 

@@ -10,10 +10,13 @@
 #include "../../common/easylogging/easylogging++.h"
 
 
-HttpRequest::HttpRequest(struct lws *wsi)
+HttpRequest::HttpRequest(struct lws *wsi, const std::string* body)
 {
     el::Loggers::getLogger(ELPP_DEFAULT_LOGGER);
     _wsi = wsi;
+    if(body != nullptr) {
+        _body = std::string(*body);
+    }
 }
 
 HttpRequest::~HttpRequest()
@@ -58,4 +61,9 @@ std::string HttpRequest::GetHeader(const std::string& name)
         LOG(WARNING) << nameIntern << " header not found";
     }
     return result;
+}
+
+std::string HttpRequest::GetBody() const
+{
+    return _body;
 }

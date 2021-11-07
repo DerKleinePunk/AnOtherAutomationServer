@@ -44,6 +44,7 @@ HttpResponse* ApiResource::Process(HttpRequest& request, const std::string& url,
 
     if(method == "POST")
     {
+        LOG(DEBUG) << "Body " << request.GetBody();
         result->SetCode(201);
     }
 

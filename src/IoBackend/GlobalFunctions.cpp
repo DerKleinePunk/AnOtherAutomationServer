@@ -37,3 +37,8 @@ const std::string GlobalFunctions::GetContentTypeFromFileName(const std::string&
 
     return "text/plain";
 }
+
+uint16_t GlobalFunctions::GetServerPort() const
+{
+    return _config->GetServerPort();
+}

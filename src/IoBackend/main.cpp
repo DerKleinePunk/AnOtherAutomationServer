@@ -5,8 +5,6 @@
 #include "../common/utils/CommandLineArgs.h"
 #include "Config.hpp"
 #include "Mqtt/MqttConnector.h"
-#include "resources/MqttResource.h"
-#include "resources/HtmlPageResource.hpp"
 #include "resources/TestResource.hpp"
 #include "resources/ApiResource.hpp"
 #include "GlobalFunctions.hpp"
@@ -16,37 +14,6 @@
 #include "ServiceEvents/ServiceEventManager.hpp"
 
 INITIALIZE_EASYLOGGINGPP
-
-void custom_access_log(const std::string& url)
-{
-    LOG(INFO) << "ACCESSING: " << url;
-}
-
-void custom_error_log(const std::string& url)
-{
-    LOG(ERROR) << "ERROR: " << url;
-}
-
-const std::shared_ptr<httpserver::http_response> not_found_custom(const httpserver::http_request& req) {
-
-    const auto headers = req.get_headers();
-    for(auto const& header : headers)
-    {
-        LOG(DEBUG) << header.first << " : " << header.second;
-    }
-    
-    if(req.get_path() == "/" && req.get_header("Accept").find("text/html") != std::string::npos)
-    {
-        const auto responce = new httpserver::string_response("See Other", 303, "text/plain");
-        responce->with_header("Location", "ui/index.html");
-        return std::shared_ptr<httpserver::string_response>(responce);
-    }
-    return std::shared_ptr<httpserver::string_response>(new httpserver::string_response("Not found custom", 404, "text/plain"));
-}
-
-const std::shared_ptr<httpserver::http_response> not_allowed_custom(const httpserver::http_request& req) {
-    return std::shared_ptr<httpserver::string_response>(new httpserver::string_response("Not allowed custom", 405, "text/plain"));
-}
 
 void PreRollOutCallback(const char* fullPath, std::size_t s)
 {
@@ -110,30 +77,13 @@ int main(int argc, char** argv)
 
     const auto ownWebServer = new WebServer(&globalFunctions);
 
-    httpserver::webserver ws = httpserver::create_webserver(config->GetServerPort())
-                               .log_access(custom_access_log)
-                               .log_error(custom_error_log)
-                               .not_found_resource(not_found_custom)
-                               .method_not_allowed_resource(not_allowed_custom)
-                               .debug();
-
     const auto connector = new MqttConnector(config);
     if(!connector->Init()) {
         LOG(ERROR) << "Mqtt Connector starting Failed";
     } else {
         LOG(INFO) << "Mqtt Connecting";
     }
-
-    MqttResource mqttResource(&globalFunctions);
-    ws.register_resource("/mqtt/{arg1}", &mqttResource);
-
-    HtmlPageResource htmlPageResource(&globalFunctions);
-    ws.register_resource("/ui/{arg1}", &htmlPageResource);
-
-    if(ws.start(false)) {
-        LOG(INFO) << "LipHttp WebServer Running";
-    }
-
+   
     auto runner = new PythonRunner(commandLineArgs.GetBasePath() + "/SimpelIoBackend.bin");
     runner->Init();
 
@@ -175,8 +125,6 @@ int main(int argc, char** argv)
         WriteFunktionText();
         std::cin >> input;
     }
-    
-    ws.stop();
 
     eventManager->Deinit();
     delete eventManager;

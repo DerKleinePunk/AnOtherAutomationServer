@@ -61,7 +61,7 @@ void WebServer::MainLoop()
     LOG(DEBUG) << "WebServer Main Loop leaved";
 }
 
-HttpResponse* WebServer::HandleResource(struct lws *wsi, const std::string& url, const std::string& method)
+HttpResponse* WebServer::HandleResource(struct lws *wsi, const std::string& url, const std::string& method, const std::string* body)
 {
     HttpResource* resource = nullptr;
 
@@ -82,7 +82,7 @@ HttpResponse* WebServer::HandleResource(struct lws *wsi, const std::string& url,
         resource = resourceIter->second.Implementation;
     }
 
-    HttpRequest request(wsi);
+    HttpRequest request(wsi, body);
     try
     {
         return resource->Process(request, url, method);
@@ -98,7 +98,7 @@ WebServer::WebServer(GlobalFunctions* globalFunctions)
 {
     el::Loggers::getLogger(ELPP_DEFAULT_LOGGER);
     _globalFunctions = globalFunctions;
-    _serverPort = 8081;
+    _serverPort = _globalFunctions->GetServerPort();
     _run = true;
     _webSocketVhostData = nullptr;
 }
@@ -434,7 +434,7 @@ int WebServer::MainCallBack(struct lws *wsi, enum lws_callback_reasons reason, v
     
     if(weHandleIt) {
         if(readyToHandle) {
-            const auto response = HandleResource(wsi, (*pss->url), (*pss->method));
+            const auto response = HandleResource(wsi, (*pss->url), (*pss->method), pss->body);
             if(response != nullptr)
             {
                 pss->response = response;
@@ -456,8 +456,8 @@ int WebServer::MainCallBack(struct lws *wsi, enum lws_callback_reasons reason, v
 
                 return 0;
             } else {
-                
-                if (lws_add_http_common_headers(wsi, HTTP_STATUS_INTERNAL_SERVER_ERROR, response->GetContentType().c_str(), 0, &p, end))
+                //Todo find way HTTP_STATUS_INTERNAL_SERVER_ERROR or HTTP_STATUS_NOT_FOUND
+                if (lws_add_http_common_headers(wsi, HTTP_STATUS_INTERNAL_SERVER_ERROR, "text/html", 0, &p, end))
                 {
                     return 1;
                 }
