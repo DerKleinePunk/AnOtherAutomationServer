@@ -9,7 +9,8 @@ private:
 public:
     virtual ~HttpResource() = default;
 
-    virtual HttpResponse* Process(HttpRequest& request) = 0;
+    virtual HttpResponse* Process(HttpRequest& request, const std::string& url, const std::string& method) = 0;
+    
 };
 
 

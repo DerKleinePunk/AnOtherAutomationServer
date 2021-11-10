@@ -1,14 +1,15 @@
 #pragma once
 #include "../WebServer/HttpRequest.hpp"
 #include "../WebServer/HttpResource.hpp"
+#include "../GlobalFunctions.hpp"
 
-class TestResource : public HttpResource
+class ApiResource : public HttpResource
 {
 private:
-    /* data */
+    GlobalFunctions* _globalFunctions;
 public:
-    TestResource(/* args */);
-    ~TestResource();
+    ApiResource(GlobalFunctions* globalFunctions);
+    ~ApiResource();
 
     HttpResponse* Process(HttpRequest& request, const std::string& url, const std::string& method);
 };

@@ -97,6 +97,17 @@ bool hasEnding(std::string const& fullString, std::string const& ending)
     }
 }
 
+bool hasBegining(std::string const& fullString, std::string const& begining)
+{
+    if(fullString.length() >= begining.length()) {
+        auto fullStringLow = str_tolower(fullString);
+        auto endingLow = str_tolower(begining);
+        return 0 == fullStringLow.compare(0, endingLow.length(), endingLow);
+    } else {
+        return false;
+    }
+}
+
 std::string getFileName(const std::string& pathString)
 {
     auto const pos = pathString.find_last_of(DIRCHAR);

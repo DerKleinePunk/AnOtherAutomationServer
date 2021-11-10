@@ -39,6 +39,7 @@ void my_connect_callback(struct mosquitto* mosq, void* userdata, int result)
 
 void my_message_callback(struct mosquitto* mosq, void* userdata, const struct mosquitto_message* message)
 {
+     el::Helpers::setThreadName("MqttConnector WorkerThread");
     const auto connector = (MqttConnector*)userdata;
     connector->OnMessage(message);
 }

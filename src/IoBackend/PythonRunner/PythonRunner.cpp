@@ -107,7 +107,7 @@ bool PythonRunner::Init()
     return true;
 }
 
-void PythonRunner::DeInit()
+void PythonRunner::Deinit()
 {
     PrintTotalRefCount();
 
