@@ -7,6 +7,11 @@ FetchContent_Declare(libwebsockets
 
 message("Fetching libwebsockets...")
 
+# option() honor variables
+if (POLICY CMP0077)
+  cmake_policy(SET CMP0077 NEW)
+endif (POLICY CMP0077)
+
 set(LWS_WITH_SHARED OFF)
 set(LWS_WITHOUT_TESTAPPS OFF)
 set(LWS_WITHOUT_TEST_SERVER OFF)
@@ -19,5 +24,6 @@ set(LWS_WITH_ACCESS_LOG ON)
 set(LWS_WITH_THREADPOOL ON) # good ?
 set(LWS_WITH_MINIMAL_EXAMPLES ON) # Later Off Build Time
 
+set(PROVIDE_UNINSTALL_TARGET OFF CACHE INTERNAL "" FORCE)
 
 FetchContent_MakeAvailable(libwebsockets)
