@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <thread>
 #include "../../common/utils/waitingqueue.h"
 
 typedef std::function<void(const std::string& name, const std::string& parameter)> EventCallbackFunction;

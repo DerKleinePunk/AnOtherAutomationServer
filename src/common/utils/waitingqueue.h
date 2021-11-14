@@ -57,7 +57,7 @@ public:
 	bool tryRemove(T& item, std::chrono::milliseconds duration) {
 		std::unique_lock<std::mutex> lock(_mutex);
 		if (_queue.empty()) {
-			if(!_singnal.wait_for(lock, duration, [this] { return !_queue->empty(); })) {
+			if(!_singnal.wait_for(lock, duration, [this] { return !_queue.empty(); })) {
 				return false;
 			}
 		}
