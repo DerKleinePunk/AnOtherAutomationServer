@@ -47,3 +47,14 @@ https://code.visualstudio.com/docs/typescript/typescript-tutorial
 
 Windows
 https://github.com/microsoft/vcpkg/blob/master/docs/users/integration.md#cmake-integration
+
+Infos Verarbeiten ggf einbauen
+https://www.nordlandcamper.de/multimedia-im-wohnwagen/raspberry-pi-als-multimedia-zentrale-im-wohnwagen/
+https://github.com/XavierBerger/RPi-Monitor
+
+Remote DBUS
+https://github.com/alban/dbus-daemon-proxy
+https://stackoverflow.com/questions/10158684/connecting-to-dbus-over-tcp/13275973#13275973
+
+HA
+https://www.home-assistant.io/integrations/tcp#binary-sensor
