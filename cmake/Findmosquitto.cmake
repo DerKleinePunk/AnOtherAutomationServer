@@ -1,0 +1,32 @@
+# - Find MOSQUITTO
+
+if(MOSQUITTO_INCLUDE_DIRS AND MOSQUITTO_LIBRARIES)
+    set((MOSQUITTO_FOUND TRUE)
+
+else(MOSQUITTO_INCLUDE_DIRS AND MOSQUITTO_LIBRARIES)
+    find_path(MOSQUITTO_INCLUDE_DIRS mosquitto
+      /usr/include
+      /usr/include/mosquitto
+      /usr/local/include/
+      /usr/local/include/mosquitto
+      )
+
+  find_library(MOSQUITTO_LIBRARIES NAMES mosquitto
+      PATHS
+      /usr/lib
+      /usr/local/lib
+      /opt/local/lib
+      )
+
+  if(MOSQUITTO_INCLUDE_DIRS AND MOSQUITTO_LIBRARIES)
+    set(MOSQUITTO_FOUND TRUE)
+    message(STATUS "Found MOSQUITTO: ${MOSQUITTO_LIBRARIES}, ${MOSQUITTO_LIBRARIES}")
+  else(MOSQUITTO_INCLUDE_DIRS AND MOSQUITTO_LIBRARIES)
+    set(MOSQUITTO_FOUND FALSE)
+    message(STATUS "MOSQUITTO not found.")
+  endif(MOSQUITTO_INCLUDE_DIRS AND MOSQUITTO_LIBRARIES)
+
+  mark_as_advanced(MOSQUITTO_INCLUDE_DIRS MOSQUITTO_LIBRARIES)
+
+endif(MOSQUITTO_INCLUDE_DIRS AND MOSQUITTO_LIBRARIES)
+    

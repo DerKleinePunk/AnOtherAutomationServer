@@ -48,7 +48,7 @@ void PythonRunner::PrintTotalRefCount()
 {
 #ifdef Py_REF_DEBUG
     PyObject* refCount = PyObject_CallObject(PySys_GetObject((char*)"gettotalrefcount"), NULL);
-    std::clog << "total refcount = " << PyInt_AsSsize_t(refCount) << std::endl;
+    std::clog << "total refcount = " << PyLong_AsSsize_t(refCount) << std::endl;
     Py_DECREF(refCount);
 #endif
 }
