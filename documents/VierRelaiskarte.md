@@ -9,8 +9,4 @@ Relais 3 schließen: A0 03 00 A3
 Relais 4 öffnen: A0 04 01 A5
 Relais 4 schließen: A0 04 00 A4
 
-Port ist wohl 8080
-
-#26 Polizei
-#25 Atel
-#29 
+Port ist wohl 8080 

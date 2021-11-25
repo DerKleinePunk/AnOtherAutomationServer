@@ -58,3 +58,7 @@ https://stackoverflow.com/questions/10158684/connecting-to-dbus-over-tcp/1327597
 
 HA
 https://www.home-assistant.io/integrations/tcp#binary-sensor
+https://www.youtube.com/watch?v=ixIGlEpvWXY
+
+Videos
+https://youtu.be/WBgdNnoF3Kg -> Scripts Video1.zip
