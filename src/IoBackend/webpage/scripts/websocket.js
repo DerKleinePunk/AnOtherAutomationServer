@@ -78,6 +78,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	document.getElementById("dataButton2").addEventListener("click", updateDoc);
 	document.getElementById("dataButton3").addEventListener("click", updateDocNo);
 	document.getElementById("dataButton4").addEventListener("click", updateDocNoBody);
+	document.getElementById("sendMqttValue").addEventListener("click", sendMqttValue);
 
 }, false);
 
@@ -91,7 +92,7 @@ function loadDoc() {
 			document.getElementById("getResponse").innerHTML = "Not Found";
 		}
 	};
-	xhttp.open("GET", "/api/sampleResult", true);
+	xhttp.open("GET", "/api/test/sampleResult", true);
 	xhttp.setRequestHeader("X-API-KEY", "12345678");
 	xhttp.send();
 }
@@ -106,7 +107,7 @@ function updateDoc() {
 			document.getElementById("getResponse").innerHTML = this.responseText;
 		}
 	};
-	xhttp.open("POST", "/api/samplePost", true);
+	xhttp.open("POST", "/api/test/samplePost", true);
 	xhttp.setRequestHeader("X-API-KEY", "12345678");
 	xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 	xhttp.send('{ "param" : "value" }');
@@ -122,7 +123,7 @@ function updateDocNo() {
 			document.getElementById("getResponse").innerHTML = "nicht erlaubt";
 		}
 	};
-	xhttp.open("POST", "/api/samplePost", true);
+	xhttp.open("POST", "/api/test/samplePost", true);
 	xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 	xhttp.send('{ "param" : "value" }');
 }
@@ -137,8 +138,27 @@ function updateDocNoBody() {
 			document.getElementById("getResponse").innerHTML = this.responseText;
 		}
 	};
-	xhttp.open("POST", "/api/samplePost", true);
+	xhttp.open("POST", "/api/test/samplePost", true);
 	xhttp.setRequestHeader("X-API-KEY", "12345678");
 	xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 	xhttp.send();
+}
+
+function sendMqttValue() {
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			document.getElementById("getResponse").innerHTML = this.responseText;
+		}
+		if (this.readyState == 4 && this.status == 201) {
+			document.getElementById("getResponse").innerHTML = this.responseText;
+		}
+	};
+	xhttp.open("POST", "/api/mqtt/set", true);
+	xhttp.setRequestHeader("X-API-KEY", "12345678");
+	xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+	var obj = new Object();
+	obj.topic = document.getElementById("topic").value;
+	obj.value = document.getElementById("value").value;
+	xhttp.send(JSON.stringify(obj));
 }

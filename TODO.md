@@ -68,6 +68,7 @@ https://git.gnunet.org/libmicrohttpd.git/tree/src/examples/websocket_chatserver_
 https://www.victronenergy.com/live/vedirect_protocol:faq
 https://github.com/karioja/vedirect
 https://github.com/cterwilliger/VeDirectFrameHandler
+https://community.victronenergy.com/questions/63915/anyone-have-python-example-how-to-read-mqtt-values.html
 
 ## Automatik Build
 https://medium.com/swlh/how-to-create-an-automated-build-pipeline-for-your-arduino-project-1df9826f2a5e

@@ -5,14 +5,14 @@
 #include <thread>
 #include "../../common/utils/waitingqueue.h"
 
-typedef std::function<void(const std::string& name, const std::string& parameter)> EventCallbackFunction;
+typedef std::function<void(const std::string& name, const std::string& parameter)> EventDelegate;
 
 struct EventConsumers
 {
     std::string EventFilter;
-    EventCallbackFunction EventConsumer;
+    EventDelegate EventConsumer;
 };
-
+    
 struct InternalEvent
 {
     std::string Name;
@@ -36,5 +36,5 @@ public:
     void Deinit();
 
     void FireNewEvent(const std::string& name, const std::string& parameter);
-    void RegisterMe(const std::string& eventFilter, EventCallbackFunction function);
+    void RegisterMe(const std::string& eventFilter, EventDelegate function);
 };

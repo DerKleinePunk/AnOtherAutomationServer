@@ -6,11 +6,13 @@
 #include "Mqtt/MqttConnector.h"
 #include "resources/TestResource.hpp"
 #include "resources/ApiResource.hpp"
+#include "resources/MqttResource.hpp"
 #include "GlobalFunctions.hpp"
 #include "WebServer/WebServer.hpp"
 #include "PythonRunner/PythonRunner.hpp"
 #include "SystemFunktions/NetworkManager.hpp"
 #include "ServiceEvents/ServiceEventManager.hpp"
+#include "Backend.hpp"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -48,6 +50,7 @@ void WriteFunktionText()
     std::cout << "r run sample.py" << std::endl;
     std::cout << "r1 run sample.py Function simpleFunc" << std::endl;
     std::cout << "s ScanAccessPoints" << std::endl;
+    std::cout << "t0 write mqtt test" << std::endl;
 }
 
 int main(int argc, char** argv)
@@ -80,7 +83,7 @@ int main(int argc, char** argv)
 
     const auto ownWebServer = new WebServer(&globalFunctions);
 
-    const auto connector = new MqttConnector(config);
+    const auto connector = new MqttConnector(config, eventManager);
     if(!connector->Init()) {
         LOG(ERROR) << "Mqtt Connector starting Failed";
     } else {
@@ -94,13 +97,20 @@ int main(int argc, char** argv)
         LOG(ERROR) << "RegisterResource failed";
     }
 
-    if(!ownWebServer->RegisterResource("/api/*", new ApiResource(&globalFunctions))){
+    if(!ownWebServer->RegisterResource("/api/mqtt/*", new MqttResource(&globalFunctions))){
+        LOG(ERROR) << "RegisterResource failed";
+    }
+
+    if(!ownWebServer->RegisterResource("/api/test/*", new ApiResource(&globalFunctions))){
         LOG(ERROR) << "RegisterResource failed";
     }
 
     if(ownWebServer->Start()) {
         LOG(INFO) << "Own WebServer Running";
     }
+
+    auto backend = new Backend(ownWebServer, eventManager);
+    backend->Init();
 
     WriteFunktionText();
 
@@ -117,12 +127,16 @@ int main(int argc, char** argv)
         } else if(input == "s") {
             const json result = networkManager->ScanAccessPoints();
              std::cout << result.dump() << std::endl;
+        } else if(input == "t0") {
+            connector->Publish("cmnd/tasmota_852612/POWER", "TOGGLE");
         } else {
             std::cout << input << " command not found" << std::endl;
         }
         WriteFunktionText();
         std::cin >> input;
     }
+
+    delete backend;
 
     eventManager->Deinit();
     delete eventManager;

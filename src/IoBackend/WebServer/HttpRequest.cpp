@@ -8,7 +8,9 @@
 #include "HttpRequest.hpp"
 #include "../../common/utils/commonutils.h"
 #include "../../common/easylogging/easylogging++.h"
+#include "../../common/json/json.hpp"
 
+using json = nlohmann::json;
 
 HttpRequest::HttpRequest(struct lws *wsi, const std::string* body)
 {
@@ -31,6 +33,13 @@ std::string HttpRequest::GetParameter(const std::string& name)
     int z = lws_get_urlarg_by_name_safe(_wsi, name.c_str(), value, sizeof(value) - 1);
     if(z>0) {
         result = value;
+    } else if(!_body.empty()) {
+        auto jsonText = json::parse(_body);
+
+        auto it_value = jsonText.find(name);
+        if(it_value != jsonText.end()) {
+            result = jsonText.at(name).get<std::string>();
+        }
     }
     return result;
 }

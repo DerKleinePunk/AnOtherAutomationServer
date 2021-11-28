@@ -18,9 +18,10 @@ void ServiceEventManager::WorkerLoop()
         InternalEvent event;
         if(_eventQueue.tryRemove(event, std::chrono::milliseconds(1000))) {
             for( auto consumer : _eventConsumer) {
-                //Todo Check Filter
-                LOG(DEBUG) << "Fire Event " << event.Name << " " << event.Parameter;
-                consumer.EventConsumer(event.Name, event.Parameter);
+                if(consumer.EventFilter.empty() || utils::hasBegining(event.Name, consumer.EventFilter)) {
+                    LOG(DEBUG) << "Fire Event " << event.Name << " " << event.Parameter;
+                    consumer.EventConsumer(event.Name, event.Parameter);
+                }
             }
         } else {
             LOG(DEBUG) << "Event Idle";
@@ -55,6 +56,12 @@ void ServiceEventManager::Deinit()
     }
 }
 
+/**
+ * @brief Fire New System Event
+ * 
+ * @param name 
+ * @param parameter 
+ */
 void ServiceEventManager::FireNewEvent(const std::string& name, const std::string& parameter)
 {
     if(_eventConsumer.size() == 0) {
@@ -69,7 +76,17 @@ void ServiceEventManager::FireNewEvent(const std::string& name, const std::strin
     _eventQueue.add(event);
 }
 
-void ServiceEventManager::RegisterMe(const std::string& eventFilter, EventCallbackFunction function)
+/**
+ * @brief Register Callback for System Events
+ * 
+ * @param eventFilter the filer string
+ * @param function the callback function
+ */
+void ServiceEventManager::RegisterMe(const std::string& eventFilter, EventDelegate function)
 {
+    EventConsumers consumer;
+    consumer.EventFilter = eventFilter;
+    consumer.EventConsumer = function;
 
+    _eventConsumer.push_back(consumer);
 }

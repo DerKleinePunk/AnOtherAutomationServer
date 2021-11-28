@@ -64,13 +64,15 @@ void WebServer::MainLoop()
 HttpResponse* WebServer::HandleResource(struct lws *wsi, const std::string& url, const std::string& method, const std::string* body)
 {
     HttpResource* resource = nullptr;
+    auto urlForResource = url;
 
     auto resourceIter = _httpResources.find(url);
     if( resourceIter == _httpResources.end()) {
         for(auto entry : _httpResources) {
             if(entry.second.EndWildcard && utils::hasBegining(url, entry.first)) {
                 resource = entry.second.Implementation;
-                LOG(DEBUG) << "Implementation found over begining";
+                urlForResource = urlForResource.substr(entry.first.size());
+                LOG(DEBUG) << "Implementation found over begining " << entry.first;
                 break;
             }
         }
@@ -80,12 +82,13 @@ HttpResponse* WebServer::HandleResource(struct lws *wsi, const std::string& url,
         }
     } else {
         resource = resourceIter->second.Implementation;
+        urlForResource = urlForResource.substr(resourceIter->first.size());
     }
 
     HttpRequest request(wsi, body);
     try
     {
-        return resource->Process(request, url, method);
+        return resource->Process(request, urlForResource, method);
     }
     catch(const std::exception& exp)
     {
@@ -262,7 +265,7 @@ bool WebServer::RegisterResource(const std::string& resourceString, HttpResource
 
     if(utils::hasEnding(resourceUrl, "/*"))
     {
-        resourceUrl = resourceUrl.substr(0, resourceUrl.length() - 2);
+        resourceUrl = resourceUrl.substr(0, resourceUrl.length() - 1);
         info.EndWildcard = true;
     }
 
@@ -270,8 +273,10 @@ bool WebServer::RegisterResource(const std::string& resourceString, HttpResource
         return false;
     }
     
+    //Todo Check this api/* and api/test/* is not OK
+
     info.Implementation = resourceClass;
-    
+   
     _httpResources.insert(std::pair<const std::string, HttpResourceInfo>(resourceUrl, info));
 
     return true;

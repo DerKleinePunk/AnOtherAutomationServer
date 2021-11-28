@@ -11,6 +11,9 @@ pip3 install esptool
 esptool.py -p /dev/ttyUSB0 read_mac
 esptool.py --port /dev/ttyUSB0 read_flash 0x00000 0x100000 relaisFWbackup.bin
 
+Auf passen wenn das esptool nicht die selbe Version ist wie die im tasmotizer muss man zwischen dem Wechselt der Applikationen
+einen Rest vom Chip machen sonst hängt sich was auf.
+
 ## Tasmota Config 4ch Relais
 
 ```text

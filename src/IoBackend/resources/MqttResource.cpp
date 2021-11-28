@@ -1,31 +1,32 @@
 #ifndef ELPP_DEFAULT_LOGGER
-#define ELPP_DEFAULT_LOGGER "ApiResource"
+#define ELPP_DEFAULT_LOGGER "MqttResource"
 #endif
 #ifndef ELPP_CURR_FILE_PERFORMANCE_LOGGER_ID
 #define ELPP_CURR_FILE_PERFORMANCE_LOGGER_ID ELPP_DEFAULT_LOGGER
 #endif
 
-#include "ApiResource.hpp"
+#include "MqttResource.hpp"
 #include "../../common/easylogging/easylogging++.h"
 #include "../../common/utils/commonutils.h"
 
-ApiResource::ApiResource(GlobalFunctions* globalFunctions)
+MqttResource::MqttResource(GlobalFunctions* globalFunctions)
 {
     el::Loggers::getLogger(ELPP_DEFAULT_LOGGER);
     _globalFunctions = globalFunctions;
 }
 
-ApiResource::~ApiResource()
+MqttResource::~MqttResource()
 {
 }
 
-HttpResponse* ApiResource::Process(HttpRequest& request, const std::string& url, const std::string& method)
+HttpResponse* MqttResource::Process(HttpRequest& request, const std::string& url, const std::string& method)
 {
     auto result = new HttpResponse();
-    const auto arg = request.GetParameter(std::string("a"));
+    const auto topic = request.GetParameter(std::string("topic"));
+    const auto value = request.GetParameter(std::string("value"));
     const auto apiKey = request.GetHeader(std::string("X-API-KEY"));
 
-    LOG(DEBUG) << url << " Api Call Get with " << arg << " apiKey " << apiKey;
+    LOG(DEBUG) << url << " Api Call Get with " << topic << " apiKey " << apiKey;
 
     if(!_globalFunctions->IsApiKeyOk(apiKey)) 
     {
@@ -34,18 +35,21 @@ HttpResponse* ApiResource::Process(HttpRequest& request, const std::string& url,
         return result; 
     }
 
-    if(arg.size() > 0) {
+    if(topic.size() > 0) {
         auto text = std::string("{\"parameter\" : \"");
-        text += arg;
+        text += topic;
         text += "\"}";
         result->SetContent("application/json", text);
+    } else {
+        result->SetContent("application/json", "{\"parameter\" : \"value\"}");
     }
-
-    result->SetContent("application/json", "{\"parameter\" : \"value\"}");
 
     if(method == "POST")
     {
         LOG(DEBUG) << "Body " << request.GetBody();
+        if(url == "set") {
+            _globalFunctions->FireNewEvent("PublishMqtt", request.GetBody());
+        }
         result->SetCode(201);
     }
 

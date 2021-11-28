@@ -7,8 +7,16 @@
 
 #include "MqttConnector.h"
 #include "../../common/easylogging/easylogging++.h"
+#include "../../common/json/json.hpp"
+
+using json = nlohmann::json;
 
 // https://www.systutorials.com/docs/linux/man/3-libmosquitto/
+// https://stackoverflow.com/questions/19057835/how-to-find-connected-mqtt-client-details
+
+static int mid_sent = 0;
+static int qos = 0;
+static int retain = 0;
 
 void my_log_callback(struct mosquitto* mosq, void* userdata, int level, const char* str)
 {
@@ -30,6 +38,10 @@ void my_connect_callback(struct mosquitto* mosq, void* userdata, int result)
         } else {
             const auto connector = (MqttConnector*)userdata;
             connector->Connected();
+            /*if(mosquitto_subscribe(mosq, NULL, "clients/#", 2) != MOSQ_ERR_SUCCESS) {
+                LOG(ERROR) << "subscribe clients failed failed";
+            } This is not Working Finde other way*/
+           
         }
 
     } else {
@@ -39,15 +51,55 @@ void my_connect_callback(struct mosquitto* mosq, void* userdata, int result)
 
 void my_message_callback(struct mosquitto* mosq, void* userdata, const struct mosquitto_message* message)
 {
-     el::Helpers::setThreadName("MqttConnector WorkerThread");
+    el::Helpers::setThreadName("MqttConnector WorkerThread");
     const auto connector = (MqttConnector*)userdata;
     connector->OnMessage(message);
 }
 
-MqttConnector::MqttConnector(const Config* config) : _mosq(nullptr)
+void my_publish_callback(struct mosquitto* mosq, void* userdata, int mid)
+{
+    const auto connector = (MqttConnector*)userdata;
+    connector->OnPublishWasSend(mid);
+}
+
+void MqttConnector::LogError(int errorCode)
+{
+    LOG(ERROR) << mosquitto_strerror(errorCode);
+}
+
+void MqttConnector::EventCallback(const std::string& name, const std::string& parameter)
+{
+    auto jsonText = json::parse(parameter);
+
+    std::string topic("");
+    std::string value("");
+
+    auto it_value = jsonText.find("topic");
+    if(it_value != jsonText.end()) {
+        topic = jsonText.at("topic").get<std::string>();
+    }
+
+    it_value = jsonText.find("value");
+    if(it_value != jsonText.end()) {
+        value = jsonText.at("value").get<std::string>();
+    }
+
+    if(topic.empty() || value.empty()) {
+        LOG(ERROR) << "Missing data";
+
+        return;
+    }
+
+    Publish(topic, value);
+
+}
+
+MqttConnector::MqttConnector(const Config* config, ServiceEventManager* serviceEventManager) : _mosq(nullptr)
 {
     el::Loggers::getLogger(ELPP_DEFAULT_LOGGER);
     _config = config;
+    _initOk = false;
+    _serviceEventManager = serviceEventManager;
 }
 
 MqttConnector::~MqttConnector()
@@ -76,6 +128,7 @@ bool MqttConnector::Init()
     mosquitto_log_callback_set(_mosq, my_log_callback);
     mosquitto_connect_callback_set(_mosq, my_connect_callback);
     mosquitto_message_callback_set(_mosq, my_message_callback);
+    mosquitto_publish_callback_set(_mosq, my_publish_callback);
 
     auto result = mosquitto_connect(_mosq, host.c_str(), port, keepalive);
     if(result != MOSQ_ERR_SUCCESS) {
@@ -94,6 +147,8 @@ bool MqttConnector::Init()
 
 void MqttConnector::Deinit()
 {
+    _initOk = false;
+
     if(_mosq == nullptr) return;
 
     auto result = mosquitto_disconnect(_mosq);
@@ -104,6 +159,7 @@ void MqttConnector::Deinit()
     result = mosquitto_loop_stop(_mosq, false);
     if(result != MOSQ_ERR_SUCCESS) {
         LOG(ERROR) << "Unable to stop loop " << std::to_string(result);
+        LogError(result);
     }
 
     mosquitto_destroy(_mosq);
@@ -113,8 +169,8 @@ void MqttConnector::Deinit()
 void MqttConnector::Connected()
 {
     LOG(INFO) << "Mqtt Conneted";
-    const auto topics = _config->GetWatchTopics();
-    for( const auto &topic : topics)
+    _topics = _config->GetWatchTopics();
+    for( const auto &topic : _topics)
     {
         if(mosquitto_subscribe(_mosq, NULL, topic.c_str(), 2) != MOSQ_ERR_SUCCESS) {
             LOG(ERROR) << topic << " subscribe failed";
@@ -122,6 +178,28 @@ void MqttConnector::Connected()
             LOG(DEBUG) << topic << " subscribed";
         }
     }
+
+    _initOk = true;
+
+    auto callback = std::bind(&MqttConnector::EventCallback, this, std::placeholders::_1, std::placeholders::_2);
+    _serviceEventManager->RegisterMe(std::string("PublishMqtt"), callback);
+}
+
+bool MqttConnector::Publish(std::string topic, std::string value)
+{
+    if(!_initOk) {
+        return false;
+    }
+
+    auto rc = mosquitto_publish(_mosq, &mid_sent, topic.c_str(), value.size(), value.c_str(), qos, retain);
+    if(rc != MOSQ_ERR_SUCCESS) {
+        LogError(rc);
+        return false;
+    }
+
+    LOG(DEBUG) << "Send with Message Id " << mid_sent;
+
+    return true;
 }
 
 void MqttConnector::OnMessage(const struct mosquitto_message* message)
@@ -133,4 +211,19 @@ void MqttConnector::OnMessage(const struct mosquitto_message* message)
     if(match) {
         printf("got message for ADC topic\n");
     }
+
+    for( const auto &topic : _topics) {
+        mosquitto_topic_matches_sub(topic.c_str(), message->topic, &match);
+        if(match) {
+            json j;
+            j["topic"] = message->topic;
+            j["value"] = (char*)message->payload;
+            _serviceEventManager->FireNewEvent("MqttValue", j.dump());
+        }
+    }
+}
+
+void MqttConnector::OnPublishWasSend(int mid)
+{
+    LOG(DEBUG) << "Sended with Message Id " << mid;
 }
