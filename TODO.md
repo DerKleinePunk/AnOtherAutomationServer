@@ -16,10 +16,12 @@ sudo apt install libmosquitto-dev
 
 ### Shelly
 
-192.168.33.X
+192.168.33.X default
 192.168.2.91 Tor
 
 https://shelly-api-docs.shelly.cloud
+
+https://shelly-api-docs.shelly.cloud/gen1/#shelly1-1pm-mqtt
 
 ## Links
 
@@ -40,8 +42,15 @@ mosquitto_pub -h 192.168.2.99 -t "devices/wb-adc/controls/text" -m "Hello, from 
 
 whatch all
 mosquitto_sub -h 192.168.2.99 -t \# -d
+mosquitto_sub -h 192.168.2.49 -t \# -d
 
 mosquitto_sub -h 192.168.2.99 -t devices/# -d
+
+cmnd/tasmota_switch/Power TOGGLE
+
+mosquitto_pub -h 192.168.2.49 -t "cmnd/tasmota_852612/POWER" -m "TOGGLE"
+mosquitto_pub -h 192.168.2.49 -t "cmnd/tasmota_852612/POWER2" -m "TOGGLE" or ON / OFF
+mosquitto_pub -h 192.168.2.49 -t "shellies/shelly1Tor/relay/0/command" -m "toggle" or on / off
 
 ## mDNS
 
