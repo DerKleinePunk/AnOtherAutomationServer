@@ -33,8 +33,6 @@ else
 	INFO "Don't forget git pull bevor building"
 fi
 
-git lfs fetch --all
-
 DEPENSFILE="DebianPackages.txt"
 
 InstallPackage(){
@@ -92,6 +90,7 @@ echo "PI $rpiversion"
 DEBUG "PI $rpiversion"
 
 InstallPackage git
+InstallPackage git-lfs
 InstallPackage cmake
 
 while read LINE; do
@@ -235,7 +234,8 @@ else
 			exit $exitCode
 		fi
 	fi
-	'if [ ! -f modules/SDL2GuiHelper/LICENSE ]; then
+	: <<KOMMENTARIO
+	if [ ! -f modules/SDL2GuiHelper/LICENSE ]; then
 		git submodule init
 		exitCode=$?
 		if [ $exitCode -ne 0 ] ; then
@@ -248,8 +248,11 @@ else
 	if [ $exitCode -ne 0 ] ; then
 		echo "git give an Error"
 		exit $exitCode
-	fi'
+	fi
+	KOMMENTARIO
 fi
+
+git lfs fetch --all
 
 DIRECTORY="buildrelease"
 if [ ! -d "$DIRECTORY" ]; then
