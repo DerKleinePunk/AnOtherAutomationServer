@@ -35,8 +35,15 @@ settings.json
 change in your Develop path and run
 cd /media/hddIntern/devtest
 
+Build script is written for Debian based Linux (Test only with rasbian or debian)
+
 ```bash
 wget -O build.sh https://raw.githubusercontent.com/DerKleinePunk/AnOtherAutomationServer/master/build.sh
 chmod +x build.sh
 ./build.sh
+```
+
+```bash
+    cd AnOtherAutomationServer/bin/Linux/
+    ./SimpelIoBackend.bin
 ```
