@@ -4,3 +4,4 @@ python3-numpy
 python3-dev
 libnm-dev
 libsqlite3-dev
+libssl-dev
