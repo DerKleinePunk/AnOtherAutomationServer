@@ -29,3 +29,12 @@ settings.json
 ## Documentation (German)
 
 [concept](documents/Konzept.md)
+
+## Build
+
+change in your Develop path and run
+
+```bash
+wget -O build.sh https://raw.githubusercontent.com/DerKleinePunk/AnOtherAutomationServer/master/build.sh
+chmod +x build.sh
+```

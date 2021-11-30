@@ -5,50 +5,59 @@ Wie man diese Idee installiert
 ## Install docker for HA
 
 HA -> Home Assisten
-In der ersten Version werden wir das wohl dringend brauchen später sollten die meisten Treiber wo hier sein
-Dann ist das "nice to Have" oder halt auch nicht
+ist "nice to Have" bzw Dokumentiert um Dinge Testen zu können
+Und machmal Idee sich auch ändern können
 
 in ein Verzeichnis wechsel wo der Install script hin so zum Beispiel ~/Downloads oder so
 
+```bash
 curl -fsSL https://get.docker.com -o get-docker.sh
-Holt das docker install script im Netz
+REM Holt das docker install script im Netz
 
 DRY_RUN=1 sh ./get-docker.sh
-Ansehen was das Script macht
+REM Ansehen was das Script macht
 
 sudo sh ./get-docker.sh
-Docker installieren
+REM Docker installieren
 
 sudo groupadd docker
 sudo usermod -aG docker <benutzer name> pi bei standard
 newgrp docker
 
-docker run hello-world <-Ersten Docker Container installieren und so testen obs läuft
+docker run hello-world 
+REM Ersten Docker Container installieren und so testen obs läuft
+```
 
 https://docs.docker.com/engine/install/debian/#install-using-the-convenience-script
 
 ### Container auf die Festplatte
 
-sudo systemctl stop docker -> Service beenden
-sudo rsync -axPS /var/lib/docker/ /media/hddIntern/docker -> alle daten rüber schieben
-sudo nano /lib/systemd/system/docker.service -> Service File bearbeiten
---data-root /media/hddIntern/docker -> in den Start auf ruf bastel
-ExecStart=/usr/bin/dockerd --data-root /media/hddIntern/docker -H fd:// --containerd=/run/containerd/containerd.sock <- so könnte der dann aus sehen
+```bash
+sudo systemctl stop docker 
+REM Service beenden
+
+sudo rsync -axPS /var/lib/docker/ /media/hddIntern/docker -> REM alle daten rüber schieben
+
+sudo nano /lib/systemd/system/docker.service 
+REM Service File bearbeiten
+REM --data-root /media/hddIntern/docker -> in den Start auf REM ruf bastel
+REM ExecStart=/usr/bin/dockerd --data-root /media/hddIntern/REM docker -H fd:// --containerd=/run/containerd/containerd.REM sock <- so könnte der dann aus sehen
 
 sudo systemctl daemon-reload
 sudo systemctl start docker
 docker info | grep "Root Dir"
 
 sudo rm -r /var/lib/docker/ -> den platz wollen wir ja nicht verschenken
+```
 
 https://stackoverflow.com/questions/55344896/attempt-to-change-docker-data-root-fails-why
 
-## HA Installieren
+### HA Container Installieren
 
 mkdir homeassistant
 
 Install:
-
+```bash
 docker run -d \
   --name homeassistant \
   --privileged \
@@ -57,6 +66,7 @@ docker run -d \
   -v /media/hddIntern/homeassistant:/config \
   --network=host \
   ghcr.io/home-assistant/raspberrypi4-homeassistant:stable  < aufpassen richtige Image nehmen 3 oder 4
+```
 
 Update:
 
