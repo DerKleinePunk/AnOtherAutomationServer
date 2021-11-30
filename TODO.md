@@ -7,14 +7,14 @@
 sudo apt install mosquitto mosquitto-clients
 sudo systemctl enable mosquitto
 sudo apt-get install apache2 apache2-doc php php-pear
-sudo apt-get install libsystemd-dev libcurl4-openssl-dev libmicrohttpd-dev
+sudo apt-get install libsystemd-dev libcurl4-openssl-dev
 
 ### Desktop
 
 sudo apt install mosquitto-clients
 sudo apt install libmosquitto-dev
 
-### Shelly
+## Shelly
 
 192.168.33.X default
 192.168.2.91 Tor

@@ -22,3 +22,10 @@ settings.json
         "TARGET" : "Linux"
     }
 ```
+### Todo
+
+[Todo](TODO.md)
+
+## Documentation (German)
+
+[concept](documents/Konzept.md)

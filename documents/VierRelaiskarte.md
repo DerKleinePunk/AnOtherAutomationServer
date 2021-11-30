@@ -4,6 +4,7 @@ https://shafi.com.au/experiment/failed-experiments/tasmota-on-esp-01-esp8266/
 https://tasmota.github.io/docs/devices/LC-Technology-WiFi-Relay/
 
 
+```text
 Relais 1 öffnen: A0 01 01 A2
 Relais 1 schließen: A0 01 00 A1
 Relais 2 öffnen: A0 02 01 A3
@@ -12,5 +13,6 @@ Relais 3 öffnen: A0 03 01 A4
 Relais 3 schließen: A0 03 00 A3
 Relais 4 öffnen: A0 04 01 A5
 Relais 4 schließen: A0 04 00 A4
+```
 
 Port ist wohl 8080 
