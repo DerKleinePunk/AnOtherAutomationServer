@@ -44,6 +44,6 @@ chmod +x build.sh
 ```
 
 ```bash
-    cd AnOtherAutomationServer/bin/Linux/
-    ./SimpelIoBackend.bin
+cd AnOtherAutomationServer/bin/Linux/
+./SimpelIoBackend.bin
 ```

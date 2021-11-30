@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.11 FATAL_ERROR)
 # Main CMake
 
+## Use the variable PROJECT_NAME for changing the target name
+SET ( PROJECT_NAME "AutomationServer" )
+
+PROJECT(${PROJECT_NAME}) ## Not Able to use CXX because C files are not compiled
+
 #
 # Debugging Options
 #
@@ -9,7 +14,8 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 ENDIF()
 
 if(DEFINED ENV{VCPKG_ROOT} AND (NOT DEFINED CMAKE_TOOLCHAIN_FILE OR CMAKE_TOOLCHAIN_FILE MATCHES "$/scripts/buildsystems/vcpkg.cmake"))
-  set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
+  set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
+  set(VCPKG_VERBOSE ON)
   set(USE_VCPKG "yes" CACHE STRING "")
 else()
   set(USE_VCPKG "no" CACHE STRING "")  
@@ -22,12 +28,6 @@ include(CheckCXXCompilerFlag)
 include(ExternalProject)
 include(CheckTypeSize)
 include(CheckIncludeFiles)
-
-## Use the variable PROJECT_NAME for changing the target name
-SET ( PROJECT_NAME "AutomationServer" )
-
-
-PROJECT(${PROJECT_NAME}) ## Not Able to use CXX because C files are not compiled
 
 MESSAGE(STATUS "Try Build ${PROJECT_NAME}")
 message(STATUS "Compiler ${CMAKE_CXX_COMPILER_ID}")
@@ -89,7 +89,7 @@ MESSAGE(STATUS "Compiler Flags are ${CMAKE_CXX_FLAGS}")
 #set(THREADS_PREFER_PTHREAD_FLAG ON)
 #FIND_PACKAGE(Threads REQUIRED)
 
-FIND_PACKAGE(SQLITE3 REQUIRED)
+FIND_PACKAGE(sqlite3 REQUIRED)
 FIND_PACKAGE(CURL REQUIRED)
 FIND_PACKAGE(mosquitto REQUIRED)
 FIND_PACKAGE(Python3 COMPONENTS Interpreter Development)
