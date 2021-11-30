@@ -4,7 +4,7 @@
 
 FILE=logger.sh
 if [ ! -f "$FILE" ]; then
-    wget -O build.sh https://raw.githubusercontent.com/DerKleinePunk/AnOtherAutomationServer/master/logger.sh
+    wget -O logger.sh https://raw.githubusercontent.com/DerKleinePunk/AnOtherAutomationServer/master/logger.sh
 fi
 
 source ./logger.sh
