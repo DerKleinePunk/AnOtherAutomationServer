@@ -33,8 +33,10 @@ settings.json
 ## Build
 
 change in your Develop path and run
+cd /media/hddIntern/devtest
 
 ```bash
 wget -O build.sh https://raw.githubusercontent.com/DerKleinePunk/AnOtherAutomationServer/master/build.sh
 chmod +x build.sh
+./build.sh
 ```
