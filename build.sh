@@ -2,6 +2,11 @@
 # wget -O build.sh https://raw.githubusercontent.com/DerKleinePunk/AnOtherAutomationServer/master/build.sh
 # chmod +x build.sh
 
+FILE=logger.sh
+if [ ! -f "$FILE" ]; then
+    wget -O build.sh https://raw.githubusercontent.com/DerKleinePunk/AnOtherAutomationServer/master/logger.sh
+fi
+
 source ./logger.sh
 SCRIPTENTRY
 
@@ -97,7 +102,8 @@ if [ "$reproBuild" = "true" ] ; then
   cd ..
 fi
 
-'echo python depens
+: <<KOMMENTARIO
+echo python depens
 INFO "python depens"
 pip3 install pyserial
 pip3 install RPi.gpio
@@ -198,7 +204,7 @@ cmake --build . -j $(nproc)
 sudo cmake --build . --target install
 cd ..
 cd ..
-'
+KOMMENTARIO
 
 echo building IoBackend and Dependecy
 echo "we are here"
