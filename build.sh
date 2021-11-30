@@ -234,7 +234,7 @@ else
 			exit $exitCode
 		fi
 	fi
-	: <<KOMMENTARIO
+: <<KOMMENTARIO
 	if [ ! -f modules/SDL2GuiHelper/LICENSE ]; then
 		git submodule init
 		exitCode=$?
@@ -249,7 +249,7 @@ else
 		echo "git give an Error"
 		exit $exitCode
 	fi
-	KOMMENTARIO
+KOMMENTARIO
 fi
 
 git lfs fetch --all
