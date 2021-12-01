@@ -8,6 +8,12 @@ The Configfile is in bin/linux after First Run
 
 Enter in your Browser localhost:8080
 
+[more](documents/Konzept.md)
+
+## Dependency
+
+sieh [DebianPackages](DebianPackages.txt) and [PythonPackages](PythonPackages.txt)
+
 ## Develop
 
 I developing with Visual Studio Code
@@ -22,13 +28,14 @@ settings.json
         "TARGET" : "Linux"
     }
 ```
+
 ### Todo
 
 [Todo](TODO.md)
 
 ## Documentation (German)
 
-[concept](documents/Konzept.md)
+[Index](documents/Dokumentation/Index.md)
 
 ## Build
 

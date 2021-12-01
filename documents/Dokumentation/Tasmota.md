@@ -39,4 +39,3 @@ Rule1
 ```
 
 Rule1 1 zum Aktivieren der Rules
-
