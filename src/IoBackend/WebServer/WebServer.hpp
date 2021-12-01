@@ -52,4 +52,5 @@ public:
     void WebSocketClientMessage(const std::string& message);
     void WebSocketInitDone(per_vhost_data__minimal* webSocketVhostData);
     void RemoveWebSocketClient(bool consumer);
+    bool IsApiKeyOk(const std::string& value);
 };

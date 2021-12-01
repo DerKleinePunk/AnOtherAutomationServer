@@ -45,7 +45,7 @@ void from_json(const json& j, ConfigFile& p)
     if(it_value != j.end()) {
         p.ApiKey = j.at("ApiKey").get<std::string>();
     } else {
-        p.ApiKey = "12345678";
+        p.ApiKey = "123456789";
     }
 
     it_value = j.find("WatchTopics");

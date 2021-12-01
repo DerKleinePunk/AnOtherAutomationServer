@@ -502,3 +502,8 @@ void WebServer::RemoveWebSocketClient(bool consumer)
 {
     LOG(INFO) << "RemoveWebSocketClient " << consumer;
 }
+
+bool WebServer::IsApiKeyOk(const std::string& value)
+{
+    return _globalFunctions->IsApiKeyOk(value);
+}

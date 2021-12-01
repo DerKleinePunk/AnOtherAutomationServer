@@ -31,6 +31,7 @@ function new_ws(urlpath, protocol)
 
 document.addEventListener("DOMContentLoaded", function() {
 
+	document.cookie = "X-API-KEY=123456789;SameSite=Strict;path=/";
 	var subscriber_ws = new_ws(get_appropriate_ws_url(""), "websocket");
 	try {
 		subscriber_ws.onopen = function() {
@@ -44,8 +45,13 @@ document.addEventListener("DOMContentLoaded", function() {
 				document.getElementById("r").scrollHeight;
 		};
 	
-		subscriber_ws.onclose = function(){
+		subscriber_ws.onclose = function(event){
 			document.getElementById("b").disabled = 1;
+			document.getElementById("r").value = document.getElementById("r").value + event.code + " close\n";
+		};
+
+		subscriber_ws.onerror = function() {
+			document.getElementById("r").value = "Error\n";
 		};
 	} catch(exception) {
 		alert("<p>Error " + exception);  
@@ -93,7 +99,7 @@ function loadDoc() {
 		}
 	};
 	xhttp.open("GET", "/api/test/sampleResult", true);
-	xhttp.setRequestHeader("X-API-KEY", "12345678");
+	xhttp.setRequestHeader("X-API-KEY", "123456789");
 	xhttp.send();
 }
 
@@ -108,7 +114,7 @@ function updateDoc() {
 		}
 	};
 	xhttp.open("POST", "/api/test/samplePost", true);
-	xhttp.setRequestHeader("X-API-KEY", "12345678");
+	xhttp.setRequestHeader("X-API-KEY", "123456789");
 	xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 	xhttp.send('{ "param" : "value" }');
 }
@@ -139,7 +145,7 @@ function updateDocNoBody() {
 		}
 	};
 	xhttp.open("POST", "/api/test/samplePost", true);
-	xhttp.setRequestHeader("X-API-KEY", "12345678");
+	xhttp.setRequestHeader("X-API-KEY", "123456789");
 	xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 	xhttp.send();
 }
@@ -155,7 +161,7 @@ function sendMqttValue() {
 		}
 	};
 	xhttp.open("POST", "/api/mqtt/set", true);
-	xhttp.setRequestHeader("X-API-KEY", "12345678");
+	xhttp.setRequestHeader("X-API-KEY", "123456789");
 	xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 	var obj = new Object();
 	obj.topic = document.getElementById("topic").value;

@@ -39,9 +39,9 @@ HttpResponse* ApiResource::Process(HttpRequest& request, const std::string& url,
         text += arg;
         text += "\"}";
         result->SetContent("application/json", text);
+    } else {
+        result->SetContent("application/json", "{\"parameter\" : \"value\"}");
     }
-
-    result->SetContent("application/json", "{\"parameter\" : \"value\"}");
 
     if(method == "POST")
     {
