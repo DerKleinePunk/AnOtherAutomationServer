@@ -2,7 +2,7 @@ include(FetchContent)
 
 FetchContent_Declare(libwebsockets 
     GIT_REPOSITORY    https://github.com/warmcat/libwebsockets.git
-    GIT_TAG           8d605f0649ed1ab6d27a443c7688598ea21fdb75 # v4.2.2 
+    GIT_TAG           a5aae049b2a386712e1be3b417915c0d44c7e675 # v4.3.0
 )
 
 message("Fetching libwebsockets...")
