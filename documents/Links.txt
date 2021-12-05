@@ -67,3 +67,13 @@ LibWebsockets
 https://github.com/warmcat/libwebsockets/blob/main/test-apps/test-sshd.c
 WSI_TOKEN_HTTP_AUTHORIZATION -> Sec
 lws_jwt_sign_token_set_http_cookie
+https://www.jonathan-petitcolas.com/2014/11/27/creating-json-web-token-in-javascript.html
+
+find -L -name "*.cpp"
+grep -w -R 'uuid.h' *.cpp
+grep -lr 'uuid.h' *.cpp
+
+find ~/develop/ -type f -name "*.cpp" -print0 | xargs -I {} -0 grep "uuid.h" "{}"
+find ~/develop/ -iname "*.cpp" -type f -print0  |  xargs -0 grep -H "nameserver"
+
+find ~/develop/ -type f -name "*.cpp" -exec grep -l "uuid.h" {} \;

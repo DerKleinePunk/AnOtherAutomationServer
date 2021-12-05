@@ -94,6 +94,33 @@ void MqttConnector::EventCallback(const std::string& name, const std::string& pa
 
 }
 
+void MqttConnector::HandleMqttInternals(const std::string& name, const std::string& value)
+{
+    if(name == "$SYS/broker/uptime") {
+        
+    }
+    /*
+    qgot message '19208 seconds' for topic '$SYS/broker/uptime'
+    got message '196.59' for topic '$SYS/broker/load/messages/received/1min'
+    got message '196.59' for topic '$SYS/broker/load/messages/sent/1min'
+    got message '786.37' for topic '$SYS/broker/load/bytes/received/1min'
+    got message '4771.89' for topic '$SYS/broker/load/bytes/sent/1min'
+    got message '186.37' for topic '$SYS/broker/load/messages/received/5min'
+    got message '186.42' for topic '$SYS/broker/load/messages/sent/5min'
+    got message '747.56' for topic '$SYS/broker/load/bytes/received/5min'
+    got message '4509.53' for topic '$SYS/broker/load/bytes/sent/5min'
+    got message '155.53' for topic '$SYS/broker/load/messages/received/15min'
+    got message '155.81' for topic '$SYS/broker/load/messages/sent/15min'
+    got message '627.43' for topic '$SYS/broker/load/bytes/received/15min'
+    got message '3754.96' for topic '$SYS/broker/load/bytes/sent/15min'
+    got message '10791' for topic '$SYS/broker/messages/received'
+    got message '10802' for topic '$SYS/broker/messages/sent'
+    got message '43802' for topic '$SYS/broker/bytes/received'
+    got message '258142' for topic '$SYS/broker/bytes/sent'
+    got message '31046' for topic '$SYS/broker/publish/bytes/sent'
+    */
+}
+
 MqttConnector::MqttConnector(const Config* config, ServiceEventManager* serviceEventManager) : _mosq(nullptr)
 {
     el::Loggers::getLogger(ELPP_DEFAULT_LOGGER);
@@ -205,19 +232,22 @@ bool MqttConnector::Publish(std::string topic, std::string value)
 void MqttConnector::OnMessage(const struct mosquitto_message* message)
 {
     bool match = 0;
-    printf("got message '%.*s' for topic '%s'\n", message->payloadlen, (char*)message->payload, message->topic);
 
-    mosquitto_topic_matches_sub("/devices/wb-adc/controls/+", message->topic, &match);
+    mosquitto_topic_matches_sub("$SYS/broker/#", message->topic, &match);
     if(match) {
-        printf("got message for ADC topic\n");
+        const auto value = std::string((char*)message->payload, message->payloadlen);
+        HandleMqttInternals(std::string(message->topic), value);
+    } else {
+        printf("got message '%.*s' for topic '%s'\n", message->payloadlen, (char*)message->payload, message->topic);
     }
 
     for( const auto &topic : _topics) {
         mosquitto_topic_matches_sub(topic.c_str(), message->topic, &match);
         if(match) {
+            const auto value = std::string((char*)message->payload, message->payloadlen);
             json j;
             j["topic"] = message->topic;
-            j["value"] = (char*)message->payload;
+            j["value"] = value;
             _serviceEventManager->FireNewEvent("MqttValue", j.dump());
         }
     }

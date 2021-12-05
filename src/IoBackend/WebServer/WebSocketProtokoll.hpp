@@ -1,5 +1,6 @@
 #pragma once
 #include <libwebsockets.h>
+#include <uuid/uuid.h>
 
 
 /* one of these created for each message */
@@ -16,7 +17,7 @@ struct per_session_data__minimal {
 	struct lws *wsi;
 	uint32_t tail;
 	char publishing; /* nonzero: peer is publishing to us */
-	char connectionId[250];
+	uuid_t connectionId;
 };
 
 /* one of these is created for each vhost our protocol is used with */

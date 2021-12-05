@@ -1,3 +1,5 @@
+var subscriber_ws;
+
 function get_appropriate_ws_url(extra_url)
 {
 	var pcol;
@@ -30,10 +32,11 @@ function new_ws(urlpath, protocol)
 }
 
 function createSubscriber() {
-	var subscriber_ws = new_ws(get_appropriate_ws_url(""), "websocket");
+	subscriber_ws = new_ws(get_appropriate_ws_url(""), "websocket");
 	try {
 		subscriber_ws.onopen = function() {
 			document.getElementById("b").disabled = 0;
+			document.getElementById("m").disabled = 0;
 		};
 	
 		subscriber_ws.onmessage =function got_packet(msg) {
@@ -45,7 +48,9 @@ function createSubscriber() {
 	
 		subscriber_ws.onclose = function(event){
 			document.getElementById("b").disabled = 1;
+			document.getElementById("m").disabled = 1;
 			document.getElementById("r").value = document.getElementById("r").value + event.code + " close\n";
+			
 		};
 
 		subscriber_ws.onerror = function() {
@@ -61,7 +66,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	//document.cookie = "X-API-KEY=123456789;SameSite=Strict;path=/";
 	createSubscriber();
 	
-	var publisher_ws = new_ws(get_appropriate_ws_url("/publisher"), "websocket");
+	/*var publisher_ws = new_ws(get_appropriate_ws_url("/publisher"), "websocket");
 	try {
 		publisher_ws.onopen = function() {
 			document.getElementById("m").disabled = 0;
@@ -75,11 +80,11 @@ document.addEventListener("DOMContentLoaded", function() {
 		};
 	} catch(exception) {
 		alert("<p>Error " + exception);  
-	}
+	}*/
 
 	function sendmsg()
 	{
-		publisher_ws.send(document.getElementById("m").value);
+		subscriber_ws.send(document.getElementById("m").value);
 		document.getElementById("m").value = "";
 	}
 
@@ -182,13 +187,14 @@ function sendLogin() {
 		}
 		if (this.readyState == 4 && this.status == 201) {
 			var result = JSON.parse(this.responseText);
-			
-			var browser=window.browser||window.chrome;
+			//Todo Find Working way
+			/*var browser=window.browser||window.chrome;
 			browser.cookies.set({
 				name: "X-API-KEY",
 				value: result.token
 			  });
-			  
+			*/
+			document.cookie = "X-API-KEY=123456789;SameSite=Strict;path=/";
 			createSubscriber();
 		}
 	};

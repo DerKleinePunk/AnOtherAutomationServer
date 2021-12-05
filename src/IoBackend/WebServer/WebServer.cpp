@@ -284,7 +284,10 @@ bool WebServer::RegisterResource(const std::string& resourceString, HttpResource
 
 void WebServer::SendWebSocketBroadcast(const std::string& message)
 {
-    if(_webSocketVhostData == nullptr) return;
+    if(_webSocketVhostData == nullptr) {
+        LOG(ERROR) << "_webSocketVhostData == nullptr";
+        return;
+    }
 
     msg amsg;
     amsg.len = message.size();
@@ -307,6 +310,38 @@ void WebServer::SendWebSocketBroadcast(const std::string& message)
                     ppss, _webSocketVhostData->pss_list) {
         if (!(*ppss)->publishing)
             lws_callback_on_writable((*ppss)->wsi);
+    } lws_end_foreach_llp(ppss, pss_list);
+}
+
+void WebServer::SendWebSocket(const std::string& message, uuid_t connectionId)
+{
+    if(_webSocketVhostData == nullptr) {
+        LOG(ERROR) << "_webSocketVhostData == nullptr";
+        return;
+    }
+
+    msg amsg;
+    amsg.len = message.size();
+    amsg.payload = malloc(LWS_PRE + amsg.len); // Now new because protokoll impemention is C
+
+    memcpy((char *)amsg.payload + LWS_PRE, message.c_str(), amsg.len);
+    if (!lws_ring_insert(_webSocketVhostData->ring, &amsg, 1)) {
+        /*__minimal_destroy_message(&amsg);
+        lwsl_user("dropping 2!\n");
+        break;*/
+        free(amsg.payload);
+        LOG(ERROR) << "no free buffer in ring";
+        return;
+    }
+
+     /* let every subscriber know we want to write something
+        * on them as soon as they are ready
+        */
+    lws_start_foreach_llp(struct per_session_data__minimal **,
+                    ppss, _webSocketVhostData->pss_list) {
+        if (!(*ppss)->publishing && (*ppss)->connectionId == connectionId) {
+            lws_callback_on_writable((*ppss)->wsi);
+        }
     } lws_end_foreach_llp(ppss, pss_list);
 }
 
@@ -504,24 +539,40 @@ int WebServer::MainCallBack(struct lws *wsi, enum lws_callback_reasons reason, v
     return lws_callback_http_dummy(wsi, reason, user, in, len);
 }
 
-void WebServer::NewWebSocketClient(bool consumer)
-{
-    LOG(INFO) << "NewWebSocketClient " << consumer;
-}
-
-void WebServer::WebSocketClientMessage(const std::string& message)
-{
-    LOG(INFO) << "WebSocketClientMessage " << message;
-}
-
 void WebServer::WebSocketInitDone(per_vhost_data__minimal* webSocketVhostData)
 {
     _webSocketVhostData = webSocketVhostData;
 }
 
-void WebServer::RemoveWebSocketClient(bool consumer)
+void WebServer::NewWebSocketClient(bool consumer, uuid_t connectionId)
 {
-    LOG(INFO) << "RemoveWebSocketClient " << consumer;
+    char uuid_str[37]; // ex. "1b4e28ba-2fa1-11d2-883f-0016d3cca427" + "\0"
+    uuid_unparse_upper(connectionId, uuid_str);
+    const auto stringId = std::string(uuid_str);
+
+    LOG(INFO) << "NewWebSocketClient " << consumer << " id " << stringId;
+}
+
+void WebServer::WebSocketClientMessage(const std::string& message, uuid_t connectionId)
+{
+    char uuid_str[37]; // ex. "1b4e28ba-2fa1-11d2-883f-0016d3cca427" + "\0"
+    uuid_unparse_upper(connectionId, uuid_str);
+    const auto stringId = std::string(uuid_str);
+
+    LOG(INFO) << "WebSocketClientMessage " << message << " id " << stringId;
+
+    if(message == "ECHO") {
+        SendWebSocket("I Cant hear you", connectionId);
+    }
+}
+
+void WebServer::RemoveWebSocketClient(bool consumer, uuid_t connectionId)
+{
+    char uuid_str[37]; // ex. "1b4e28ba-2fa1-11d2-883f-0016d3cca427" + "\0"
+    uuid_unparse_upper(connectionId, uuid_str);
+    const auto stringId = std::string(uuid_str);
+
+    LOG(INFO) << "RemoveWebSocketClient " << consumer << " id " << stringId;
 }
 
 bool WebServer::IsApiKeyOk(const std::string& value)
