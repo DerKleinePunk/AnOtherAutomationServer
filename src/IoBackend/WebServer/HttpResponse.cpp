@@ -38,7 +38,23 @@ void HttpResponse::SetCode(unsigned int code)
     _code = code;
 }
 
+void HttpResponse::SetCookie(const std::string& name, const std::string& value)
+{
+    if(_cookies.find(name) != _cookies.end())
+    {
+        _cookies[name] = value;
+        return;
+    }
+    _cookies.insert(std::pair<const std::string, std::string>(name, value));
+    
+}
+
 unsigned int HttpResponse::GetCode() 
 {
     return _code;
+}
+
+std::map<const std::string,std::string> HttpResponse::GetCookies()
+{
+    return _cookies;
 }

@@ -443,9 +443,30 @@ int WebServer::MainCallBack(struct lws *wsi, enum lws_callback_reasons reason, v
             if(response != nullptr)
             {
                 pss->response = response;
+                
                 if (lws_add_http_common_headers(wsi, response->GetCode(), response->GetContentType().c_str(), LWS_ILLEGAL_HTTP_CONTENT_LEN, /* no content len */ &p, end))
                 {
                     return 1;
+                }
+
+                const auto cookies = response->GetCookies();
+                for(auto cookie : cookies) {
+                    /*n = lws_snprintf(temp, sizeof(temp), "__Host-%s=%s;"
+                        "HttpOnly;"
+                        "Secure;"
+                        "SameSite=strict;"
+                        "Path=/;"
+                        "Max-Age=%lu",
+                        i->cookie_name, plain, i->expiry_unix_time);
+                        */
+                    char temp[128];
+                    int n = lws_snprintf(temp, sizeof(temp), "__Host-%s=%s;SameSite=Strict;path=/", cookie.first.c_str(),  cookie.second.c_str());
+
+                    if (lws_add_http_header_by_token(wsi, WSI_TOKEN_HTTP_SET_COOKIE, (uint8_t *)temp, n, &p, end)) {
+                        //lwsl_err("%s: failed to add JWT cookie header\n", __func__);
+                        LOG(WARNING) << "failed write cookie header";
+                        return 1;
+                    }
                 }
 
                 if (lws_finalize_write_http_header(wsi, start, &p, end))

@@ -29,9 +29,7 @@ function new_ws(urlpath, protocol)
 	return new WebSocket(urlpath, protocol);
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-
-	document.cookie = "X-API-KEY=123456789;SameSite=Strict;path=/";
+function createSubscriber() {
 	var subscriber_ws = new_ws(get_appropriate_ws_url(""), "websocket");
 	try {
 		subscriber_ws.onopen = function() {
@@ -56,6 +54,12 @@ document.addEventListener("DOMContentLoaded", function() {
 	} catch(exception) {
 		alert("<p>Error " + exception);  
 	}
+} 
+
+document.addEventListener("DOMContentLoaded", function() {
+
+	//document.cookie = "X-API-KEY=123456789;SameSite=Strict;path=/";
+	createSubscriber();
 	
 	var publisher_ws = new_ws(get_appropriate_ws_url("/publisher"), "websocket");
 	try {
@@ -85,6 +89,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	document.getElementById("dataButton3").addEventListener("click", updateDocNo);
 	document.getElementById("dataButton4").addEventListener("click", updateDocNoBody);
 	document.getElementById("sendMqttValue").addEventListener("click", sendMqttValue);
+	document.getElementById("sendLogin").addEventListener("click", sendLogin);
 
 }, false);
 
@@ -166,5 +171,31 @@ function sendMqttValue() {
 	var obj = new Object();
 	obj.topic = document.getElementById("topic").value;
 	obj.value = document.getElementById("value").value;
+	xhttp.send(JSON.stringify(obj));
+}
+
+function sendLogin() {
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			document.getElementById("getResponse").innerHTML = this.responseText;
+		}
+		if (this.readyState == 4 && this.status == 201) {
+			var result = JSON.parse(this.responseText);
+			
+			var browser=window.browser||window.chrome;
+			browser.cookies.set({
+				name: "X-API-KEY",
+				value: result.token
+			  });
+			  
+			createSubscriber();
+		}
+	};
+	xhttp.open("POST", "/api/auth/login", true);
+	xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+	var obj = new Object();
+	obj.user = document.getElementById("topic").value;
+	obj.pass = document.getElementById("value").value;
 	xhttp.send(JSON.stringify(obj));
 }

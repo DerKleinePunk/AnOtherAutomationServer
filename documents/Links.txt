@@ -63,5 +63,7 @@ https://www.youtube.com/watch?v=ixIGlEpvWXY
 Videos
 https://youtu.be/WBgdNnoF3Kg -> Scripts Video1.zip
 
-
+LibWebsockets
 https://github.com/warmcat/libwebsockets/blob/main/test-apps/test-sshd.c
+WSI_TOKEN_HTTP_AUTHORIZATION -> Sec
+lws_jwt_sign_token_set_http_cookie
