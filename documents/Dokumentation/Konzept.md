@@ -32,8 +32,8 @@ Als Logging schreiber
 
 Vielleicht:
 
-GUI mit SDL2 siehe [Carnine](www.carnine.de) wo bei halt die Frage ist man kann ja auch ein Browser als GUI nehmen wo bei da halt echt resourcen braucht Chrome
-läuft nicht auf einem PI2 die GUI schon und flüssig mit anzeige einer Karte
+GUI mit SDL2 siehe [Carnine](www.carnine.de) wo bei halt die Frage ist man kann ja auch ein Browser als GUI nehmen wo bei da halt echt resourcen braucht.
+Chrome läuft nicht auf einem PI2 die GUI schon und flüssig mit anzeige einer Karte. Ok die Karte runkel schon ein bisschen wenn man schneller fährt.
 
 Karte aus den Openstreet Map daten.
 
