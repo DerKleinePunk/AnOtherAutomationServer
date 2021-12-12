@@ -55,6 +55,9 @@ mosquitto_pub -h 192.168.2.49 -t "shellies/shelly1Tor/relay/0/command" -m "toggl
 ## mDNS
 
 https://www.megunolink.com/documentation/connecting/mdns-browser/
+apt-get install avahi-utils
+libavahi-client-dev
+https://www.avahi.org/doxygen/v0.7/html/client-browse-services_8c-example.html
 
 ## http  Websocket
 
@@ -72,3 +75,5 @@ https://community.victronenergy.com/questions/63915/anyone-have-python-example-h
 
 ## Automatik Build
 https://medium.com/swlh/how-to-create-an-automated-build-pipeline-for-your-arduino-project-1df9826f2a5e
+
+
