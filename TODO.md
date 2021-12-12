@@ -59,6 +59,13 @@ apt-get install avahi-utils
 libavahi-client-dev
 https://www.avahi.org/doxygen/v0.7/html/client-browse-services_8c-example.html
 
+http://192.168.1.2/cm?cmnd=setoption55%201 Enable mDNS on Tasmota
+Funktioniert nicht mangels Resourcen im Chip !?
+
+https://www.sigmdel.ca/michel/ha/rpi/syslog_en.html
+
+http://arduinoarsingabout.blogspot.com/2018/02/mdns-sonoff-tasmota-code-spelunking-and.html
+
 ## http  Websocket
 
 MHD_ALLOW_SUSPEND_RESUME
