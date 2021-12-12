@@ -1,6 +1,7 @@
 # Das Konzept / die Hinter diesem Projekt
 
 ## Das Problem
+
 Es gibt eine vielfallt an Sensoren und Aktoren im Fahrzeug bzw im Haus. Von günstig bis Teuer aber auf ganze Systeme wie zum Beispiel Victron Venus.
 ...
 BAer auch eine Menge Menschen die das nutzen wollen / würden aber Entweder sind sie Teuer oder sind Komplex leider trifft das auf viel Opensource Projekte
@@ -37,11 +38,9 @@ Chrome läuft nicht auf einem PI2 die GUI schon und flüssig mit anzeige einer K
 
 Karte aus den Openstreet Map daten.
 
-
 ### Die GUI
 
 Vielleicht wir es auch eine GUI mit React und Typescript geben wäre etwas was ich noch Lernen möchte.
-
 
 ## Ziele
 
@@ -49,3 +48,5 @@ Vielleicht wir es auch eine GUI mit React und Typescript geben wäre etwas was i
 * Muss ohne Internet Funktionieren
 * einfach Installieren aber auch Integriebar sein
 * Vollständig Dokumentiert (ja ich weiß das Unmöglich)
+
+![Overview](Overview.png)
