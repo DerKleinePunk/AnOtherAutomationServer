@@ -6,3 +6,4 @@ libnm-dev
 libsqlite3-dev
 libssl-dev
 uuid-dev
+libmosquitto-dev

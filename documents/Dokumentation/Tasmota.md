@@ -39,3 +39,9 @@ Rule1
 ```
 
 Rule1 1 zum Aktivieren der Rules
+
+## Tasmota and Mqtt
+
+tasmota/discovery/\<mac\>/config hier ist ein Json zur Konfig
+
+tasmota/discovery/\<mac\>/sensory hier ist ein Json zur Sensoren drin

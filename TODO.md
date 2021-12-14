@@ -41,16 +41,25 @@ mosquitto_pub -h 192.168.2.99 -t "test/message" -m "Hello, from Desktop"
 mosquitto_pub -h 192.168.2.99 -t "devices/wb-adc/controls/text" -m "Hello, from Desktop"
 
 whatch all
+
+```bash
 mosquitto_sub -h 192.168.2.99 -t \# -d
 mosquitto_sub -h 192.168.2.49 -t \# -d
+```
 
 mosquitto_sub -h 192.168.2.99 -t devices/# -d
 
 cmnd/tasmota_switch/Power TOGGLE
 
+```bash
 mosquitto_pub -h 192.168.2.49 -t "cmnd/tasmota_852612/POWER" -m "TOGGLE"
 mosquitto_pub -h 192.168.2.49 -t "cmnd/tasmota_852612/POWER2" -m "TOGGLE" or ON / OFF
 mosquitto_pub -h 192.168.2.49 -t "shellies/shelly1Tor/relay/0/command" -m "toggle" or on / off
+```
+
+```Json
+{"ip":"192.168.X.Y","dn":"Tasmota","fn":["Tasmota","","","",null,null,null,null],"hn":"tasmota-852612-1554","mac":"84CCA8852612","md":"4CH Relay","ty":0,"if":0,"ofln":"Offline","onln":"Online","state":["OFF","ON","TOGGLE","HOLD"],"sw":"10.0.0","t":"tasmota_852612","ft":"%prefix%/%topic%/","tp":["cmnd","stat","tele"],"rl":[1,1,1,1,0,0,0,0],"swc":[-1,-1,-1,-1,-1,-1,-1,-1],"swn":[null,null,null,null,null,null,null,null],"btn":[0,0,0,0,0,0,0,0],"so":{"4":0,"11":0,"13":0,"17":0,"20":0,"30":0,"68":0,"73":0,"82":0,"114":0,"117":0},"lk":0,"lt_st":0,"sho":[0,0,0,0],"ver":1}
+```
 
 ## mDNS
 
@@ -82,5 +91,3 @@ https://community.victronenergy.com/questions/63915/anyone-have-python-example-h
 
 ## Automatik Build
 https://medium.com/swlh/how-to-create-an-automated-build-pipeline-for-your-arduino-project-1df9826f2a5e
-
-
