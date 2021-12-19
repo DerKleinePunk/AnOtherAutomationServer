@@ -56,6 +56,7 @@ mosquitto_pub -h 192.168.2.49 -t "cmnd/tasmota_852612/POWER" -m "TOGGLE"
 mosquitto_pub -h 192.168.2.49 -t "cmnd/tasmota_852612/POWER2" -m "TOGGLE" or ON / OFF
 mosquitto_pub -h 192.168.2.49 -t "shellies/shelly1Tor/relay/0/command" -m "toggle" or on / off
 mosquitto_pub -h 192.168.2.49 -t "herbiOs/lights/Licht1/state" -m "ON"
+mosquitto_pub -h 192.168.2.49 -t "herbiOs/lights/Licht1/state" -m "{ \"state\" : \"ON\", \"brightness\" : 125}"
 mosquitto_pub -h 192.168.2.49 -t "mn/test/1" -m "TestValue"
 ```
 

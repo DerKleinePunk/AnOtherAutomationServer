@@ -80,7 +80,7 @@ int main(int argc, char** argv)
     auto eventManager = new ServiceEventManager();
     eventManager->Init();
     
-    GlobalFunctions globalFunctions(config, eventManager);
+    GlobalFunctions globalFunctions(config, eventManager, networkManager);
 
     const auto ownWebServer = new WebServer(&globalFunctions);
 
@@ -131,7 +131,7 @@ int main(int argc, char** argv)
             runner->RunScript("sample", "simpleFunc");
         } else if(input == "s") {
             const json result = networkManager->ScanAccessPoints();
-             std::cout << result.dump() << std::endl;
+            std::cout << result.dump() << std::endl;
         } else if(input == "t0") {
             connector->Publish("cmnd/tasmota_852612/POWER", "TOGGLE");
         } else {

@@ -67,7 +67,14 @@ std::string HttpRequest::GetHeader(const std::string& name)
         }
         delete [] value;
     } else if(size < 0){
-        LOG(WARNING) << nameIntern << " header not found";
+        /*size_t max = 32;
+        char textBuffer[32];
+		if(lws_http_cookie_get(_wsi, "X-API-KEY", textBuffer, &max) == 0) {
+            result = std::string(textBuffer, max);
+        } else {
+            LOG(WARNING) << nameIntern << " header or cookie not found";
+        }*/
+        LOG(WARNING) << nameIntern << " header or cookie not found";
     }
     return result;
 }

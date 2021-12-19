@@ -9,10 +9,11 @@
 #include "../common/utils/commonutils.h"
 #include "GlobalFunctions.hpp"
 
-GlobalFunctions::GlobalFunctions(Config* config, ServiceEventManager* serviceEventManager)
+GlobalFunctions::GlobalFunctions(Config* config, ServiceEventManager* serviceEventManager, NetworkManager* networkManager)
 {
     _config = config;
     _serviceEventManager = serviceEventManager;
+    _networkManager = networkManager;
 }
 
 GlobalFunctions::~GlobalFunctions()
@@ -47,4 +48,10 @@ uint16_t GlobalFunctions::GetServerPort() const
 void GlobalFunctions::FireNewEvent(const std::string& name, const std::string& parameter)
 {
     _serviceEventManager->FireNewEvent(name, parameter); 
+}
+
+std::string GlobalFunctions::ScanAccessPoints(const std::string& interfaceName)
+{
+    const json result = _networkManager->ScanAccessPoints(interfaceName);
+    return result.dump();
 }

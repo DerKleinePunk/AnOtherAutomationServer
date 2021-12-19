@@ -95,6 +95,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	document.getElementById("dataButton4").addEventListener("click", updateDocNoBody);
 	document.getElementById("sendMqttValue").addEventListener("click", sendMqttValue);
 	document.getElementById("sendLogin").addEventListener("click", sendLogin);
+	document.getElementById("getAccessPoints").addEventListener("click", getAccessPoints);
 
 }, false);
 
@@ -204,4 +205,20 @@ function sendLogin() {
 	obj.user = document.getElementById("topic").value;
 	obj.pass = document.getElementById("value").value;
 	xhttp.send(JSON.stringify(obj));
+}
+
+function getAccessPoints() {
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			document.getElementById("getResponse").innerHTML = this.responseText;
+		}
+		if (this.readyState == 4 && this.status == 401) {
+			document.getElementById("getResponse").innerHTML = "nicht erlaubt";
+		}
+	};
+	xhttp.open("GET", "/api/test/system/wlan", true);
+	xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+	xhttp.setRequestHeader("X-API-KEY", "123456789");
+	xhttp.send();
 }

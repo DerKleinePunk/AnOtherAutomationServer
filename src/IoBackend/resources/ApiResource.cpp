@@ -27,10 +27,15 @@ HttpResponse* ApiResource::Process(HttpRequest& request, const std::string& url,
 
     LOG(DEBUG) << url << " Api Call Get with " << arg << " apiKey " << apiKey;
 
-    if(!_globalFunctions->IsApiKeyOk(apiKey)) 
-    {
+    if(!_globalFunctions->IsApiKeyOk(apiKey)) {
         result->SetContent("application/json", "{\"error\" : \"UNAUTHORIZED\"}");
         result->SetCode(HTTP_STATUS_UNAUTHORIZED);
+        return result; 
+    }
+
+    if(url == "system/wlan" && method == "GET") {
+        result->SetContent("application/json", _globalFunctions->ScanAccessPoints());
+        result->SetCode(200);
         return result; 
     }
 
