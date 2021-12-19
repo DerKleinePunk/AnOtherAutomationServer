@@ -114,7 +114,7 @@ int main(int argc, char** argv)
         LOG(INFO) << "Own WebServer Running";
     }
 
-    auto backend = new Backend(ownWebServer, eventManager);
+    auto backend = new Backend(ownWebServer, eventManager, config, runner);
     backend->Init();
 
     WriteFunktionText();

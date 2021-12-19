@@ -116,7 +116,7 @@ void PythonRunner::Deinit()
     }
 }
 
-bool PythonRunner::RunScript(const std::string& scriptFile, const std::string& functionToCall)
+bool PythonRunner::RunScript(const std::string& scriptFile, const std::string& functionToCall, const std::string& parameter)
 {
     PyObject *pName, *pModule, *pFunc;
 
@@ -136,8 +136,18 @@ bool PythonRunner::RunScript(const std::string& scriptFile, const std::string& f
         if (pFunc && PyCallable_Check(pFunc)) {
             PyObject* pArgs = nullptr;
 
+            if(parameter.size() > 0) {
+                pArgs = PyTuple_New(1);
+                auto pValue = PyUnicode_FromString(parameter.c_str());
+                PyTuple_SetItem(pArgs, 0, pValue);
+            }
+
             //pValue = 
             PyObject_CallObject(pFunc, pArgs);
+            if(parameter.size() > 0) {
+                Py_DECREF(pArgs);
+            }
+            
 
         } else {
             Py_DECREF(pFunc);

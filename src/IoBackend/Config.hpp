@@ -2,6 +2,14 @@
 
 #include <string>
 #include <vector>
+#include <map>
+
+struct EventNode
+{
+    std::string Name;
+    std::string Function;
+    std::map<std::string, std::string> Parameters;
+};
 
 struct ConfigFile
 {
@@ -9,6 +17,7 @@ struct ConfigFile
     uint16_t ServerPort;
     std::string ApiKey;
     std::vector<std::string> WatchTopics;
+    std::vector<EventNode> EventRoot;
 };
 
 class Config
@@ -27,4 +36,5 @@ public:
     uint16_t GetServerPort() const;
     std::string GetApiKey() const;
     std::vector<std::string> GetWatchTopics() const;
+    std::vector<EventNode> GetEventRoot() const;
 };

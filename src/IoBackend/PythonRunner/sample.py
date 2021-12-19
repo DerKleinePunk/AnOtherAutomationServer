@@ -24,4 +24,10 @@ def simpleFunc():
     connector.LogEntry("DEBUG", "simpleFunc Startet")
     return
 
+def callbackMqtt(text):
+    print("callbackMqtt called " + text)
+    connector.LogEntry("DEBUG", "callbackMqtt")
+
+    return
+
 print("finally")

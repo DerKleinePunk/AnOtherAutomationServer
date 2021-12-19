@@ -15,14 +15,48 @@
 
 using json = nlohmann::json;
 
+void to_json(json& j, const EventNode& p)
+{
+    j = json{ 
+        { "Name", p.Name }, 
+        { "Function", p.Function },
+        { "Parameters", p.Parameters }  
+    };
+}
+
 void to_json(json& j, const ConfigFile& p)
 {
     j = json{ 
         { "MqttServer", p.MqttServer }, 
         { "ServerPort", p.ServerPort }, 
         { "ApiKey", p.ApiKey }, 
-        { "WatchTopics", p.WatchTopics } 
+        { "WatchTopics", p.WatchTopics },
+        { "EventRoot", p.EventRoot }
     };
+}
+
+void from_json(const json& j, EventNode& p)
+{
+    auto it_value = j.find("Name");
+    if(it_value != j.end()) {
+        p.Name = j.at("Name").get<std::string>();
+    } else {
+        p.Name = "EmptyEvent";
+    }
+
+    it_value = j.find("Function");
+    if(it_value != j.end()) {
+        p.Function = j.at("Function").get<std::string>();
+    } else {
+        p.Function = "EmptyFunctionName";
+    }
+
+    it_value = j.find("Parameters");
+    if(it_value != j.end()) {
+        p.Parameters = j.at("Parameters").get<std::map<std::string, std::string>>();
+    } else {
+        //p.Parameters = "Parameters";
+    }
 }
 
 void from_json(const json& j, ConfigFile& p)
@@ -53,6 +87,17 @@ void from_json(const json& j, ConfigFile& p)
         p.WatchTopics = j.at("WatchTopics").get<std::vector<std::string>>();
     } else {
         p.WatchTopics.push_back("devices/#");
+    }
+
+    it_value = j.find("EventRoot");
+    if(it_value != j.end()) {
+        p.EventRoot = j.at("EventRoot").get<std::vector<EventNode>>();
+    } else {
+        EventNode node;
+        node.Name = "MqttValue";
+        node.Function = "CallPython";
+
+        p.EventRoot.push_back(node);
     }
 }
 
@@ -126,4 +171,9 @@ std::string Config::GetApiKey() const
 std::vector<std::string> Config::GetWatchTopics() const
 {
     return _configFile.WatchTopics;
+}
+
+std::vector<EventNode> Config::GetEventRoot() const
+{
+    return _configFile.EventRoot;
 }

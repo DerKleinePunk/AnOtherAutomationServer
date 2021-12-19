@@ -31,7 +31,6 @@ static PyObject* ConnectorLogEntry(PyObject *self, PyObject *args)
         Py_RETURN_NONE;
     }
 
-    //Todo write Log
     auto dictionary = PyModule_GetDict(self);
     auto classPointer = PyDict_GetItemString(dictionary, CLASSKEY);
     auto parent = (PythonConnector*)PyLong_AsVoidPtr(classPointer);
@@ -86,6 +85,8 @@ void PythonConnector::LogIt(const std::string& level, const std::string& text)
 {
     if(level == "INFO") {
         LOG(INFO) << text;
+    } else if(level == "ERROR") {
+        LOG(ERROR) << text;
     } else {
         LOG(DEBUG) << text;
     }

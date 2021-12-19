@@ -16,6 +16,6 @@ public:
     bool Init();
     void Deinit();
 
-    bool RunScript(const std::string& scriptFile, const std::string& functionToCall = "");
+    bool RunScript(const std::string& scriptFile, const std::string& functionToCall = "", const std::string& parameter = "");
 };
 
