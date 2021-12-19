@@ -11,27 +11,52 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
+typedef PyObject* (*module_init_function)();
+
+#define CLASSKEY "ClassPointer"
+
 static PyObject* ConnectorVer(PyObject *self, PyObject *args)
 {
     //PyBytes_FromString
     return PyUnicode_FromString("0.0");
 }
 
+static PyObject* ConnectorLogEntry(PyObject *self, PyObject *args)
+{
+    const char* level;
+    const char* text;
+
+    //https://docstore.mik.ua/orelly/other/python/0596001886_pythonian-chp-24-sect-1.html PyArg_ParseTuple
+    if (!PyArg_ParseTuple(args, "ss", &level, &text)) {
+        Py_RETURN_NONE;
+    }
+
+    //Todo write Log
+    auto dictionary = PyModule_GetDict(self);
+    auto classPointer = PyDict_GetItemString(dictionary, CLASSKEY);
+    auto parent = (PythonConnector*)PyLong_AsVoidPtr(classPointer);
+    parent->LogIt(std::string(level), std::string(text));
+
+    Py_RETURN_NONE;
+}
+
 
 static PyMethodDef ConnectorMethods[] = {
-    {"ver", ConnectorVer, METH_VARARGS,
-     "Return the Version from Backend"},
+    {"Ver", ConnectorVer, METH_VARARGS, "Return the Version from Backend"},
+    {"LogEntry", ConnectorLogEntry, METH_VARARGS, "Write Logfile Entry"},
     {NULL, NULL, 0, NULL}
 };
 
 static PyModuleDef ConnectorModule = {
-    PyModuleDef_HEAD_INIT, "connector", NULL, -1, ConnectorMethods,
+    PyModuleDef_HEAD_INIT, "connector", "The Backend Connector Interface", -1, ConnectorMethods,
     NULL, NULL, NULL, NULL
 };
 
-static PyObject* PyInit_Connector(void)
+PyObject* PythonConnector::ModuleInit()
 {
-    return PyModule_Create(&ConnectorModule);
+    auto module = PyModule_Create(&ConnectorModule);
+    PyModule_AddObject(module, CLASSKEY, PyLong_FromVoidPtr(this));
+    return module;
 }
 
 PythonConnector::PythonConnector(/* args */)
@@ -46,7 +71,10 @@ PythonConnector::~PythonConnector()
 
 bool PythonConnector::Init()
 {
-    if(PyImport_AppendInittab("connector", &PyInit_Connector) < 0)
+    utils::Callback<PyObject*()>::func = std::bind(&PythonConnector::ModuleInit, this);
+    module_init_function func = static_cast<module_init_function>(utils::Callback<PyObject*()>::callback);
+
+    if(PyImport_AppendInittab("connector", func) < 0)
     {
         return false;
     }
@@ -54,3 +82,11 @@ bool PythonConnector::Init()
     return true;
 }
 
+void PythonConnector::LogIt(const std::string& level, const std::string& text)
+{
+    if(level == "INFO") {
+        LOG(INFO) << text;
+    } else {
+        LOG(DEBUG) << text;
+    }
+}

@@ -32,3 +32,4 @@ allow_anonymous true
 ## Links
 
 [mosquitto-logging](http://www.steves-internet-guide.com/mosquitto-logging/)
+[Python und Mqtt](https://smarthome-blogger.de/blog/tutorial/python-mqtt-tutorial/)

@@ -4,4 +4,5 @@
 * [InstallPI](InstallPI.md)
 * [Tasmota](Tasmota.md)
 * [Mosquitto](Mosquitto.md)
+* [Node.js](Node.md)
 * [Api](SoftwareApi.md)
