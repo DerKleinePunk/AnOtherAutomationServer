@@ -91,7 +91,7 @@ int main(int argc, char** argv)
         LOG(INFO) << "Mqtt Connecting";
     }
    
-    auto runner = new PythonRunner(commandLineArgs.GetBasePath() + "/SimpelIoBackend.bin");
+    auto runner = new PythonRunner(commandLineArgs.GetBasePath() + "/SimpelIoBackend.bin", &globalFunctions);
     runner->Init();
 
     if(!ownWebServer->RegisterResource("/dynpage", new TestResource())){

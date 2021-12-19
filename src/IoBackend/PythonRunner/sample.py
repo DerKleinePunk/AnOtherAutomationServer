@@ -4,6 +4,7 @@
 #connector came over Backend
 import connector 
 import sys
+import json
 
 print("Version from Backend", connector.Ver())
 print(sys.path)
@@ -27,7 +28,10 @@ def simpleFunc():
 def callbackMqtt(text):
     print("callbackMqtt called " + text)
     connector.LogEntry("DEBUG", "callbackMqtt")
-
+    params = json.loads(text)
+    if(params["topic"] == "mn/test/1"):
+        connector.LogEntry("DEBUG", params["value"])
+        connector.WriteMqtt("herbiOs/lights/Licht1/state", params["value"])
     return
 
 print("finally")

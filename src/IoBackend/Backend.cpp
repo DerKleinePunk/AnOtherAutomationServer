@@ -7,6 +7,10 @@
 
 #include "Backend.hpp"
 #include "../common/easylogging/easylogging++.h"
+#include "../common/json/json.hpp"
+#include <map>
+
+using json = nlohmann::json;
 
 void Backend::EventCallback(const std::string& name, const std::string& parameter)
 {
@@ -16,6 +20,10 @@ void Backend::EventCallback(const std::string& name, const std::string& paramete
 
     for(auto entry : _config->GetEventRoot()) {
         if(entry.Name == name) {
+            auto jsonText = json::parse(parameter);
+            auto currentParameter = jsonText.get<std::map<std::string, std::string>>();
+            entry.Parameters.insert(currentParameter.begin(), currentParameter.end());
+            
             Run(entry.Function, entry.Parameters);
         }
     }
@@ -38,8 +46,10 @@ void Backend::Run(const std::string& name, const std::map<std::string, std::stri
             function = entry->second;
         }
 
+        json parameterJson = parameters;
+
         if(script.size() > 0 && function.size() > 0 ) {
-            _runner->RunScript(script, function, "Hello");
+            _runner->RunScript(script, function, parameterJson.dump());
         } else {
             LOG(ERROR) << "missing Parameter to Run Function CallPython";
         }

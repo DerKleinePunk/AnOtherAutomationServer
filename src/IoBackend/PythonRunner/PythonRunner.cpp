@@ -8,8 +8,11 @@
 #include "PythonRunner.hpp"
 #include "../../common/easylogging/easylogging++.h"
 #include "../../common/utils/commonutils.h"
+#include "../../common/json/json.hpp"
+
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
+using json = nlohmann::json;
 
 //Stolen from https://github.com/pybind/pybind11
 
@@ -53,10 +56,20 @@ void PythonRunner::PrintTotalRefCount()
 #endif
 }
 
-PythonRunner::PythonRunner(const std::string& appName)
+void PythonRunner::WriteMqtt(const std::string& topic, const std::string& value)
+{
+    json j;
+    j["topic"] = topic;
+    j["value"] = value;
+
+    _globalFunctions->FireNewEvent("PublishMqtt", j.dump());
+}
+
+PythonRunner::PythonRunner(const std::string& appName, GlobalFunctions* globalFunctions)
 {
     el::Loggers::getLogger(ELPP_DEFAULT_LOGGER);
     _appName = appName;
+    _globalFunctions = globalFunctions;
 }
 
 PythonRunner::~PythonRunner()
@@ -71,7 +84,9 @@ bool PythonRunner::Init()
         return false;
     }
 
-    _connector = new PythonConnector();
+    WriteMqttDelegate delegate = std::bind(&PythonRunner::WriteMqtt, this, std::placeholders::_1, std::placeholders::_2);
+
+    _connector = new PythonConnector(delegate);
     bool init_signal_handlers = false;
     bool add_program_dir_to_path = true;
 

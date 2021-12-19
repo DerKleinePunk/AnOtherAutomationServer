@@ -39,10 +39,28 @@ static PyObject* ConnectorLogEntry(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+static PyObject* ConnectorWriteMqtt(PyObject *self, PyObject *args)
+{
+    const char* level;
+    const char* text;
+
+    //https://docstore.mik.ua/orelly/other/python/0596001886_pythonian-chp-24-sect-1.html PyArg_ParseTuple
+    if (!PyArg_ParseTuple(args, "ss", &level, &text)) {
+        Py_RETURN_NONE;
+    }
+
+    auto dictionary = PyModule_GetDict(self);
+    auto classPointer = PyDict_GetItemString(dictionary, CLASSKEY);
+    auto parent = (PythonConnector*)PyLong_AsVoidPtr(classPointer);
+    parent->WriteMqtt(std::string(level), std::string(text));
+
+    Py_RETURN_NONE;
+}
 
 static PyMethodDef ConnectorMethods[] = {
     {"Ver", ConnectorVer, METH_VARARGS, "Return the Version from Backend"},
     {"LogEntry", ConnectorLogEntry, METH_VARARGS, "Write Logfile Entry"},
+    {"WriteMqtt", ConnectorWriteMqtt, METH_VARARGS, "Write Value to Mqtt Topic"},
     {NULL, NULL, 0, NULL}
 };
 
@@ -58,9 +76,15 @@ PyObject* PythonConnector::ModuleInit()
     return module;
 }
 
-PythonConnector::PythonConnector(/* args */)
+/**
+ * @brief Construct a new Python Connector:: Python Connector object
+ * 
+ * @param writeMqttEvent 
+ */
+PythonConnector::PythonConnector(WriteMqttDelegate writeMqttEvent)
 {
     el::Loggers::getLogger(ELPP_DEFAULT_LOGGER);
+    _writeMqttEvent = writeMqttEvent;
 }
 
 PythonConnector::~PythonConnector()
@@ -89,5 +113,12 @@ void PythonConnector::LogIt(const std::string& level, const std::string& text)
         LOG(ERROR) << text;
     } else {
         LOG(DEBUG) << text;
+    }
+}
+
+void PythonConnector::WriteMqtt(const std::string& topic, const std::string& value)
+{
+    if(_writeMqttEvent != nullptr) {
+        _writeMqttEvent(topic, value);
     }
 }
