@@ -94,3 +94,7 @@ https://community.victronenergy.com/questions/63915/anyone-have-python-example-h
 
 ## Automatik Build
 https://medium.com/swlh/how-to-create-an-automated-build-pipeline-for-your-arduino-project-1df9826f2a5e
+
+## Git hints
+git reset --hard
+git clean -fx
