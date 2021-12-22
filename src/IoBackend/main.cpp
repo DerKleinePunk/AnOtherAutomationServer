@@ -130,8 +130,15 @@ int main(int argc, char** argv)
         } else if(input == "r1") {
             runner->RunScript("sample", "simpleFunc");
         } else if(input == "s") {
-            const json result = networkManager->ScanAccessPoints();
-            std::cout << result.dump() << std::endl;
+            const auto result = networkManager->ScanAccessPoints();
+            for ( const auto device : result) {
+                std::cout << device.Iface << std::endl;
+                for (const auto apInfo : device.AccessPoints) {
+                    std::cout << "     " << apInfo.Ssid << std::endl;
+                }
+            }
+            json jsonText = result;
+            std::cout << jsonText.dump() << std::endl;
         } else if(input == "t0") {
             connector->Publish("cmnd/tasmota_852612/POWER", "TOGGLE");
         } else {
