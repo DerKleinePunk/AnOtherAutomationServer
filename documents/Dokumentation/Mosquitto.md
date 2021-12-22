@@ -12,6 +12,11 @@ Es werden alle dateinen die auf .conf enden ein gelesen
 
 Das sind Config Files wie ich sie mir überlegt habe man könnte auch alles in eine schreiben
 
+```bash
+sudo nano /etc/mosquitto/conf.d/logging.conf
+sudo nano /etc/mosquitto/conf.d/listener.conf
+```
+
 ### logging.conf
 
 ```text

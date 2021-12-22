@@ -134,7 +134,7 @@ void NetworkManager::BuildAccessPointInfo(NMAccessPoint* ap, std::vector<AccessP
     GBytes *    ssid;
     const char *hwaddr;
     NM80211Mode mode;
-    char *      freq_str, *ssid_str, *bitrate_str, *strength_str, *wpa_flags_str, *rsn_flags_str;
+    char *      freq_str, *ssid_str, *bitrate_str, *wpa_flags_str, *rsn_flags_str;
     GString *   security_str;
 
     /* Get AP properties */
@@ -156,7 +156,7 @@ void NetworkManager::BuildAccessPointInfo(NMAccessPoint* ap, std::vector<AccessP
 
     freq_str      = g_strdup_printf("%u MHz", freq);
     bitrate_str   = g_strdup_printf("%u Mbit/s", bitrate / 1000);
-    strength_str  = g_strdup_printf("%u", strength);
+    //strength_str  = g_strdup_printf("%u", strength);
     wpa_flags_str = ap_wpa_rsn_flags_to_string(wpa_flags);
     rsn_flags_str = ap_wpa_rsn_flags_to_string(rsn_flags);
 
@@ -205,7 +205,7 @@ void NetworkManager::BuildAccessPointInfo(NMAccessPoint* ap, std::vector<AccessP
     g_free(ssid_str);
     g_free(freq_str);
     g_free(bitrate_str);
-    g_free(strength_str);
+    //g_free(strength_str);
     g_free(wpa_flags_str);
     g_free(rsn_flags_str);
     g_string_free(security_str, TRUE);

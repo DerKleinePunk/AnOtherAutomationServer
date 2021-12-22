@@ -82,6 +82,13 @@ https://www.home-assistant.io/installation/raspberrypi
 
 http://192.168.2.99:8123
 
+## Mqtt
+
+sudo apt install mosquitto mosquitto-clients
+sudo systemctl enable mosquitto
+
+[Hier weiter](Mosquitto.md)
+
 ## Todo
 
 Docker as a non-root user
