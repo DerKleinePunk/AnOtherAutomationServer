@@ -15,6 +15,7 @@ struct AccessPointInfo
     std::string Mode;
     std::string Freg;
     std::string Bitrate;
+    uint8_t Strength;
 };
 
 void to_json(json& j, const AccessPointInfo& p);

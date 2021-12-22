@@ -17,7 +17,8 @@ void to_json(json& j, const AccessPointInfo& p)
         { "Bssid", p.Bssid }, 
         { "Freg", p.Freg }, 
         { "Mode", p.Mode },
-        { "Ssid", p.Ssid }  
+        { "Ssid", p.Ssid },
+        { "Strength", p.Strength}
     };
 }
 
@@ -185,16 +186,17 @@ void NetworkManager::BuildAccessPointInfo(NMAccessPoint* ap, std::vector<AccessP
                                                 : "Unknown";
     info.Freg = freq_str;
     info.Bitrate = bitrate_str;
+    info.Strength = strength;
 
-    printf("SSID:       %s\n", ssid_str);
+    //printf("SSID:       %s\n", ssid_str);
     /*printf("BSSID:      %s\n", hwaddr);
     printf("Mode:       %s\n",
            mode == NM_802_11_MODE_ADHOC   ? "Ad-Hoc"
            : mode == NM_802_11_MODE_INFRA ? "Infrastructure"
                                           : "Unknown");*/
-    printf("Freq:       %s\n", freq_str);
-    printf("Bitrate:    %s\n", bitrate_str);
-    printf("Strength:   %s\n", strength_str);
+    //printf("Freq:       %s\n", freq_str);
+    //printf("Bitrate:    %s\n", bitrate_str);
+    //printf("Strength:   %s\n", strength_str);
     printf("Security:   %s\n", security_str->str);
     printf("WPA flags:  %s\n", wpa_flags_str);
     printf("RSN flags:  %s\n", rsn_flags_str);
