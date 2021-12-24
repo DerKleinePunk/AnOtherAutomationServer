@@ -12,6 +12,7 @@
 #include "WebServer/WebServer.hpp"
 #include "PythonRunner/PythonRunner.hpp"
 #include "SystemFunktions/NetworkManager.hpp"
+#include "SystemFunktions/I2CManager.hpp"
 #include "ServiceEvents/ServiceEventManager.hpp"
 #include "Backend.hpp"
 
@@ -94,6 +95,8 @@ int main(int argc, char** argv)
     auto runner = new PythonRunner(commandLineArgs.GetBasePath() + "/SimpelIoBackend.bin", &globalFunctions);
     runner->Init();
 
+    auto i2cManager = new I2CManager();
+
     if(!ownWebServer->RegisterResource("/dynpage", new TestResource())){
         LOG(ERROR) << "RegisterResource failed";
     }
@@ -149,6 +152,9 @@ int main(int argc, char** argv)
     }
 
     delete backend;
+    
+    i2cManager->Deinit();
+    delete i2cManager;
 
     eventManager->Deinit();
     delete eventManager;

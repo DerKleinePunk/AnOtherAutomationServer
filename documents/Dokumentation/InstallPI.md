@@ -57,6 +57,7 @@ https://stackoverflow.com/questions/55344896/attempt-to-change-docker-data-root-
 mkdir homeassistant
 
 Install:
+
 ```bash
 docker run -d \
   --name homeassistant \
@@ -88,6 +89,21 @@ sudo apt install mosquitto mosquitto-clients
 sudo systemctl enable mosquitto
 
 [Hier weiter](Mosquitto.md)
+
+## I²C
+
+```bash
+sudo apt-get install i2c-tools
+i2cdetect -y 1
+```
+
+Welche Geräte Sind am Bus
+
+sudo echo 6 >/sys/class/gpio/export
+sudo echo out > /sys/class/gpio/gpio6/direction
+sudo echo 1 >/sys/class/gpio/gpio6/value
+
+Der GPIO 6 ist bei mir die Freigabe von MCP23017 damit bei Startup nix dummes passiert.
 
 ## Todo
 

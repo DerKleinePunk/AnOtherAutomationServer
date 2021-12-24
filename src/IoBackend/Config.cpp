@@ -24,14 +24,42 @@ void to_json(json& j, const EventNode& p)
     };
 }
 
-void to_json(json& j, const ConfigFile& p)
+void to_json(json& j, const MCP23017Resource* p)
 {
     j = json{ 
+        { "Type", p->Type },
+        { "Address" , p->Address}
+    };
+}
+
+void to_json(json& j, const GPSMouseResource* p)
+{
+    j = json{ 
+        { "Type", p->Type },
+        { "ComPort" , p->ComPort}
+    };
+}
+
+//reinterpret_cast
+
+void to_json(json& j, Resource* p)
+{
+    if(p->Type == "MCP23017") {
+        to_json(j, reinterpret_cast<MCP23017Resource*>(p));
+    } else if(p->Type == "GPSMouse") {
+        to_json(j, reinterpret_cast<GPSMouseResource*>(p));
+    }
+}
+
+void to_json(json& j, const ConfigFile& p)
+{
+    j = json { 
         { "MqttServer", p.MqttServer }, 
         { "ServerPort", p.ServerPort }, 
         { "ApiKey", p.ApiKey }, 
         { "WatchTopics", p.WatchTopics },
-        { "EventRoot", p.EventRoot }
+        { "EventRoot", p.EventRoot },
+        { "Resources", p.Resources }
     };
 }
 
@@ -56,6 +84,27 @@ void from_json(const json& j, EventNode& p)
         p.Parameters = j.at("Parameters").get<std::map<std::string, std::string>>();
     } else {
         //p.Parameters = "Parameters";
+    }
+}
+
+void from_json(const json& j, Resource& p)
+{
+    auto it_value = j.find("Type");
+    if(it_value != j.end()) {
+        p.Type = j.at("Type").get<std::string>();
+    } else {
+        LOG(WARNING) << "Type Not found in Resource Entry";
+    }
+}
+
+void from_json(const json& j, MCP23017Resource* p)
+{
+    auto it_value = j.find("Type");
+    if(it_value != j.end()) {
+        p->Type = j.at("Type").get<std::string>();
+        p->Address = j.at("Address").get<uint8_t>();
+    } else {
+        LOG(WARNING) << "Type Not found in Resource Entry";
     }
 }
 
@@ -96,8 +145,34 @@ void from_json(const json& j, ConfigFile& p)
         EventNode node;
         node.Name = "MqttValue";
         node.Function = "CallPython";
-
         p.EventRoot.push_back(node);
+    }
+
+    it_value = j.find("Resources");
+    if(it_value != j.end()) {
+        auto resources = j.at("Resources");
+        for (json::iterator it = resources.begin(); it != resources.end(); ++it)
+        {
+            Resource valueType;
+            from_json(it.value(), valueType);
+            if(valueType.Type == "MCP23017") {
+                MCP23017Resource* mcpType = new MCP23017Resource();
+                from_json(it.value(), mcpType);
+                p.Resources.push_back(mcpType);
+            } else {
+                LOG(WARNING) << valueType.Type << " Unkownen Type";
+            }
+        }
+    } else {
+        MCP23017Resource* entry = new MCP23017Resource();
+        entry->Type = "MCP23017";
+        entry->Address = 0x20;
+        p.Resources.push_back(entry);
+
+        GPSMouseResource* entry2 = new GPSMouseResource();
+        entry2->Type = "GPSMouse";
+        entry2->ComPort = "none";
+        p.Resources.push_back(entry2);
     }
 }
 
@@ -138,6 +213,22 @@ void Config::Load()
         _configFile.ServerPort = 8080;
         _configFile.ApiKey = "12345678";
         _configFile.WatchTopics.push_back("devices/#");
+        
+        EventNode node;
+        node.Name = "MqttValue";
+        node.Function = "CallPython";
+        _configFile.EventRoot.push_back(node);
+
+        MCP23017Resource* entry = new MCP23017Resource();
+        entry->Type = "MCP23017";
+        entry->Address = 0x20;
+        _configFile.Resources.push_back(entry);
+
+        GPSMouseResource* entry2 = new GPSMouseResource();
+        entry2->Type = "GPSMouse";
+        entry2->ComPort = "none";
+        _configFile.Resources.push_back(entry2);
+
         std::ofstream o(_filenameConfig);
         const json jConfig = _configFile;
         o << std::setw(4) << jConfig << std::endl;

@@ -11,6 +11,21 @@ struct EventNode
     std::map<std::string, std::string> Parameters;
 };
 
+struct Resource
+{
+    std::string Type;
+};
+
+struct MCP23017Resource : public Resource
+{
+    uint8_t Address;
+};  
+
+struct GPSMouseResource : public Resource
+{
+    std::string ComPort;
+};
+
 struct ConfigFile
 {
     std::string MqttServer;
@@ -18,6 +33,7 @@ struct ConfigFile
     std::string ApiKey;
     std::vector<std::string> WatchTopics;
     std::vector<EventNode> EventRoot;
+    std::vector<Resource*> Resources;
 };
 
 class Config

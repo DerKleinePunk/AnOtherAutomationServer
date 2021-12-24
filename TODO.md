@@ -33,6 +33,7 @@ https://www.kohlenklau.de/mqtt-auf-raspberry-pi-installieren/
 https://www.sophos.com/en-us/medialibrary/PDFs/documentation/UTMonAWS/Sophos-UTM-RESTful-API.pdf
 https://www.waveshare.com/wiki/2.13inch_e-Paper_HAT
 https://www.waveshare.com/w/upload/d/d8/2.13inch_e-Paper_%28B%29_V3_Specification.pdf
+https://techtutorialsx.com/2021/11/02/esp32-dynamic-sensor-network/
 
 ## Test Commands
 
@@ -96,5 +97,8 @@ https://community.victronenergy.com/questions/63915/anyone-have-python-example-h
 https://medium.com/swlh/how-to-create-an-automated-build-pipeline-for-your-arduino-project-1df9826f2a5e
 
 ## Git hints
+
 git reset --hard
 git clean -fx
+git checkout feature/4-mqtt-rewrite
+git submodule add https://github.com/DerKleinePunk/PiGPIOHelper.git

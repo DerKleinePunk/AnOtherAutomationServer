@@ -19,7 +19,7 @@ INCLUDE_DIRECTORIES(${GLIB_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${NM_INCLUDE_DIRS})
 # INCLUDE_DIRECTORIES(libwebsockets)
 
-add_executable(${project_BIN} ${SRCS} ${easylogging_SRCS} ${common_utils_SRCS})
+add_executable(${project_BIN} ${SRCS} ${easylogging_SRCS} ${common_utils_SRCS} ${GPIOHelper_SRCS} ${exception_SRCS})
 
 TARGET_LINK_LIBRARIES(${project_BIN} PRIVATE ${Python3_LIBRARIES})
 TARGET_LINK_LIBRARIES(${project_BIN} PRIVATE ${MOSQUITTO_LIBRARIES} ${GLIB_LDFLAGS} ${NM_LIBRARIES})
