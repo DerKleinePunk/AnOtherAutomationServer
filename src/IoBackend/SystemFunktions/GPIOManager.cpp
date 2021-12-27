@@ -45,7 +45,10 @@ void GPIOManager::EventCallback(const std::string& name, const std::string& para
 
         size_t pos = 0;
         for(auto mcp : _mcp23017) {
-            if(topic == "/SimpleIo/" + mcp->MqttBaseName) {
+            std::string intTopic("SimpleIo/");
+            intTopic += mcp->MqttBaseName;
+            LOG(DEBUG) << "Check " << intTopic;
+            if(topic == intTopic) {
                 if(value == "on") {
                     _mcp23017Impl[pos]->SetPin(0, pin_value::on);
                 } else if(value == "off") {
