@@ -107,6 +107,39 @@ Der GPIO 6 ist bei mir die Freigabe von MCP23017 damit bei Startup nix dummes pa
 
 sudo adduser pi gpio
 
+## Network Manager
+
+Die Implementierung bassiert auf [wifi-HotSpot](https://github.com/MartinVerges/wifi-HotSpot)
+
+To Controller the with this Software braucht man den Netwerk Manager
+
+```bash
+sudo apt-get install network-manager network-manager-config-connectivity-debian
+```
+
+### nstall DHCP and DNS for AP
+
+```bash
+sudo apt-get install dnsmasq
+```
+
+```text
+interface=wlan0,eth0
+no-dhcp-interface=eth1,wlan1
+dhcp-range=interface:wlan0,192.168.255.101,192.168.255.199,255.255.255.0,14d
+dhcp-range=interface:eth0,172.29.0.101,172.29.0.199,255.255.255.0,14d
+proxy-dnssec
+cache-size=1000
+domain-needed
+bogus-priv
+
+server=8.8.8.8
+server=1.1.1.1
+server=208.67.222.222
+```
+
+In short, I offer DHCP and DNS on wlan0 (integrated) and eth0 (network port). DNS is proxied to 8.8.8.8 (Google) or 1.1.1.1 (Cloudflare) or 208.67.222.222 (OpenDNS).
+
 ## Todo
 
 Docker as a non-root user

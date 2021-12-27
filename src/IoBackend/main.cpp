@@ -95,7 +95,7 @@ int main(int argc, char** argv)
     auto runner = new PythonRunner(commandLineArgs.GetBasePath() + "/SimpelIoBackend.bin", &globalFunctions);
     runner->Init();
 
-    auto gpioManager = new GPIOManager(config);
+    auto gpioManager = new GPIOManager(config, eventManager);
     gpioManager->Init();
 
     if(!ownWebServer->RegisterResource("/dynpage", new TestResource())){

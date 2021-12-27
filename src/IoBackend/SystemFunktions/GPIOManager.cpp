@@ -7,6 +7,9 @@
 
 #include "../../common/easylogging/easylogging++.h"
 #include "GPIOManager.hpp"
+#include "../../common/json/json.hpp"
+
+using json = nlohmann::json;
 
 LocalGpioPin::LocalGpioPin(std::uint8_t port, bool output, const std::string& mqttName):
     GpioPin(port, output)
@@ -16,14 +19,53 @@ LocalGpioPin::LocalGpioPin(std::uint8_t port, bool output, const std::string& mq
     _isEnablePin = false;
 }
 
+void GPIOManager::EventCallback(const std::string& name, const std::string& parameter)
+{
+    if(name == "MqttValue") {
+        auto jsonText = json::parse(parameter);
+
+        std::string topic("");
+        std::string value("");
+
+        auto it_value = jsonText.find("topic");
+        if(it_value != jsonText.end()) {
+            topic = jsonText.at("topic").get<std::string>();
+        }
+
+        it_value = jsonText.find("value");
+        if(it_value != jsonText.end()) {
+            value = jsonText.at("value").get<std::string>();
+        }
+
+        if(topic.empty() || value.empty()) {
+            LOG(ERROR) << "Missing data";
+
+            return;
+        }
+
+        size_t pos = 0;
+        for(auto mcp : _mcp23017) {
+            if(topic == "/SimpleIo/" + mcp->MqttBaseName) {
+                if(value == "on") {
+                    _mcp23017Impl[pos]->SetPin(0, pin_value::on);
+                } else if(value == "off") {
+                    _mcp23017Impl[pos]->SetPin(0, pin_value::off);
+                }
+            }
+            pos++;
+        }
+    }
+}
+
 /**
  * @brief Construct a new GPIOManager::GPIOManager object
  * 
  * @param config 
  */
-GPIOManager::GPIOManager(Config* config)
+GPIOManager::GPIOManager(Config* config, ServiceEventManager* serviceEventManager)
 {
     _config = config;
+    _serviceEventManager = serviceEventManager;
     _i2cBus = nullptr;
 }
 
@@ -101,11 +143,33 @@ bool GPIOManager::Init()
         }
     }
 
+    for(auto mcp : _mcp23017) {
+        auto mcpImpl = new MCP23017(_i2cBus, mcp->Address);
+        _mcp23017Impl.push_back(mcpImpl);
+        uint8_t pos = 0;
+        for(auto zeichen : mcp->OutputMap) {
+            if(zeichen == '1') {
+                mcpImpl->ConfigPin(pos, pin_direction::out);
+            } else {
+                mcpImpl->ConfigPin(pos, pin_direction::in);
+            }
+            pos++;
+        }
+    }
+
+    auto callback = std::bind(&GPIOManager::EventCallback, this, std::placeholders::_1, std::placeholders::_2);
+    _serviceEventManager->RegisterMe(std::string("MqttValue"), callback);
+
     return true;
 }
 
 void GPIOManager::Deinit()
 {
+    for(auto mcp : _mcp23017) {
+        delete mcp;
+    }
+    _mcp23017.clear();
+
     for(auto pin : _gpioPins ) {
         if(pin->GetDirection() == pin_direction::out) {
             *pin << pin_value::off;

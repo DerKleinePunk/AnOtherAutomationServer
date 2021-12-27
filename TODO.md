@@ -59,6 +59,7 @@ mosquitto_pub -h 192.168.2.49 -t "shellies/shelly1Tor/relay/0/command" -m "toggl
 mosquitto_pub -h 192.168.2.49 -t "herbiOs/lights/Licht1/state" -m "ON"
 mosquitto_pub -h 192.168.2.49 -t "herbiOs/lights/Licht1/state" -m "{ \"state\" : \"ON\", \"brightness\" : 125}"
 mosquitto_pub -h 192.168.2.49 -t "mn/test/1" -m "TestValue"
+mosquitto_pub -h 192.168.2.50 -t "SimpleIo/RelaisBoard" -m "on"
 ```
 
 ```Json
