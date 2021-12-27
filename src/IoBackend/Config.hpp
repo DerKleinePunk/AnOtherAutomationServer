@@ -11,19 +11,39 @@ struct EventNode
     std::map<std::string, std::string> Parameters;
 };
 
+enum class ResourceType {
+    None,
+    GPIOPin,
+    MCP23017,
+    GPSMouse
+};
+
+std::ostream& operator<<(std::ostream& os, const ResourceType type);
+
 struct Resource
 {
-    std::string Type;
+    ResourceType Type;
 };
 
 struct MCP23017Resource : public Resource
 {
     uint8_t Address;
+    uint8_t EnablePin;
+    bool UseEnable;
+    std::string OutputMap;
+    std::string MqttBaseName;
 };  
 
 struct GPSMouseResource : public Resource
 {
     std::string ComPort;
+};
+
+struct GPIOPinResource : public Resource
+{
+    uint8_t Address;
+    bool Output;
+    std::string MqttBaseName;
 };
 
 struct ConfigFile
@@ -53,4 +73,5 @@ public:
     std::string GetApiKey() const;
     std::vector<std::string> GetWatchTopics() const;
     std::vector<EventNode> GetEventRoot() const;
+    std::vector<Resource*> GetResources() const;
 };

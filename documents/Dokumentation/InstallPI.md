@@ -105,6 +105,8 @@ sudo echo 1 >/sys/class/gpio/gpio6/value
 
 Der GPIO 6 ist bei mir die Freigabe von MCP23017 damit bei Startup nix dummes passiert.
 
+sudo adduser pi gpio
+
 ## Todo
 
 Docker as a non-root user

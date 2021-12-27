@@ -15,6 +15,34 @@
 
 using json = nlohmann::json;
 
+NLOHMANN_JSON_SERIALIZE_ENUM( ResourceType, {
+    {ResourceType::None, nullptr},
+    {ResourceType::GPIOPin, "GPIOPin"},
+    {ResourceType::GPSMouse, "GPSMouse"},
+    {ResourceType::MCP23017, "MCP23017"},
+})
+
+std::ostream& operator<<(std::ostream& os, const ResourceType type)
+{
+    switch(type) {
+        case ResourceType::None:
+            os << "None";
+            break;
+        case ResourceType::GPIOPin:
+            os << "GPIOPin";
+            break;
+        case ResourceType::GPSMouse:
+            os << "GPSMouse";
+            break;
+         case ResourceType::MCP23017:
+            os << "MCP23017";
+            break;
+        default:
+            os.setstate(std::ios_base::failbit);
+    }
+    return os;
+}
+
 void to_json(json& j, const EventNode& p)
 {
     j = json{ 
@@ -28,7 +56,11 @@ void to_json(json& j, const MCP23017Resource* p)
 {
     j = json{ 
         { "Type", p->Type },
-        { "Address" , p->Address}
+        { "Address" , p->Address},
+        { "EnablePin" , p->EnablePin},
+        { "UseEnable" , p->UseEnable},
+        { "OutputMap" , p->OutputMap},
+        { "MqttBaseName" , p->MqttBaseName},
     };
 }
 
@@ -40,13 +72,11 @@ void to_json(json& j, const GPSMouseResource* p)
     };
 }
 
-//reinterpret_cast
-
 void to_json(json& j, Resource* p)
 {
-    if(p->Type == "MCP23017") {
+    if(p->Type == ResourceType::MCP23017) {
         to_json(j, reinterpret_cast<MCP23017Resource*>(p));
-    } else if(p->Type == "GPSMouse") {
+    } else if(p->Type == ResourceType::GPSMouse) {
         to_json(j, reinterpret_cast<GPSMouseResource*>(p));
     }
 }
@@ -91,7 +121,7 @@ void from_json(const json& j, Resource& p)
 {
     auto it_value = j.find("Type");
     if(it_value != j.end()) {
-        p.Type = j.at("Type").get<std::string>();
+        p.Type = j.at("Type").get<ResourceType>();
     } else {
         LOG(WARNING) << "Type Not found in Resource Entry";
     }
@@ -101,10 +131,64 @@ void from_json(const json& j, MCP23017Resource* p)
 {
     auto it_value = j.find("Type");
     if(it_value != j.end()) {
-        p->Type = j.at("Type").get<std::string>();
-        p->Address = j.at("Address").get<uint8_t>();
+        p->Type = ResourceType::MCP23017;
+        
     } else {
         LOG(WARNING) << "Type Not found in Resource Entry";
+    }
+
+    it_value = j.find("Address");
+    if(it_value != j.end()) {
+        p->Address = j.at("Address").get<uint8_t>();
+    } else {
+        p->Address = 0x20;
+    }
+
+    it_value = j.find("EnablePin");
+    if(it_value != j.end()) {
+        p->EnablePin = j.at("EnablePin").get<uint8_t>();
+    } else {
+        p->EnablePin = 0x06;
+    }
+
+    it_value = j.find("UseEnable");
+    if(it_value != j.end()) {
+        p->UseEnable = j.at("UseEnable").get<bool>();
+    } else {
+        p->UseEnable = false;
+    }
+
+    it_value = j.find("OutputMap");
+    if(it_value != j.end()) {
+        p->OutputMap = j.at("OutputMap").get<std::string>();
+    } else {
+        p->OutputMap = "1111111100000000";
+    }
+
+    it_value = j.find("MqttBaseName");
+    if(it_value != j.end()) {
+        p->MqttBaseName = j.at("MqttBaseName").get<std::string>();
+    } else {
+        p->MqttBaseName = "RelaisBoard";
+    }
+       
+}
+
+void from_json(const json& j, GPSMouseResource* p)
+{
+    auto it_value = j.find("Type");
+    if(it_value != j.end()) {
+        p->Type = ResourceType::GPSMouse;
+        
+    } else {
+        LOG(WARNING) << "Type Not found in Resource Entry";
+    }
+
+    it_value = j.find("Address");
+    if(it_value != j.end()) {
+        p->ComPort = j.at("Address").get<std::string>();
+    } else {
+        p->ComPort = "None";
     }
 }
 
@@ -155,8 +239,12 @@ void from_json(const json& j, ConfigFile& p)
         {
             Resource valueType;
             from_json(it.value(), valueType);
-            if(valueType.Type == "MCP23017") {
+            if(valueType.Type == ResourceType::MCP23017) {
                 MCP23017Resource* mcpType = new MCP23017Resource();
+                from_json(it.value(), mcpType);
+                p.Resources.push_back(mcpType);
+            } else if(valueType.Type == ResourceType::GPSMouse){
+                GPSMouseResource* mcpType = new GPSMouseResource();
                 from_json(it.value(), mcpType);
                 p.Resources.push_back(mcpType);
             } else {
@@ -165,12 +253,12 @@ void from_json(const json& j, ConfigFile& p)
         }
     } else {
         MCP23017Resource* entry = new MCP23017Resource();
-        entry->Type = "MCP23017";
+        entry->Type = ResourceType::MCP23017;
         entry->Address = 0x20;
         p.Resources.push_back(entry);
 
         GPSMouseResource* entry2 = new GPSMouseResource();
-        entry2->Type = "GPSMouse";
+        entry2->Type = ResourceType::GPSMouse;
         entry2->ComPort = "none";
         p.Resources.push_back(entry2);
     }
@@ -220,12 +308,12 @@ void Config::Load()
         _configFile.EventRoot.push_back(node);
 
         MCP23017Resource* entry = new MCP23017Resource();
-        entry->Type = "MCP23017";
+        entry->Type = ResourceType::MCP23017;
         entry->Address = 0x20;
         _configFile.Resources.push_back(entry);
 
         GPSMouseResource* entry2 = new GPSMouseResource();
-        entry2->Type = "GPSMouse";
+        entry2->Type = ResourceType::GPSMouse;
         entry2->ComPort = "none";
         _configFile.Resources.push_back(entry2);
 
@@ -267,4 +355,9 @@ std::vector<std::string> Config::GetWatchTopics() const
 std::vector<EventNode> Config::GetEventRoot() const
 {
     return _configFile.EventRoot;
+}
+
+std::vector<Resource*> Config::GetResources() const
+{
+    return _configFile.Resources;
 }
