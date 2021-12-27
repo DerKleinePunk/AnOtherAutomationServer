@@ -234,8 +234,7 @@ else
 			exit $exitCode
 		fi
 	fi
-: <<KOMMENTARIO
-	if [ ! -f modules/SDL2GuiHelper/LICENSE ]; then
+	if [ ! -f modules/PiGPIOHelper/LICENSE ]; then
 		git submodule init
 		exitCode=$?
 		if [ $exitCode -ne 0 ] ; then
@@ -249,7 +248,6 @@ else
 		echo "git give an Error"
 		exit $exitCode
 	fi
-KOMMENTARIO
 fi
 
 git lfs fetch --all

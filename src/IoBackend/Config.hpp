@@ -27,8 +27,8 @@ struct Resource
 
 struct MCP23017Resource : public Resource
 {
-    uint8_t Address;
-    uint8_t EnablePin;
+    std::uint8_t Address;
+    std::uint8_t EnablePin;
     bool UseEnable;
     std::string OutputMap;
     std::string MqttBaseName;
@@ -41,7 +41,7 @@ struct GPSMouseResource : public Resource
 
 struct GPIOPinResource : public Resource
 {
-    uint8_t Address;
+    std::uint8_t Address;
     bool Output;
     std::string MqttBaseName;
 };
@@ -49,7 +49,7 @@ struct GPIOPinResource : public Resource
 struct ConfigFile
 {
     std::string MqttServer;
-    uint16_t ServerPort;
+    std::uint16_t ServerPort;
     std::string ApiKey;
     std::vector<std::string> WatchTopics;
     std::vector<EventNode> EventRoot;
