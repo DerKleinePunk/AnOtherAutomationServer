@@ -96,7 +96,11 @@ int main(int argc, char** argv)
     runner->Init();
 
     auto gpioManager = new GPIOManager(config, eventManager);
-    gpioManager->Init();
+    if(gpioManager->Init()) {
+        LOG(INFO) << "gpio manager started";
+    } else {
+        LOG(ERROR) << "gpio manager starting Failed";
+    }
 
     if(!ownWebServer->RegisterResource("/dynpage", new TestResource())){
         LOG(ERROR) << "RegisterResource failed";

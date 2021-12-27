@@ -84,6 +84,8 @@ GPIOManager::~GPIOManager()
  */
 bool GPIOManager::Init()
 {
+    LOG(DEBUG) << "Init ->";
+
     auto useI2C = false;
 
     for(auto resource : _config->GetResources()) {
@@ -163,14 +165,16 @@ bool GPIOManager::Init()
     auto callback = std::bind(&GPIOManager::EventCallback, this, std::placeholders::_1, std::placeholders::_2);
     _serviceEventManager->RegisterMe(std::string("MqttValue"), callback);
 
+    LOG(DEBUG) << "Init <- success";
     return true;
 }
 
 void GPIOManager::Deinit()
 {
-    for(auto mcp : _mcp23017) {
+    //Do not delete the Config Pointer
+    /*for(auto mcp : _mcp23017) {
         delete mcp;
-    }
+    }*/
     _mcp23017.clear();
 
     for(auto pin : _gpioPins ) {
