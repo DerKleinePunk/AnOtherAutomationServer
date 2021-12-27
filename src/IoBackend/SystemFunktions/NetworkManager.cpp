@@ -238,15 +238,18 @@ std::vector<DeviceInfo> NetworkManager::ScanAccessPoints(const std::string& inte
     //Save all Devices ?
     /* Get all devices managed by NetworkManager */
     const GPtrArray* devices = nm_client_get_devices(_client);
+    LOG(DEBUG) << std::to_string(devices->len) << " devices get from nm-client";
 
     std::vector<DeviceInfo> resultInfo;
     /* Go through the array and process Wi-Fi devices */
     for (guint i = 0; i < devices->len; i++) {
         NMDevice *device = reinterpret_cast<NMDevice*>(g_ptr_array_index(devices, i));
-        if (NM_IS_DEVICE_WIFI(device)){
+        if (NM_IS_DEVICE_WIFI(device)) {
             if(interfaceName.size() == 0 || strcmp(interfaceName.c_str(), nm_device_get_iface(device)) == 0) {
                 BuildWifiDeviceInfo(device, resultInfo);
             }
+        } else {
+            LOG(DEBUG) << nm_device_get_iface(device) << " is not an wifi device";
         }
     }
 

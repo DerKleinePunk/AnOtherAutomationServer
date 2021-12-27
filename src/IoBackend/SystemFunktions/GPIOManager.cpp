@@ -11,7 +11,9 @@
 LocalGpioPin::LocalGpioPin(std::uint8_t port, bool output, const std::string& mqttName):
     GpioPin(port, output)
 {
+    el::Loggers::getLogger(ELPP_DEFAULT_LOGGER);
     _mqttName = mqttName;
+    _isEnablePin = false;
 }
 
 /**
@@ -45,23 +47,43 @@ bool GPIOManager::Init()
             _mcp23017.push_back(mcp);
             useI2C = true;
             if(mcp->UseEnable) {
-                auto enablePin = new LocalGpioPin(mcp->EnablePin, true, std::string ("none"));
-                _gpioPins.push_back(enablePin);
+                try
+                {
+                    auto enablePin = new LocalGpioPin(mcp->EnablePin, true, std::string ("none"));
+                    enablePin->_isEnablePin = true;
+                    _gpioPins.push_back(enablePin);
+                }
+                catch(const std::exception& e)
+                {
+                    LOG(ERROR) << e.what();
+                    return false;
+                }
             }
         } else if(resource->Type == ResourceType::GPIOPin) {
             auto currentPin = reinterpret_cast<GPIOPinResource*>(resource);
-            auto enablePin = new LocalGpioPin(currentPin->Address, currentPin->Output, currentPin->MqttBaseName);
-            _gpioPins.push_back(enablePin);
+            try
+            {
+                auto enablePin = new LocalGpioPin(currentPin->Address, currentPin->Output, currentPin->MqttBaseName);
+                _gpioPins.push_back(enablePin);
+            }
+            catch(const std::exception& e)
+            {
+                LOG(ERROR) << e.what();
+                return false;
+            }
         }
     }
 
     for(auto pin : _gpioPins ) {
-
-    }
+        if(pin->GetDirection() == pin_direction::out) {
+            *pin << pin_value::off;
+        }
+    }   
     
-
     //Todo Check I²C Pins are Free (GPIOPin Config)
     if(useI2C) {
+        LOG(DEBUG) << "Starting I²C Bus";
+
         try
         {
            _i2cBus = new I2CBus("/dev/i2c-1");
@@ -69,19 +91,28 @@ bool GPIOManager::Init()
         catch(const std::exception& e)
         {
             LOG(ERROR) << e.what();
+            return false;
         }
     }
 
-    return false;
+    for(auto pin : _gpioPins ) {
+        if(pin->_isEnablePin) {
+            *pin << pin_value::on;
+        }
+    }
+
+    return true;
 }
 
 void GPIOManager::Deinit()
 {
     for(auto pin : _gpioPins ) {
-        //if(pin)
+        if(pin->GetDirection() == pin_direction::out) {
+            *pin << pin_value::off;
+        }
         delete pin;
     }
-    
+
     _gpioPins.clear();
 
     if(_i2cBus != nullptr) {

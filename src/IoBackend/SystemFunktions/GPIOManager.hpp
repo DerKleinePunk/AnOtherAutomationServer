@@ -11,6 +11,7 @@ private:
 
 public:
     LocalGpioPin(std::uint8_t port, bool output, const std::string& mqttName);
+    bool _isEnablePin;
 };
 
 class GPIOManager
