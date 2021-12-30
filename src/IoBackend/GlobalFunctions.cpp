@@ -55,3 +55,24 @@ std::string GlobalFunctions::ScanAccessPoints(const std::string& interfaceName)
     const json result = _networkManager->ScanAccessPoints(interfaceName);
     return result.dump();
 }
+
+void GlobalFunctions::SetInternalVariable(const std::string& name, const std::string& value)
+{
+    if(_internalVariables.find(name) != _internalVariables.end()) {
+        _internalVariables[name] = value;         
+    } else {
+        _internalVariables.insert(std::pair<std::string, std::string>(name, value));
+    }
+}
+
+std::string GlobalFunctions::GetInternalVariable(const std::string& name) const
+{
+    std::string result("");
+
+    const auto findIt = _internalVariables.find(name);
+    if( findIt != _internalVariables.end()) {
+        result = findIt->second; 
+    }
+
+    return result;
+}

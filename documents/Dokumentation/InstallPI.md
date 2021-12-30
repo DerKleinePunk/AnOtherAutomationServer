@@ -115,7 +115,16 @@ To Controller the with this Software braucht man den Netwerk Manager
 
 ```bash
 sudo apt-get install network-manager network-manager-config-connectivity-debian
+sudo apt purge openresolv dhcpcd5
 ```
+
+Das Remove braucht man das mit der NM das WLAN Verwalten kann.
+[Headless-Setup-via-Network-Manager](https://awesomeopensource.com/project/sraodev/Raspberry-Pi-Headless-Setup-via-Network-Manager)
+
+### Network Manager Console Komands
+
+nmcli radio
+nmcli device
 
 ### nstall DHCP and DNS for AP
 
