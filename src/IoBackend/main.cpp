@@ -53,6 +53,7 @@ void WriteFunktionText()
     std::cout << "r1 run sample.py Function simpleFunc" << std::endl;
     std::cout << "s ScanAccessPoints" << std::endl;
     std::cout << "t0 write mqtt test" << std::endl;
+    std::cout << "i0 show internal vars" << std::endl;
 }
 
 int main(int argc, char** argv)
@@ -95,7 +96,7 @@ int main(int argc, char** argv)
     auto runner = new PythonRunner(commandLineArgs.GetBasePath() + "/SimpelIoBackend.bin", &globalFunctions);
     runner->Init();
 
-    auto gpioManager = new GPIOManager(config, eventManager);
+    auto gpioManager = new GPIOManager(config, &globalFunctions);
     if(gpioManager->Init()) {
         LOG(INFO) << "gpio manager started";
     } else {
@@ -149,6 +150,8 @@ int main(int argc, char** argv)
             std::cout << jsonText.dump() << std::endl;
         } else if(input == "t0") {
             connector->Publish("cmnd/tasmota_852612/POWER", "TOGGLE");
+        } else if(input == "i0") {
+            globalFunctions.ShowInternalVars();
         } else {
             std::cout << input << " command not found" << std::endl;
         }

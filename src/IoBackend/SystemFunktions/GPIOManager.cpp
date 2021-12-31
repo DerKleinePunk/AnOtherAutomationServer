@@ -11,25 +11,25 @@
 
 using json = nlohmann::json;
 
-LocalGpioPin::LocalGpioPin(std::uint8_t port, bool output, const std::string& mqttName):
+LocalGpioPin::LocalGpioPin(std::uint8_t port, bool output, const std::string& varName):
     GpioPin(port, output)
 {
     el::Loggers::getLogger(ELPP_DEFAULT_LOGGER);
-    _mqttName = mqttName;
+    _varName = varName;
     _isEnablePin = false;
 }
 
 void GPIOManager::EventCallback(const std::string& name, const std::string& parameter)
 {
-    if(name == "MqttValue") {
+    if(name == "ChangeValue") {
         auto jsonText = json::parse(parameter);
 
-        std::string topic("");
+        std::string name("");
         std::string value("");
 
-        auto it_value = jsonText.find("topic");
+        auto it_value = jsonText.find("name");
         if(it_value != jsonText.end()) {
-            topic = jsonText.at("topic").get<std::string>();
+            name = jsonText.at("name").get<std::string>();
         }
 
         it_value = jsonText.find("value");
@@ -37,25 +37,27 @@ void GPIOManager::EventCallback(const std::string& name, const std::string& para
             value = jsonText.at("value").get<std::string>();
         }
 
-        if(topic.empty() || value.empty()) {
+        if(name.empty() || value.empty()) {
             LOG(ERROR) << "Missing data";
 
             return;
         }
 
-        size_t pos = 0;
         for(auto mcp : _mcp23017) {
-            std::string intTopic("SimpleIo/");
-            intTopic += mcp->MqttBaseName;
-            LOG(DEBUG) << "Check " << intTopic;
-            if(topic == intTopic) {
-                if(value == "on") {
-                    _mcp23017Impl[pos]->SetPin(0, pin_value::on);
-                } else if(value == "off") {
-                    _mcp23017Impl[pos]->SetPin(0, pin_value::off);
+            LOG(DEBUG) << "Check " << std::to_string(mcp->Address);
+            for(int i = 0; i < 16; i++) {
+                if(name == mcp->VarName[i]) {
+                    if(value == "on") {
+                        _mcp23017Impl[i]->SetPin(0, pin_value::on);
+                        _globalFunctions->SetInternalVariable(name, "on");
+                    } else if(value == "off") {
+                        _mcp23017Impl[i]->SetPin(0, pin_value::off);
+                        _globalFunctions->SetInternalVariable(name, "off");
+                    } else {
+                        LOG(WARNING) << value << " is not know want to do";
+                    }
                 }
             }
-            pos++;
         }
     }
 }
@@ -64,11 +66,14 @@ void GPIOManager::EventCallback(const std::string& name, const std::string& para
  * @brief Construct a new GPIOManager::GPIOManager object
  * 
  * @param config 
+ * 
+ * @param globalFunctions
  */
-GPIOManager::GPIOManager(Config* config, ServiceEventManager* serviceEventManager)
+GPIOManager::GPIOManager(Config* config, GlobalFunctions* globalFunctions)
 {
+    el::Loggers::getLogger(ELPP_DEFAULT_LOGGER);
     _config = config;
-    _serviceEventManager = serviceEventManager;
+    _globalFunctions = globalFunctions;
     _i2cBus = nullptr;
 }
 
@@ -110,7 +115,7 @@ bool GPIOManager::Init()
             auto currentPin = reinterpret_cast<GPIOPinResource*>(resource);
             try
             {
-                auto enablePin = new LocalGpioPin(currentPin->Address, currentPin->Output, currentPin->MqttBaseName);
+                auto enablePin = new LocalGpioPin(currentPin->Address, currentPin->Output, currentPin->VarName);
                 _gpioPins.push_back(enablePin);
             }
             catch(const std::exception& e)
@@ -163,7 +168,7 @@ bool GPIOManager::Init()
     }
 
     auto callback = std::bind(&GPIOManager::EventCallback, this, std::placeholders::_1, std::placeholders::_2);
-    _serviceEventManager->RegisterMe(std::string("MqttValue"), callback);
+    _globalFunctions->RegisterForEvent(std::string("ChangeValue"), callback);
 
     LOG(DEBUG) << "Init <- success";
     return true;

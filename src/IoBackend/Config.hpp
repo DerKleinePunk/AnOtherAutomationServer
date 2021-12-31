@@ -31,7 +31,7 @@ struct MCP23017Resource : public Resource
     std::uint8_t EnablePin;
     bool UseEnable;
     std::string OutputMap;
-    std::string MqttBaseName;
+    std::string VarName[16];
 };  
 
 struct GPSMouseResource : public Resource
@@ -43,7 +43,7 @@ struct GPIOPinResource : public Resource
 {
     std::uint8_t Address;
     bool Output;
-    std::string MqttBaseName;
+    std::string VarName;
 };
 
 struct ConfigFile

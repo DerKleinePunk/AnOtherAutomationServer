@@ -60,7 +60,7 @@ void to_json(json& j, const MCP23017Resource* p)
         { "EnablePin" , p->EnablePin},
         { "UseEnable" , p->UseEnable},
         { "OutputMap" , p->OutputMap},
-        { "MqttBaseName" , p->MqttBaseName},
+        { "VarName" , p->VarName},
     };
 }
 
@@ -165,11 +165,18 @@ void from_json(const json& j, MCP23017Resource* p)
         p->OutputMap = "1111111100000000";
     }
 
-    it_value = j.find("MqttBaseName");
+    it_value = j.find("VarName");
     if(it_value != j.end()) {
-        p->MqttBaseName = j.at("MqttBaseName").get<std::string>();
+        std::size_t i = 0;
+        for(;i<j.at("VarName").size();i++) {
+            p->VarName[i] = j.at("VarName")[i];
+        }
     } else {
-        p->MqttBaseName = "RelaisBoard";
+        p->VarName[0] = "RelaisBoard0";
+        p->VarName[1] = "Automatik";
+        for(std::size_t i = 2;i<16;i++) {
+            p->VarName[i] = "Empty" + std::to_string(i);
+        }
     }
        
 }
@@ -310,6 +317,8 @@ void Config::Load()
         MCP23017Resource* entry = new MCP23017Resource();
         entry->Type = ResourceType::MCP23017;
         entry->Address = 0x20;
+        entry->VarName[0] = "RelaisBoard0";
+        entry->VarName[1] = "Automatik";
         _configFile.Resources.push_back(entry);
 
         GPSMouseResource* entry2 = new GPSMouseResource();

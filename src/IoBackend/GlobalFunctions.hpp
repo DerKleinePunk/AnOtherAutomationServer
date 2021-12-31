@@ -21,10 +21,13 @@ public:
     uint16_t GetServerPort() const;
 
     void FireNewEvent(const std::string& name, const std::string& parameter);
+    void RegisterForEvent(const std::string& eventFilter, EventDelegate function);
+
     std::string ScanAccessPoints(const std::string& interfaceName = "");
 
     void SetInternalVariable(const std::string& name, const std::string& value);
     std::string GetInternalVariable(const std::string& name) const;
+    void ShowInternalVars();
 
 };
 

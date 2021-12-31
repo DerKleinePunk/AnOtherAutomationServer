@@ -12,6 +12,7 @@ private:
     GlobalFunctions* _globalFunctions;
     void PrintTotalRefCount();
     void WriteMqtt(const std::string& topic, const std::string& value);
+    void ChangeValue(const std::string& name, const std::string& value);
 public:
     PythonRunner(const std::string& appName, GlobalFunctions* globalFunctions);
     ~PythonRunner();

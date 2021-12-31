@@ -22,7 +22,7 @@ The http Header is X-API-KEY
         {
             "Address": 32,
             "EnablePin": 6,
-            "MqttBaseName": "RelaisBoard",
+            "VarBaseName": "RelaisBoard",
             "OutputMap": "1111111100000000",
             "Type": "MCP23017",
             "UseEnable": true
