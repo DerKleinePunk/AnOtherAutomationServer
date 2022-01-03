@@ -51,6 +51,7 @@ struct ConfigFile
     std::string MqttServer;
     std::uint16_t ServerPort;
     std::string ApiKey;
+    std::string UiWebSitePath;
     std::vector<std::string> WatchTopics;
     std::vector<EventNode> EventRoot;
     std::vector<Resource*> Resources;

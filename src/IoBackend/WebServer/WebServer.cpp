@@ -222,7 +222,8 @@ bool WebServer::Start() {
     info.gid = -1;
     info.uid = -1;
     //info.error_document_404 = "/404.html";
-    info.options = LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT | LWS_SERVER_OPTION_HTTP_HEADERS_SECURITY_BEST_PRACTICES_ENFORCE;
+    //info.options = LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT | LWS_SERVER_OPTION_HTTP_HEADERS_SECURITY_BEST_PRACTICES_ENFORCE;
+    info.options = LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT;
     info.user = this;
 
     // keep alive

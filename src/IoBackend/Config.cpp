@@ -86,7 +86,8 @@ void to_json(json& j, const ConfigFile& p)
     j = json { 
         { "MqttServer", p.MqttServer }, 
         { "ServerPort", p.ServerPort }, 
-        { "ApiKey", p.ApiKey }, 
+        { "ApiKey", p.ApiKey },
+        { "UiWebSitePath", p.UiWebSitePath}, 
         { "WatchTopics", p.WatchTopics },
         { "EventRoot", p.EventRoot },
         { "Resources", p.Resources }
