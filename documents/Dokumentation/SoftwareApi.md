@@ -14,18 +14,38 @@ The http Header is X-API-KEY
         {
             "Function": "CallPython",
             "Name": "MqttValue",
-            "Parameters": {}
+            "Parameters": {
+                "Script" : "sample",
+                "Function" : "callbackMqtt"
+            }
         }
     ],
-    "MqttServer": "192.168.2.50",
+    "MqttServer": "192.168.2.49",
     "Resources": [
         {
             "Address": 32,
             "EnablePin": 6,
-            "VarBaseName": "RelaisBoard",
             "OutputMap": "1111111100000000",
             "Type": "MCP23017",
-            "UseEnable": true
+            "UseEnable": true,
+            "VarName": [
+                "RelaisBoard0",
+                "Automatik",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                ""
+            ]
         },
         {
             "ComPort": "None",
@@ -39,3 +59,12 @@ The http Header is X-API-KEY
     ]
 }
 ```
+
+ApiKey -> The Key to Call the Rest Api Functions
+EventRoot -> Der Interne Eent Manager Im Oberene Beispiel Wenn das Event MqttValue ein Tritt dann bitt die Funktion callbackMqtt im Sample.py auf rufen.
+
+## System Events
+
+MqttValue -> Ein Wert im Mqtt wurde geändert Überwachte Mqtt bereiche werden im WatchTopics Konfiguriert
+ChangeValue -> Ändere eine eine Interne Variable
+ValueChanged -> Interne / Gobale Variable wurde geändert

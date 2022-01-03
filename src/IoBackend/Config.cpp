@@ -236,6 +236,8 @@ void from_json(const json& j, ConfigFile& p)
         EventNode node;
         node.Name = "MqttValue";
         node.Function = "CallPython";
+        node.Parameters.insert(std::pair<std::string, std::string>("Script", "sample"));
+        node.Parameters.insert(std::pair<std::string, std::string>("Function", "callbackMqtt"));
         p.EventRoot.push_back(node);
     }
 
@@ -312,6 +314,8 @@ void Config::Load()
         EventNode node;
         node.Name = "MqttValue";
         node.Function = "CallPython";
+        node.Parameters.insert(std::pair<std::string, std::string>("Script", "sample"));
+        node.Parameters.insert(std::pair<std::string, std::string>("Function", "callbackMqtt"));
         _configFile.EventRoot.push_back(node);
 
         MCP23017Resource* entry = new MCP23017Resource();

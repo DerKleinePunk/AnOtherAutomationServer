@@ -29,7 +29,19 @@ def callbackMqtt(text):
     print("callbackMqtt called " + text)
     connector.LogEntry("DEBUG", "callbackMqtt")
     params = json.loads(text)
-    if(params["topic"] == "mn/test/1"):
+    if(params["topic"] == "SimpleIo/Io/RelaisBoard"):
+        connector.LogEntry("DEBUG", params["value"])
+        connector.WriteMqtt("herbiOs/lights/Licht1/set", params["value"])
+    if(params["topic"] == "herbiOs/lights/Licht1/set"):
+        connector.LogEntry("DEBUG", params["value"])
+        connector.ChangeValue("RelaisBoard0", params["value"])
+    return
+
+def callbackValueChanged(text):
+    print("callbackValueChanged called " + text)
+    connector.LogEntry("DEBUG", "callbackValueChanged")
+    params = json.loads(text)
+    if(params["name"] == "RelaisBoard0"):
         connector.LogEntry("DEBUG", params["value"])
         connector.WriteMqtt("herbiOs/lights/Licht1/state", params["value"])
     return

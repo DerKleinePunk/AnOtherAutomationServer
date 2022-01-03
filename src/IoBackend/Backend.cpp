@@ -29,10 +29,10 @@ void Backend::EventCallback(const std::string& name, const std::string& paramete
     }
 }
 
-void Backend::Run(const std::string& name, const std::map<std::string, std::string>& parameters)
+void Backend::Run(const std::string& function, const std::map<std::string, std::string>& parameters)
 {
-    LOG(DEBUG) << "Try to run " << name << " with ";// << parameters;
-    if(name == "CallPython") {
+    LOG(DEBUG) << "Try to run " << function << " with ";// << parameters;
+    if(function == "CallPython") {
         std::string script;
         std::string function;
         
@@ -54,6 +54,8 @@ void Backend::Run(const std::string& name, const std::map<std::string, std::stri
             LOG(ERROR) << "missing Parameter to Run Function CallPython";
         }
         
+    } else if(function == "SetVar") {
+        //Todo ?!?
     }
 }
 
