@@ -21,6 +21,8 @@ LocalGpioPin::LocalGpioPin(std::uint8_t port, bool output, const std::string& va
 
 void GPIOManager::EventCallback(const std::string& name, const std::string& parameter)
 {
+    LOG(DEBUG) << "EventCallback " << name << " with " << parameter;
+
     if(name == "ChangeValue") {
         auto jsonText = json::parse(parameter);
 

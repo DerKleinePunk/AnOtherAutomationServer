@@ -147,5 +147,7 @@ void PythonConnector::ChangeValue(const std::string& name, const std::string& va
 {
     if(_changeValueDelegate != nullptr) {
         _changeValueDelegate(name, value);
+    } else {
+        LOG(WARNING) << "changeValueDelegate is nullptr";
     }
 }

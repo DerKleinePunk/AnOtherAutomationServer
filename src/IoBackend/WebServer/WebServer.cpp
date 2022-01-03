@@ -320,6 +320,11 @@ void WebServer::SendWebSocket(const std::string& message, uuid_t connectionId)
         return;
     }
 
+    if(_webSocketClients.size() == 0) {
+        LOG(DEBUG) << "No WebSocket client no send";
+        return;
+    }
+
     msg amsg;
     amsg.len = message.size();
     amsg.payload = malloc(LWS_PRE + amsg.len); // Now new because protokoll impemention is C
@@ -551,6 +556,11 @@ void WebServer::NewWebSocketClient(bool consumer, uuid_t connectionId)
     const auto stringId = std::string(uuid_str);
 
     LOG(INFO) << "NewWebSocketClient " << consumer << " id " << stringId;
+
+    WebSocketClient client;
+    client.Type = "all";
+
+    _webSocketClients.insert(std::pair<std::string, WebSocketClient>(stringId, client));
 }
 
 void WebServer::WebSocketClientMessage(const std::string& message, uuid_t connectionId)
@@ -573,6 +583,9 @@ void WebServer::RemoveWebSocketClient(bool consumer, uuid_t connectionId)
     const auto stringId = std::string(uuid_str);
 
     LOG(INFO) << "RemoveWebSocketClient " << consumer << " id " << stringId;
+    if(_webSocketClients.find(stringId) != _webSocketClients.end()) {
+        _webSocketClients.erase(stringId);
+    }
 }
 
 bool WebServer::IsApiKeyOk(const std::string& value)

@@ -22,6 +22,11 @@ struct HttpResourceInfo
     bool EndWildcard;
 };
 
+struct WebSocketClient
+{
+    std::string Type;
+};
+
 class WebServer
 {
 private:
@@ -34,6 +39,7 @@ private:
     bool _run;
     std::map<const std::string , HttpResourceInfo> _httpResources;
     per_vhost_data__minimal* _webSocketVhostData;
+    std::map<std::string, WebSocketClient> _webSocketClients;
 
     void LogCallBack(int level, const char *line);
     void MainLoop();

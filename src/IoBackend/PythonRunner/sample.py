@@ -34,7 +34,11 @@ def callbackMqtt(text):
         connector.WriteMqtt("herbiOs/lights/Licht1/set", params["value"])
     if(params["topic"] == "herbiOs/lights/Licht1/set"):
         connector.LogEntry("DEBUG", params["value"])
-        connector.ChangeValue("RelaisBoard0", params["value"])
+        value = json.loads(params["value"]) 
+        if(value["state"] == "ON"):
+            connector.ChangeValue("RelaisBoard0", "on")
+        if(value["state"] == "OFF"):
+            connector.ChangeValue("RelaisBoard0", "off")
     return
 
 def callbackValueChanged(text):
@@ -43,7 +47,11 @@ def callbackValueChanged(text):
     params = json.loads(text)
     if(params["name"] == "RelaisBoard0"):
         connector.LogEntry("DEBUG", params["value"])
-        connector.WriteMqtt("herbiOs/lights/Licht1/state", params["value"])
+        if(params["value"] == "off" ):
+            connector.WriteMqtt("herbiOs/lights/Licht1/state", "{ \"state\" : \"OFF\" , \"brightness\" : 0 }" )
+        if(params["value"] == "on"):
+            connector.WriteMqtt("herbiOs/lights/Licht1/state", "{ \"state\" : \"ON\" , \"brightness\" :255 }" )
     return
+
 
 print("finally")
