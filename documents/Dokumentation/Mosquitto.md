@@ -34,7 +34,16 @@ allow_anonymous true
 # password_file /etc/mosquitto/password_file
 ```
 
+## Clear mosquitto
+
+```bash
+sudo service mosquitto stop
+sudo rm /var/lib/mosquitto/mosquitto.db
+sudo service mosquitto start
+```
+
 ## Links
 
 [mosquitto-logging](http://www.steves-internet-guide.com/mosquitto-logging/)
 [Python und Mqtt](https://smarthome-blogger.de/blog/tutorial/python-mqtt-tutorial/)
+[deleting-mosquitto-mqtt-retained-messages](https://andygoodenberger.wordpress.com/2017/09/24/deleting-mosquitto-mqtt-retained-messages/)

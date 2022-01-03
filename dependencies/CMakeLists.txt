@@ -24,9 +24,14 @@ set(LWS_WITH_EXPORT_LWSTARGETS OFF)
 
 set(LWS_WITH_THREADPOOL ON) # good ?
 
+message("Build for Type ${CMAKE_BUILD_TYPE}")
+
 if (CMAKE_BUILD_TYPE STREQUAL "Debug") 
   set(LWS_WITH_MINIMAL_EXAMPLES ON) # Later Off Build Time
   set(LWS_WITH_SHARED ON)
+else()
+  set(LWS_WITHOUT_TESTAPPS ON)
+  set(LWS_WITHOUT_TEST_SERVER ON)
 endif()
 
 FetchContent_MakeAvailable(libwebsockets)

@@ -290,6 +290,11 @@ void WebServer::SendWebSocketBroadcast(const std::string& message)
         return;
     }
 
+    if(_webSocketClients.size() == 0) {
+        LOG(DEBUG) << "No WebSocket client no send";
+        return;
+    }
+
     msg amsg;
     amsg.len = message.size();
     amsg.payload = malloc(LWS_PRE + amsg.len); // Now new because protokoll impemention is C
