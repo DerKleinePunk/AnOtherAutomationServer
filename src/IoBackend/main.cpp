@@ -13,6 +13,7 @@
 #include "PythonRunner/PythonRunner.hpp"
 #include "SystemFunktions/NetworkManager.hpp"
 #include "SystemFunktions/GPIOManager.hpp"
+#include "SystemFunktions/IODeviceManager.hpp"
 #include "ServiceEvents/ServiceEventManager.hpp"
 #include "Backend.hpp"
 
@@ -52,6 +53,7 @@ void WriteFunktionText()
     std::cout << "r run sample.py" << std::endl;
     std::cout << "r1 run sample.py Function simpleFunc" << std::endl;
     std::cout << "s ScanAccessPoints" << std::endl;
+    std::cout << "s1 Connect AccessPoint" << std::endl;
     std::cout << "t0 write mqtt test" << std::endl;
     std::cout << "i0 show internal vars" << std::endl;
 }
@@ -103,6 +105,13 @@ int main(int argc, char** argv)
         LOG(ERROR) << "gpio manager starting Failed";
     }
 
+    auto ioDeviceManager = new IODeviceManager(&globalFunctions);
+    if(ioDeviceManager->Init()) {
+        LOG(INFO) << "io device manager started";
+    } else {
+        LOG(ERROR) << "io device manager starting Failed";
+    }
+
     if(!ownWebServer->RegisterResource("/dynpage", new TestResource())){
         LOG(ERROR) << "RegisterResource failed";
     }
@@ -150,6 +159,12 @@ int main(int argc, char** argv)
                 }
                 json jsonText = result;
                 std::cout << jsonText.dump() << std::endl;
+            } else if(input == "s1") {
+                if(networkManager->ConnectAccessPoint("ROBONETZ", "1234")) {
+                    LOG(INFO) << "WLAN ROBONETZ connected";
+                } else {
+                    LOG(ERROR) << "WLAN ROBONETZ not connected";
+                }
             } else if(input == "t0") {
                 connector->Publish("cmnd/tasmota_852612/POWER", "TOGGLE");
             } else if(input == "i0") {

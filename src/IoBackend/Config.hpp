@@ -64,6 +64,10 @@ private:
     std::string _filenameConfig;
 public:
     Config(const std::string& filename = "");
+    Config(const Config& orig) = delete;
+	Config(Config&& other) = delete;
+	Config& operator=(const Config& other) = delete;
+	Config& operator=(Config&& other) = delete;
     ~Config();
 
     void Load ();

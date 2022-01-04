@@ -10,6 +10,9 @@
 #include "NetworkManager.hpp"
 #include <glib.h>
 
+//https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/blob/main/examples/C/glib/get-ap-info-libnm.c
+//https://github.com/liugang/NetworkManager/blob/master/wifi-scan.c
+
 void to_json(json& j, const AccessPointInfo& p)
 {
     j = json{ 
@@ -60,6 +63,14 @@ ap_wpa_rsn_flags_to_string(guint32 flags)
         flags_str[i++] = g_strdup("psk");
     if (flags & NM_802_11_AP_SEC_KEY_MGMT_802_1X)
         flags_str[i++] = g_strdup("802.1X");
+    if (flags & NM_802_11_AP_SEC_KEY_MGMT_SAE)
+        flags_str[i++] = g_strdup("sae");
+    if (flags & NM_802_11_AP_SEC_KEY_MGMT_OWE)
+        flags_str[i++] = g_strdup("owe");
+    if (flags & NM_802_11_AP_SEC_KEY_MGMT_OWE_TM)
+        flags_str[i++] = g_strdup("owe_transition_mode");
+    if (flags & NM_802_11_AP_SEC_KEY_MGMT_EAP_SUITE_B_192)
+        flags_str[i++] = g_strdup("wpa-eap-suite-b-192");
 
     if (i == 0)
         flags_str[i++] = g_strdup("none");
@@ -213,6 +224,48 @@ void NetworkManager::BuildAccessPointInfo(NMAccessPoint* ap, std::vector<AccessP
     accessPoints.push_back(info);
 }
 
+void NetworkManager::AddedCB(GObject *client, GAsyncResult *result, gpointer user_data)
+{
+    const auto loop = reinterpret_cast<GMainLoop*>(user_data);
+    NMRemoteConnection *remote;
+    GError             *error = NULL;
+
+    /* NM responded to our request; either handle the resulting error or
+     * print out the object path of the connection we just added.
+     */
+    remote = nm_client_add_connection_finish(NM_CLIENT(client), result, &error);
+
+    if (error) {
+        g_print("Error adding connection: %s", error->message);
+        g_error_free(error);
+    } else {
+        g_print("Added: %s\n", nm_connection_get_path(NM_CONNECTION(remote)));
+        g_object_unref(remote);
+    }
+
+    /* Tell the mainloop we're done and we can quit now */
+    g_main_loop_quit(loop);
+
+}
+
+void NetworkManager::ActivateConnectionCB(GObject *client, GAsyncResult *result, gpointer user_data)
+{
+    const auto loop = reinterpret_cast<GMainLoop*>(user_data);
+    GError *error = nullptr;
+
+    NMActiveConnection *active;
+    active = nm_client_activate_connection_finish (NM_CLIENT (client), result, &error);
+
+    if (error) {
+		g_print("Error activation connection: %s", error->message);
+        LOG(ERROR) << error->message;
+
+		g_error_free (error);
+    }
+    /* Tell the mainloop we're done and we can quit now */
+    g_main_loop_quit(loop);
+}
+
 NetworkManager::NetworkManager(/* args */)
 {
     el::Loggers::getLogger(ELPP_DEFAULT_LOGGER);
@@ -254,4 +307,146 @@ std::vector<DeviceInfo> NetworkManager::ScanAccessPoints(const std::string& inte
     }
 
     return resultInfo;
+}
+
+bool NetworkManager::ConnectAccessPoint(const std::string& connectionName, const std::string& password, const std::string& interfaceName)
+{
+    if(_client == nullptr) {
+        if(!CreateClient()){
+            LOG(ERROR) << "Error Creating NMClient";
+            return {};
+        }
+    }
+
+    auto loop = g_main_loop_new(NULL, FALSE);
+
+    /*NMConnection        *connection;
+    NMSettingConnection *s_con;
+    NMSettingWired      *s_wired;
+    NMSettingIP4Config  *s_ip4;
+    char                *uuid;
+
+    // Create a new connection object 
+    connection = nm_simple_connection_new();
+
+    // Build up the 'connection' Setting 
+    s_con = (NMSettingConnection *) nm_setting_connection_new();
+    uuid  = nm_utils_uuid_generate();
+    g_object_set(G_OBJECT(s_con),
+                 NM_SETTING_CONNECTION_UUID,
+                 uuid,
+                 NM_SETTING_CONNECTION_ID,
+                 connectionName.c_str(),
+                 NM_SETTING_CONNECTION_TYPE,
+                 "802-3-ethernet",
+                 NULL);
+    g_free(uuid);
+    nm_connection_add_setting(connection, NM_SETTING(s_con));
+
+    // Build up the 'wired' Setting
+    s_wired = (NMSettingWired *) nm_setting_wired_new();
+    nm_connection_add_setting(connection, NM_SETTING(s_wired));
+
+    // Build up the 'ipv4' Setting 
+    s_ip4 = (NMSettingIP4Config *) nm_setting_ip4_config_new();
+    g_object_set(G_OBJECT(s_ip4),
+                 NM_SETTING_IP_CONFIG_METHOD,
+                 NM_SETTING_IP4_CONFIG_METHOD_AUTO,
+                 NULL);
+    nm_connection_add_setting(connection, NM_SETTING(s_ip4));
+
+    utils::Callback<void(GObject* , GAsyncResult*, gpointer)>::func = std::bind(&NetworkManager::AddedCB, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    GAsyncReadyCallback added_cb = static_cast<GAsyncReadyCallback>(utils::Callback<void(GObject* , GAsyncResult*, gpointer)>::callback);
+
+    //Ask the settings service to add the new connection; we'll quit the
+    // mainloop and exit when the callback is called.
+    
+    nm_client_add_connection_async(_client, connection, FALSE, NULL, added_cb, loop);
+    g_object_unref(connection);*/
+
+    //device_found = find_device_for_connection (nmc, connection, ifname, ap, nsp, &device, &spec_object, &local);
+
+    //nm_client_activate_connection_async (_client, connection, device, spec_object, NULL, callback, info);
+
+    //utils::Callback<void(GObject* , GAsyncResult*, gpointer)>::func = std::bind(&NetworkManager::AddedCB, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    //GAsyncReadyCallback added_cb = static_cast<GAsyncReadyCallback>(utils::Callback<void(GObject* , GAsyncResult*, gpointer)>::callback);
+
+    const char *spec_object;
+
+    //https://cgit.freedesktop.org/NetworkManager/NetworkManager/tree/clients/cli/connections.c?id=9c3df9caa3296a55fe54e6aa02fe8a11b27deaba
+    //https://stackoverflow.com/questions/57621775/libnm-specifying-password-when-connecting-to-wifi-from-c-program
+
+    const GPtrArray* devices = nm_client_get_devices(_client);
+    LOG(DEBUG) << std::to_string(devices->len) << " devices get from nm-client";
+
+    NMDevice* found_device = nullptr;
+    NM80211ApSecurityFlags ap_wpa_flags;
+    NM80211ApSecurityFlags ap_rsn_flags;
+
+    for (guint i = 0; i < devices->len; i++) {
+        NMDevice *device = reinterpret_cast<NMDevice*>(g_ptr_array_index(devices, i));
+        if (NM_IS_DEVICE_WIFI(device)) {
+            if(interfaceName.size() == 0 || strcmp(interfaceName.c_str(), nm_device_get_iface(device)) == 0) {
+                //char *bssid_up = g_ascii_strup (connectionName.c_str(), -1);
+				const GPtrArray *aps = nm_device_wifi_get_access_points (NM_DEVICE_WIFI(device));      
+                for (guint j = 0; j < aps->len; j++) {
+					NMAccessPoint *candidate_ap = reinterpret_cast<NMAccessPoint*>(g_ptr_array_index(aps, j));
+                    //Todo later find Networks without SSID Broadcast
+					//const char *candidate_bssid = nm_access_point_get_ssid (candidate_ap);
+                    const auto ssid = nm_access_point_get_ssid (candidate_ap);
+                    const auto ssid_str = nm_utils_ssid_to_utf8((guint8*)(g_bytes_get_data(ssid, NULL)), g_bytes_get_size(ssid));
+
+					if (strcmp (connectionName.c_str(), ssid_str) == 0) {
+                        ap_wpa_flags = nm_access_point_get_wpa_flags(candidate_ap);
+                        ap_rsn_flags = nm_access_point_get_rsn_flags(candidate_ap);
+						found_device = device;
+						spec_object = nm_object_get_path (NM_OBJECT (candidate_ap));
+						break;
+					}
+                    g_free(ssid_str);
+				}
+				//g_free (bssid_up);
+            }
+        } else {
+            if(found_device == nullptr) {
+                LOG(DEBUG) << nm_device_get_iface(device) << " is not an wifi device";
+            } else {
+                break;
+            }
+        }
+    }
+    
+    utils::Callback<void(GObject* , GAsyncResult*, gpointer)>::func = std::bind(&NetworkManager::ActivateConnectionCB, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    GAsyncReadyCallback added_cb = static_cast<GAsyncReadyCallback>(utils::Callback<void(GObject* , GAsyncResult*, gpointer)>::callback);
+
+    if(found_device != nullptr) {
+        bool wep_passphrase = false; //Todo Understand
+        //auto agent = nm_secret_agent_simple_new ("nmcli-connect");
+        
+        NMConnection* connection = nm_simple_connection_new();
+        auto s_wsec = (NMSettingWirelessSecurity *) nm_setting_wireless_security_new ();
+        nm_connection_add_setting (connection, NM_SETTING (s_wsec));
+        auto arg_connection = nm_connection_get_path(connection);
+
+        if (ap_wpa_flags == NM_802_11_AP_SEC_NONE && ap_rsn_flags == NM_802_11_AP_SEC_NONE) {
+            /* WEP */
+            nm_setting_wireless_security_set_wep_key(s_wsec, 0, password.c_str());
+            g_object_set(G_OBJECT(s_wsec),
+                            NM_SETTING_WIRELESS_SECURITY_WEP_KEY_TYPE,
+                            wep_passphrase ? NM_WEP_KEY_TYPE_PASSPHRASE : NM_WEP_KEY_TYPE_KEY,
+                            NULL);
+        } else if ((ap_wpa_flags & NM_802_11_AP_SEC_KEY_MGMT_PSK)
+                    || (ap_rsn_flags & NM_802_11_AP_SEC_KEY_MGMT_PSK)
+                    || (ap_rsn_flags & NM_802_11_AP_SEC_KEY_MGMT_SAE)) {
+            /* WPA PSK */
+            g_object_set(s_wsec, NM_SETTING_WIRELESS_SECURITY_PSK, password.c_str(), NULL);
+        }
+
+        nm_client_activate_connection_async (_client, connection, found_device, spec_object, NULL, added_cb, loop);
+    }
+
+    /* Wait for the connection to be added */
+    g_main_loop_run(loop);
+
+    return false;
 }

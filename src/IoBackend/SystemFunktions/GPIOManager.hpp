@@ -29,6 +29,10 @@ private:
     void EventCallback(const std::string& name, const std::string& parameter);
 public:
     GPIOManager(Config* config, GlobalFunctions* globalFunctions);
+    GPIOManager(const GPIOManager& orig) = delete;
+	GPIOManager(GPIOManager&& other) = delete;
+	GPIOManager& operator=(const GPIOManager& other) = delete;
+	GPIOManager& operator=(GPIOManager&& other) = delete;
     ~GPIOManager();
 
     bool Init();

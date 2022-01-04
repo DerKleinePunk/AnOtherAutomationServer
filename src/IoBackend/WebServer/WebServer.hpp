@@ -46,6 +46,10 @@ private:
     HttpResponse* HandleResource(struct lws *wsi, const std::string& url, const std::string& method, const std::string* body);
 public:
     WebServer(GlobalFunctions* globalFunctions);
+    WebServer(const WebServer& orig) = delete;
+	WebServer(WebServer&& other) = delete;
+	WebServer& operator=(const WebServer& other) = delete;
+	WebServer& operator=(WebServer&& other) = delete;
     ~WebServer();
 
     bool Start();

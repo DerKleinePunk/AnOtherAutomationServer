@@ -12,11 +12,17 @@
 
 using json = nlohmann::json;
 
-IODeviceManager::IODeviceManager(/* args */)
+IODeviceManager::IODeviceManager(GlobalFunctions* globalFunctions)
 {
     el::Loggers::getLogger(ELPP_DEFAULT_LOGGER);
+    _globalFunctions = globalFunctions;
 }
 
 IODeviceManager::~IODeviceManager()
 {
+}
+
+bool IODeviceManager::Init()
+{
+    return true;
 }
