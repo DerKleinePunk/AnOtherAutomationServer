@@ -22,7 +22,7 @@ HttpResponse* TestResource::Process(HttpRequest& request, const std::string& url
 {
     auto result = new HttpResponse();
     const auto arg = request.GetParameter(std::string("a"));
-    const auto apiKey = request.GetHeader(std::string("X-API-KEY"));
+    const auto apiKey = request.GetHeader(std::string("X-API-KEY"), true);
 
     LOG(DEBUG) << "Api Call Get with " << arg << " apiKey " << apiKey;
 

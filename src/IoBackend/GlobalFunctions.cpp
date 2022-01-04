@@ -25,6 +25,11 @@ bool GlobalFunctions::IsApiKeyOk(const std::string& value)
     return value == _config->GetApiKey();
 }
 
+std::string GlobalFunctions::GetApiKey() const
+{
+    return _config->GetApiKey();
+}
+
 const std::string GlobalFunctions::GetContentTypeFromFileName(const std::string& fileName) const
 {
     if(utils::hasEnding(fileName, ".html") || utils::hasEnding(fileName, ".htm"))

@@ -131,34 +131,41 @@ int main(int argc, char** argv)
     std::string input;
     std::cin >> input;
 
-    while(input != "q") {
-        if(input == "t") {
-            ownWebServer->SendWebSocketBroadcast("Hello from Server");
-        } else if(input == "r") {
-            runner->RunScript("sample");
-        } else if(input == "r1") {
-            runner->RunScript("sample", "simpleFunc");
-        } else if(input == "s") {
-            const auto result = networkManager->ScanAccessPoints();
-            for ( const auto device : result) {
-                std::cout << device.Iface << std::endl;
-                for (const auto apInfo : device.AccessPoints) {
-                    std::cout << "     " << apInfo.Ssid << std::endl;
+    try
+    {
+        while(input != "q") {
+            if(input == "t") {
+                ownWebServer->SendWebSocketBroadcast("Hello from Server");
+            } else if(input == "r") {
+                runner->RunScript("sample");
+            } else if(input == "r1") {
+                runner->RunScript("sample", "simpleFunc");
+            } else if(input == "s") {
+                const auto result = networkManager->ScanAccessPoints();
+                for ( const auto device : result) {
+                    std::cout << device.Iface << std::endl;
+                    for (const auto apInfo : device.AccessPoints) {
+                        std::cout << "     " << apInfo.Ssid << std::endl;
+                    }
                 }
+                json jsonText = result;
+                std::cout << jsonText.dump() << std::endl;
+            } else if(input == "t0") {
+                connector->Publish("cmnd/tasmota_852612/POWER", "TOGGLE");
+            } else if(input == "i0") {
+                globalFunctions.ShowInternalVars();
+            } else {
+                std::cout << input << " command not found" << std::endl;
             }
-            json jsonText = result;
-            std::cout << jsonText.dump() << std::endl;
-        } else if(input == "t0") {
-            connector->Publish("cmnd/tasmota_852612/POWER", "TOGGLE");
-        } else if(input == "i0") {
-            globalFunctions.ShowInternalVars();
-        } else {
-            std::cout << input << " command not found" << std::endl;
+            WriteFunktionText();
+            std::cin >> input;
         }
-        WriteFunktionText();
-        std::cin >> input;
     }
-
+    catch(const std::exception& e)
+    {
+        LOG(ERROR) << e.what();
+    }
+    
     delete backend;
     
     gpioManager->Deinit();

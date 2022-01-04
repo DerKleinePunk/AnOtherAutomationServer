@@ -26,7 +26,7 @@ HttpResponse* AuthResource::HandleLogin(HttpRequest& request, const std::string&
         return result; 
     }
 
-    std::string token("12345678");
+    const auto token = _globalFunctions->GetApiKey();
 
     //"X-API-KEY=123456789;SameSite=Strict;path=/"
     result->SetCookie("X-API-KEY", token);
@@ -62,7 +62,7 @@ HttpResponse* AuthResource::Process(HttpRequest& request, const std::string& url
     }
 
     const auto arg = request.GetParameter(std::string("a"));
-    const auto apiKey = request.GetHeader(std::string("X-API-KEY"));
+    const auto apiKey = request.GetHeader(std::string("X-API-KEY"), true);
 
     LOG(DEBUG) << url << " Api Call Get with " << arg << " apiKey " << apiKey;
 

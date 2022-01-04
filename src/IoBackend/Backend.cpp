@@ -15,7 +15,13 @@ using json = nlohmann::json;
 void Backend::EventCallback(const std::string& name, const std::string& parameter)
 {
     if(name == "MqttValue") {
-        _webServer->SendWebSocketBroadcast("MqttValue" + parameter);
+        auto jsonText = json::parse(parameter);
+        jsonText["Event"] = "MqttValue";
+        _webServer->SendWebSocketBroadcast(jsonText);
+    } else if(name == "ValueChanged") {
+         auto jsonText = json::parse(parameter);
+        jsonText["Event"] = "ValueChanged";
+        _webServer->SendWebSocketBroadcast(jsonText);
     }
 
     for(auto entry : _config->GetEventRoot()) {

@@ -44,7 +44,7 @@ std::string HttpRequest::GetParameter(const std::string& name)
     return result;
 }
 
-std::string HttpRequest::GetHeader(const std::string& name)
+std::string HttpRequest::GetHeader(const std::string& name, bool canbeCookie)
 {
     auto result = std::string("");
     auto nameIntern = name;
@@ -67,14 +67,17 @@ std::string HttpRequest::GetHeader(const std::string& name)
         }
         delete [] value;
     } else if(size < 0){
-        /*size_t max = 32;
-        char textBuffer[32];
-		if(lws_http_cookie_get(_wsi, "X-API-KEY", textBuffer, &max) == 0) {
-            result = std::string(textBuffer, max);
+        if(canbeCookie) {
+            size_t max = 32;
+            char textBuffer[32];
+            if(lws_http_cookie_get(_wsi, name.c_str(), textBuffer, &max) == 0) {
+                result = std::string(textBuffer, max);
+            } else {
+                LOG(WARNING) << nameIntern << " header or cookie not found";
+            }
         } else {
             LOG(WARNING) << nameIntern << " header or cookie not found";
-        }*/
-        LOG(WARNING) << nameIntern << " header or cookie not found";
+        }
     }
     return result;
 }

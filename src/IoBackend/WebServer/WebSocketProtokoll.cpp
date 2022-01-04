@@ -107,10 +107,12 @@ int callback_websocket(struct lws *wsi, enum lws_callback_reasons reason, void *
 		break;
 
 	case LWS_CALLBACK_CLOSED:
+		webServer->RemoveWebSocketClient(!pss->publishing, pss->connectionId);
+		uuid_clear(pss->connectionId);
+		
 		/* remove our closing pss from the list of live pss */
 		lws_ll_fwd_remove(struct per_session_data__minimal, pss_list,
 				  pss, vhd->pss_list);
-		webServer->RemoveWebSocketClient(!pss->publishing, pss->connectionId);
 		break;
 
 	case LWS_CALLBACK_SERVER_WRITEABLE:

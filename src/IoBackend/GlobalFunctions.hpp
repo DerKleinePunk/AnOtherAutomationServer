@@ -17,6 +17,8 @@ public:
     ~GlobalFunctions();
 
     bool IsApiKeyOk(const std::string& value);
+    std::string GetApiKey() const;
+
     const std::string GetContentTypeFromFileName(const std::string& fileName) const;
     uint16_t GetServerPort() const;
 

@@ -12,7 +12,7 @@ public:
     ~HttpRequest();
 
     std::string GetParameter(const std::string& name);
-    std::string GetHeader(const std::string& name);
+    std::string GetHeader(const std::string& name, bool canbeCookie = false);
     std::string GetBody() const;
 };
 

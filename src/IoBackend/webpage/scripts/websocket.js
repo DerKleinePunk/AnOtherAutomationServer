@@ -37,13 +37,14 @@ function createSubscriber() {
 		subscriber_ws.onopen = function() {
 			document.getElementById("b").disabled = 0;
 			document.getElementById("m").disabled = 0;
+			document.getElementById("r").value = "";
 		};
 	
 		subscriber_ws.onmessage =function got_packet(msg) {
 			document.getElementById("r").value =
-				document.getElementById("r").value + msg.data + "\n";
+			document.getElementById("r").value + msg.data + "\n";
 			document.getElementById("r").scrollTop =
-				document.getElementById("r").scrollHeight;
+			document.getElementById("r").scrollHeight;
 		};
 	
 		subscriber_ws.onclose = function(event){
@@ -156,7 +157,7 @@ function updateDocNoBody() {
 		}
 	};
 	xhttp.open("POST", "/api/test/samplePost", true);
-	xhttp.setRequestHeader("X-API-KEY", "123456789");
+	//xhttp.setRequestHeader("X-API-KEY", "123456789"); Machen wir mit dem Cookie
 	xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 	xhttp.send();
 }
@@ -172,7 +173,7 @@ function sendMqttValue() {
 		}
 	};
 	xhttp.open("POST", "/api/mqtt/set", true);
-	xhttp.setRequestHeader("X-API-KEY", "123456789");
+	//xhttp.setRequestHeader("X-API-KEY", "123456789"); Machen wir mit dem Cookie
 	xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 	var obj = new Object();
 	obj.topic = document.getElementById("topic").value;
@@ -195,7 +196,7 @@ function sendLogin() {
 				value: result.token
 			  });
 			*/
-			document.cookie = "X-API-KEY=123456789;SameSite=Strict;path=/";
+			//document.cookie = "X-API-KEY=123456789;SameSite=Strict;path=/";
 			createSubscriber();
 		}
 	};
@@ -219,6 +220,6 @@ function getAccessPoints() {
 	};
 	xhttp.open("GET", "/api/test/system/wlan", true);
 	xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-	xhttp.setRequestHeader("X-API-KEY", "123456789");
+	//xhttp.setRequestHeader("X-API-KEY", "123456789"); Machen wir mit dem Cookie
 	xhttp.send();
 }

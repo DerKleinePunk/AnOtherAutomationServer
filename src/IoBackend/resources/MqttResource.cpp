@@ -24,7 +24,7 @@ HttpResponse* MqttResource::Process(HttpRequest& request, const std::string& url
     auto result = new HttpResponse();
     const auto topic = request.GetParameter(std::string("topic"));
     const auto value = request.GetParameter(std::string("value"));
-    const auto apiKey = request.GetHeader(std::string("X-API-KEY"));
+    const auto apiKey = request.GetHeader(std::string("X-API-KEY"), true);
 
     LOG(DEBUG) << url << " Api Call Get with " << topic << " apiKey " << apiKey;
 

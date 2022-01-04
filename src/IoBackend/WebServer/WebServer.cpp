@@ -52,12 +52,20 @@ void WebServer::MainLoop()
     el::Helpers::setThreadName("WebServer WorkerThread");
     LOG(DEBUG) << "WebServer Main Loop running";
 
-    while(_run){
-        if( lws_service(_context, 0) < 0 ) {
-            LOG(ERROR) << "Error polling for socket activity.";
-            break;
+    try
+    {
+        while(_run){
+            if( lws_service(_context, 0) < 0 ) {
+                LOG(ERROR) << "Error polling for socket activity.";
+                break;
+            }
         }
     }
+    catch(const std::exception& e)
+    {
+        LOG(ERROR) << e.what();
+    }
+        
     LOG(DEBUG) << "WebServer Main Loop leaved";
 }
 
@@ -177,6 +185,12 @@ static struct lws_protocols protocols[] = {
     { NULL, NULL, 0, 0 } /* terminator */
 };
 
+/**
+ * @brief Starts the Webserver
+ * 
+ * @return true 
+ * @return false 
+ */
 bool WebServer::Start() {
     
     lws_context_creation_info info;
@@ -222,6 +236,7 @@ bool WebServer::Start() {
     info.gid = -1;
     info.uid = -1;
     //info.error_document_404 = "/404.html";
+    //Todo put T to Config
     //info.options = LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT | LWS_SERVER_OPTION_HTTP_HEADERS_SECURITY_BEST_PRACTICES_ENFORCE;
     info.options = LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT;
     info.user = this;
@@ -506,7 +521,9 @@ int WebServer::MainCallBack(struct lws *wsi, enum lws_callback_reasons reason, v
                         i->cookie_name, plain, i->expiry_unix_time);
                         */
                     char temp[128];
-                    int n = lws_snprintf(temp, sizeof(temp), "__Host-%s=%s;SameSite=Strict;path=/", cookie.first.c_str(),  cookie.second.c_str());
+                    //Todo Host Cookies scheit FireFox nur noch bei https zu unterstüzen
+                    //int n = lws_snprintf(temp, sizeof(temp), "__Host-%s=%s;SameSite=Strict;Path=/;", cookie.first.c_str(),  cookie.second.c_str());
+                    int n = lws_snprintf(temp, sizeof(temp), "%s=%s;SameSite=Strict;Path=/;", cookie.first.c_str(),  cookie.second.c_str());
 
                     if (lws_add_http_header_by_token(wsi, WSI_TOKEN_HTTP_SET_COOKIE, (uint8_t *)temp, n, &p, end)) {
                         //lwsl_err("%s: failed to add JWT cookie header\n", __func__);
