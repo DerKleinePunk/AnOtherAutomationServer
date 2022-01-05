@@ -105,7 +105,7 @@ int main(int argc, char** argv)
         LOG(ERROR) << "gpio manager starting Failed";
     }
 
-    auto ioDeviceManager = new IODeviceManager(&globalFunctions);
+    auto ioDeviceManager = new IODeviceManager(config, &globalFunctions);
     if(ioDeviceManager->Init()) {
         LOG(INFO) << "io device manager started";
     } else {

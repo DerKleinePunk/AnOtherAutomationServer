@@ -17,11 +17,11 @@ void Backend::EventCallback(const SystemEvent event, const std::string& paramete
     if(event == SystemEvent::MqttValue) {
         auto jsonText = json::parse(parameter);
         jsonText["Event"] = "MqttValue";
-        _webServer->SendWebSocketBroadcast(jsonText);
+        _webServer->SendWebSocketBroadcast(jsonText.dump());
     } else if(event == SystemEvent::ValueChanged) {
          auto jsonText = json::parse(parameter);
         jsonText["Event"] = "ValueChanged";
-        _webServer->SendWebSocketBroadcast(jsonText);
+        _webServer->SendWebSocketBroadcast(jsonText.dump());
     }
 
     for(auto entry : _config->GetEventRoot()) {

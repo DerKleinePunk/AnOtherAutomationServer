@@ -4,8 +4,8 @@ MESSAGE(STATUS "Try Build ${PROJECT_NAME}")
 
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
 
-## Use all the *.cpp files we found under this folder for the project Find better way for coomen cpp files
-FILE(GLOB SRCS "*.cpp" "*/*.cpp")
+## Use all the *.cpp files we found under this folder for the project Find better way for comon cpp files
+FILE(GLOB SRCS "*.cpp" "*/*.cpp" "*/*/*.cpp")
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows" )
     SET (project_BIN ${PROJECT_NAME})
