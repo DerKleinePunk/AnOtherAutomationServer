@@ -15,7 +15,7 @@ private:
     std::vector<std::string> _topics;
 
     void LogError(int errorCode);
-    void EventCallback(const std::string& name, const std::string& parameter);
+    void EventCallback(const SystemEvent event, const std::string& parameter);
     void HandleMqttInternals(const std::string& name, const std::string& value);
 public:
     MqttConnector(const Config* config, ServiceEventManager* serviceEventManager);

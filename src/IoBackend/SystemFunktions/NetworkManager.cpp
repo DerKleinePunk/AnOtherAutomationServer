@@ -450,11 +450,21 @@ bool NetworkManager::ConnectAccessPoint(const std::string& connectionName, const
         NMConnection* connection = nm_simple_connection_new();
         nm_connection_set_path(connection, "/");
         
+        char* uuid;
+
+        uuid  = nm_utils_uuid_generate();
+        g_object_set(G_OBJECT(connection),
+                 NM_SETTING_CONNECTION_UUID,
+                 uuid,
+                 NM_SETTING_CONNECTION_ID,
+                 connectionName.c_str(),
+                 NM_SETTING_CONNECTION_TYPE,
+                 "802-3-ethernet",
+                 NULL);
+
         auto s_wireless = ( NMSettingWireless*) nm_setting_wireless_new();
         nm_connection_add_setting (connection, NM_SETTING (s_wireless));
-
-        //g_object_set(G_OBJECT(s_wireless), "security", "802-11-wireless-security", NULL);
-
+        
         auto s_wsec = (NMSettingWirelessSecurity *) nm_setting_wireless_security_new();
         nm_connection_add_setting (connection, NM_SETTING (s_wsec));
  

@@ -22,8 +22,10 @@ public:
     const std::string GetContentTypeFromFileName(const std::string& fileName) const;
     uint16_t GetServerPort() const;
 
-    void FireNewEvent(const std::string& name, const std::string& parameter);
-    void RegisterForEvent(const std::string& eventFilter, EventDelegate function);
+    void FireNewEvent(const SystemEvent event, const std::string& parameter);
+    void RegisterForEvent(const std::vector<SystemEvent>& eventFilter, EventDelegate function);
+    void RegisterForEvent(const SystemEvent event, EventDelegate function);
+
 
     std::string ScanAccessPoints(const std::string& interfaceName = "");
 

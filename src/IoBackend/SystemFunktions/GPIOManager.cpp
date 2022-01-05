@@ -19,11 +19,11 @@ LocalGpioPin::LocalGpioPin(std::uint8_t port, bool output, const std::string& va
     _isEnablePin = false;
 }
 
-void GPIOManager::EventCallback(const std::string& name, const std::string& parameter)
+void GPIOManager::EventCallback(const SystemEvent event, const std::string& parameter)
 {
-    LOG(DEBUG) << "EventCallback " << name << " with " << parameter;
+    LOG(DEBUG) << "EventCallback " << event << " with " << parameter;
 
-    if(name == "ChangeValue") {
+    if(event == SystemEvent::ChangeValue) {
         auto jsonText = json::parse(parameter);
 
         std::string name("");
@@ -170,7 +170,7 @@ bool GPIOManager::Init()
     }
 
     auto callback = std::bind(&GPIOManager::EventCallback, this, std::placeholders::_1, std::placeholders::_2);
-    _globalFunctions->RegisterForEvent(std::string("ChangeValue"), callback);
+    _globalFunctions->RegisterForEvent(SystemEvent::ChangeValue, callback);
 
     LOG(DEBUG) << "Init <- success";
     return true;

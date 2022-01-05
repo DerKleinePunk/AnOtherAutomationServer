@@ -18,16 +18,24 @@ void ServiceEventManager::WorkerLoop()
         InternalEvent event;
         if(_eventQueue.tryRemove(event, std::chrono::milliseconds(1000))) {
             for( auto consumer : _eventConsumer) {
-                if(consumer.EventFilter.empty() || utils::hasBegining(event.Name, consumer.EventFilter)) {
-                    LOG(DEBUG) << "Fire Event " << event.Name << " " << event.Parameter;
-                    consumer.EventConsumer(event.Name, event.Parameter);
+                if(consumer.EventFilter.size() == 0 || 
+                    std::find(consumer.EventFilter.begin(), consumer.EventFilter.end(), event.Event) != consumer.EventFilter.end()) {
+                    LOG(DEBUG) << "Fire Event " << event.Event << " " << event.Parameter;
+                    consumer.EventConsumer(event.Event, event.Parameter);
                 }
             }
         } else {
             LOG(DEBUG) << "Event Idle";
+            if(_eventConsumer.size() > 0) {
+                for( auto consumer : _eventConsumer) {
+                    if(consumer.EventFilter.size() == 0 || 
+                        std::find(consumer.EventFilter.begin(), consumer.EventFilter.end(), SystemEvent::Idle) != consumer.EventFilter.end()) {
+                        consumer.EventConsumer(SystemEvent::Idle, "");
+                    }
+                }
+            }
         }
     }
-    
 }
 
 ServiceEventManager::ServiceEventManager(/* args */)
@@ -62,31 +70,39 @@ void ServiceEventManager::Deinit()
  * @param name 
  * @param parameter 
  */
-void ServiceEventManager::FireNewEvent(const std::string& name, const std::string& parameter)
+void ServiceEventManager::FireNewEvent(const SystemEvent event, const std::string& parameter)
 {
     if(_eventConsumer.size() == 0) {
-        LOG(WARNING) << "No Consumers no Event";
+        LOG(WARNING) << "No Consumers no event fired";
         return;
     }
 
-    InternalEvent event;
-    event.Name = name;
-    event.Parameter = parameter;
+    InternalEvent intEvent;
+    intEvent.Event = event;
+    intEvent.Parameter = parameter;
 
-    _eventQueue.add(event);
+    _eventQueue.add(intEvent);
 }
 
 /**
  * @brief Register Callback for System Events
  * 
- * @param eventFilter the filer string
+ * @param eventFilter the Filter for EvemtTypes
  * @param function the callback function
  */
-void ServiceEventManager::RegisterMe(const std::string& eventFilter, EventDelegate function)
+void ServiceEventManager::RegisterMe(const std::vector<SystemEvent>& eventFilter, EventDelegate function)
 {
     EventConsumers consumer;
     consumer.EventFilter = eventFilter;
     consumer.EventConsumer = function;
 
     _eventConsumer.push_back(consumer);
+}
+
+void ServiceEventManager::RegisterMe(const SystemEvent eventFilter, EventDelegate function)
+{
+    std::vector<SystemEvent> myEvents;
+    myEvents.push_back(eventFilter);
+
+    RegisterMe(myEvents, function);
 }

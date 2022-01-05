@@ -48,7 +48,7 @@ HttpResponse* MqttResource::Process(HttpRequest& request, const std::string& url
     {
         LOG(DEBUG) << "Body " << request.GetBody();
         if(url == "set") {
-            _globalFunctions->FireNewEvent("PublishMqtt", request.GetBody());
+            _globalFunctions->FireNewEvent(SystemEvent::PublishMqtt, request.GetBody());
         }
         result->SetCode(201);
     }

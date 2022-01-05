@@ -62,7 +62,7 @@ void PythonRunner::WriteMqtt(const std::string& topic, const std::string& value)
     j["topic"] = topic;
     j["value"] = value;
 
-    _globalFunctions->FireNewEvent("PublishMqtt", j.dump());
+    _globalFunctions->FireNewEvent(SystemEvent::PublishMqtt, j.dump());
 }
 
 void PythonRunner::ChangeValue(const std::string& name, const std::string& value)
@@ -71,7 +71,7 @@ void PythonRunner::ChangeValue(const std::string& name, const std::string& value
     j["name"] = name;
     j["value"] = value;
 
-    _globalFunctions->FireNewEvent("ChangeValue", j.dump());
+    _globalFunctions->FireNewEvent(SystemEvent::ChangeValue, j.dump());
 }
 
 PythonRunner::PythonRunner(const std::string& appName, GlobalFunctions* globalFunctions)

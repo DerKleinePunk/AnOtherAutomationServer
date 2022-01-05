@@ -67,7 +67,7 @@ void MqttConnector::LogError(int errorCode)
     LOG(ERROR) << mosquitto_strerror(errorCode);
 }
 
-void MqttConnector::EventCallback(const std::string& name, const std::string& parameter)
+void MqttConnector::EventCallback(const SystemEvent event, const std::string& parameter)
 {
     auto jsonText = json::parse(parameter);
 
@@ -209,7 +209,7 @@ void MqttConnector::Connected()
     _initOk = true;
 
     auto callback = std::bind(&MqttConnector::EventCallback, this, std::placeholders::_1, std::placeholders::_2);
-    _serviceEventManager->RegisterMe(std::string("PublishMqtt"), callback);
+    _serviceEventManager->RegisterMe(SystemEvent::PublishMqtt, callback);
 }
 
 bool MqttConnector::Publish(std::string topic, std::string value)
@@ -248,7 +248,7 @@ void MqttConnector::OnMessage(const struct mosquitto_message* message)
             json j;
             j["topic"] = message->topic;
             j["value"] = value;
-            _serviceEventManager->FireNewEvent("MqttValue", j.dump());
+            _serviceEventManager->FireNewEvent(SystemEvent::MqttValue, j.dump());
         }
     }
 }

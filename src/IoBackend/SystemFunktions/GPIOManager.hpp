@@ -26,7 +26,7 @@ private:
     std::vector<MCP23017*> _mcp23017Impl;
     GlobalFunctions* _globalFunctions;
 
-    void EventCallback(const std::string& name, const std::string& parameter);
+    void EventCallback(const SystemEvent event, const std::string& parameter);
 public:
     GPIOManager(Config* config, GlobalFunctions* globalFunctions);
     GPIOManager(const GPIOManager& orig) = delete;

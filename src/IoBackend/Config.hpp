@@ -3,10 +3,11 @@
 #include <string>
 #include <vector>
 #include <map>
+#include "GlobalTypes.hpp"
 
 struct EventNode
 {
-    std::string Name;
+    SystemEvent Event;
     std::string Function;
     std::map<std::string, std::string> Parameters;
 };
@@ -62,6 +63,7 @@ class Config
 private:
     ConfigFile _configFile;
     std::string _filenameConfig;
+    bool _loadFailed;
 public:
     Config(const std::string& filename = "");
     Config(const Config& orig) = delete;

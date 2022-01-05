@@ -68,3 +68,5 @@ EventRoot -> Der Interne Eent Manager Im Oberene Beispiel Wenn das Event MqttVal
 MqttValue -> Ein Wert im Mqtt wurde geändert Überwachte Mqtt bereiche werden im WatchTopics Konfiguriert
 ChangeValue -> Ändere eine eine Interne Variable
 ValueChanged -> Interne / Gobale Variable wurde geändert
+
+siehe GlobalTypes.hpp

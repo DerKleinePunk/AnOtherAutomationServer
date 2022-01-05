@@ -4,18 +4,19 @@
 #include <functional>
 #include <thread>
 #include "../../common/utils/waitingqueue.h"
+#include "../GlobalTypes.hpp"
 
-typedef std::function<void(const std::string& name, const std::string& parameter)> EventDelegate;
+typedef std::function<void(const SystemEvent event, const std::string& parameter)> EventDelegate;
 
 struct EventConsumers
 {
-    std::string EventFilter;
+    std::vector<SystemEvent> EventFilter;
     EventDelegate EventConsumer;
 };
-    
+
 struct InternalEvent
 {
-    std::string Name;
+    SystemEvent Event;
     std::string Parameter;
 };
 
@@ -35,6 +36,7 @@ public:
     bool Init();
     void Deinit();
 
-    void FireNewEvent(const std::string& name, const std::string& parameter);
-    void RegisterMe(const std::string& eventFilter, EventDelegate function);
+    void FireNewEvent(const SystemEvent event, const std::string& parameter);
+    void RegisterMe(const std::vector<SystemEvent>& eventFilter, EventDelegate function);
+    void RegisterMe(const SystemEvent eventFilter, EventDelegate function);
 };

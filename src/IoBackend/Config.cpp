@@ -22,6 +22,14 @@ NLOHMANN_JSON_SERIALIZE_ENUM( ResourceType, {
     {ResourceType::MCP23017, "MCP23017"},
 })
 
+NLOHMANN_JSON_SERIALIZE_ENUM( SystemEvent, {
+    {SystemEvent::ChangeValue, "ChangeValue"},
+    {SystemEvent::Idle, "Idle"},
+    {SystemEvent::MqttValue, "MqttValue"},
+    {SystemEvent::PublishMqtt, "PublishMqtt"},
+    {SystemEvent::ValueChanged, "ValueChanged"},
+})
+
 std::ostream& operator<<(std::ostream& os, const ResourceType type)
 {
     switch(type) {
@@ -46,7 +54,7 @@ std::ostream& operator<<(std::ostream& os, const ResourceType type)
 void to_json(json& j, const EventNode& p)
 {
     j = json{ 
-        { "Name", p.Name }, 
+        { "Event", p.Event }, 
         { "Function", p.Function },
         { "Parameters", p.Parameters }  
     };
@@ -96,14 +104,9 @@ void to_json(json& j, const ConfigFile& p)
 
 void from_json(const json& j, EventNode& p)
 {
-    auto it_value = j.find("Name");
-    if(it_value != j.end()) {
-        p.Name = j.at("Name").get<std::string>();
-    } else {
-        p.Name = "EmptyEvent";
-    }
+    p.Event = j.at("Event").get<SystemEvent>();
 
-    it_value = j.find("Function");
+    auto it_value = j.find("Function");
     if(it_value != j.end()) {
         p.Function = j.at("Function").get<std::string>();
     } else {
@@ -235,7 +238,7 @@ void from_json(const json& j, ConfigFile& p)
         p.EventRoot = j.at("EventRoot").get<std::vector<EventNode>>();
     } else {
         EventNode node;
-        node.Name = "MqttValue";
+        node.Event = SystemEvent::MqttValue;
         node.Function = "CallPython";
         node.Parameters.insert(std::pair<std::string, std::string>("Script", "sample"));
         node.Parameters.insert(std::pair<std::string, std::string>("Function", "callbackMqtt"));
@@ -284,6 +287,7 @@ Config::Config(const std::string& filename)
     }
 
     LOG(DEBUG) << "ConfigFile FileName is " << _filenameConfig;
+    _loadFailed = false;
 }
 
 Config::~Config()
@@ -302,8 +306,10 @@ void Config::Load()
             ifs.close();
         } catch(std::domain_error& exp) {
             LOG(ERROR) << "Loadconfig  " << exp.what();
+            _loadFailed = true;
         } catch(std::exception& exp) {
             LOG(ERROR) << "Loadconfig  " << exp.what();
+            _loadFailed = true;
         }
     } else {
         LOG(DEBUG) << "Create new config file";
@@ -313,7 +319,7 @@ void Config::Load()
         _configFile.WatchTopics.push_back("devices/#");
         
         EventNode node;
-        node.Name = "MqttValue";
+        node.Event = SystemEvent::MqttValue;
         node.Function = "CallPython";
         node.Parameters.insert(std::pair<std::string, std::string>("Script", "sample"));
         node.Parameters.insert(std::pair<std::string, std::string>("Function", "callbackMqtt"));
@@ -340,6 +346,8 @@ void Config::Load()
 
 void Config::Save()
 {
+    if(_loadFailed) return;
+
     std::ofstream o(_filenameConfig);
     const json jConfig = _configFile;
     o << std::setw(4) << jConfig << std::endl;

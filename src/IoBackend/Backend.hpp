@@ -13,7 +13,7 @@ private:
     const Config* _config;
     PythonRunner* _runner;
 
-    void EventCallback(const std::string& name, const std::string& parameter);
+    void EventCallback(const SystemEvent event, const std::string& parameter);
     void Run(const std::string& name, const std::map<std::string, std::string>& parameters);
 
 public:

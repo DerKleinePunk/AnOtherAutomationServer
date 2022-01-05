@@ -12,20 +12,20 @@
 
 using json = nlohmann::json;
 
-void Backend::EventCallback(const std::string& name, const std::string& parameter)
+void Backend::EventCallback(const SystemEvent event, const std::string& parameter)
 {
-    if(name == "MqttValue") {
+    if(event == SystemEvent::MqttValue) {
         auto jsonText = json::parse(parameter);
         jsonText["Event"] = "MqttValue";
         _webServer->SendWebSocketBroadcast(jsonText);
-    } else if(name == "ValueChanged") {
+    } else if(event == SystemEvent::ValueChanged) {
          auto jsonText = json::parse(parameter);
         jsonText["Event"] = "ValueChanged";
         _webServer->SendWebSocketBroadcast(jsonText);
     }
 
     for(auto entry : _config->GetEventRoot()) {
-        if(entry.Name == name) {
+        if(entry.Event == event) {
             auto jsonText = json::parse(parameter);
             auto currentParameter = jsonText.get<std::map<std::string, std::string>>();
             entry.Parameters.insert(currentParameter.begin(), currentParameter.end());
@@ -81,5 +81,6 @@ Backend::~Backend()
 void Backend::Init()
 {
     auto callback = std::bind(&Backend::EventCallback, this, std::placeholders::_1, std::placeholders::_2);
-    _serviceEventManager->RegisterMe(std::string(""), callback);
+    std::vector<SystemEvent> eventList;
+    _serviceEventManager->RegisterMe(eventList, callback);
 };

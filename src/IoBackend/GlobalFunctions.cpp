@@ -50,13 +50,18 @@ uint16_t GlobalFunctions::GetServerPort() const
     return _config->GetServerPort();
 }
 
-void GlobalFunctions::FireNewEvent(const std::string& name, const std::string& parameter)
+void GlobalFunctions::FireNewEvent(const SystemEvent event, const std::string& parameter)
 {
-    _serviceEventManager->FireNewEvent(name, parameter); 
+    _serviceEventManager->FireNewEvent(event, parameter); 
 }
 
-void GlobalFunctions::RegisterForEvent(const std::string& eventFilter, EventDelegate function) {
+void GlobalFunctions::RegisterForEvent(const std::vector<SystemEvent>& eventFilter, EventDelegate function) {
     _serviceEventManager->RegisterMe(eventFilter, function);
+}
+
+void GlobalFunctions::RegisterForEvent(const SystemEvent event, EventDelegate function)
+{
+    _serviceEventManager->RegisterMe(event, function);
 }
 
 std::string GlobalFunctions::ScanAccessPoints(const std::string& interfaceName)
@@ -82,7 +87,7 @@ void GlobalFunctions::SetInternalVariable(const std::string& name, const std::st
         json j;
         j["name"] = name;
         j["value"] = value;
-        FireNewEvent("ValueChanged", j.dump());
+        FireNewEvent(SystemEvent::ValueChanged, j.dump());
     }
 }
 
