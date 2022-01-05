@@ -43,8 +43,9 @@ void WebServer::LogCallBack(int level, const char *line)
     std::string traceLine(line);
     utils::replaceAll(traceLine, "\n", "");
     utils::replaceAll(traceLine, "\r", "");
-
-    LOG(DEBUG) << traceLine;
+    
+    //Todo Remove Date and interprat Level
+    VLOG(5) << traceLine;
 }
 
 void WebServer::MainLoop()

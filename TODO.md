@@ -69,6 +69,8 @@ HerbiOs default password hMA3x994QvC46YZKnlBnnhZy4QAsQJus
 herbiOs/switches/inverter/config
 { "name": "Inverter", "unique_id": "inverter" }
 
+nmcli device wifi connect ROBOTERNETZ
+
 ```Json
 {"ip":"192.168.X.Y","dn":"Tasmota","fn":["Tasmota","","","",null,null,null,null],"hn":"tasmota-852612-1554","mac":"84CCA8852612","md":"4CH Relay","ty":0,"if":0,"ofln":"Offline","onln":"Online","state":["OFF","ON","TOGGLE","HOLD"],"sw":"10.0.0","t":"tasmota_852612","ft":"%prefix%/%topic%/","tp":["cmnd","stat","tele"],"rl":[1,1,1,1,0,0,0,0],"swc":[-1,-1,-1,-1,-1,-1,-1,-1],"swn":[null,null,null,null,null,null,null,null],"btn":[0,0,0,0,0,0,0,0],"so":{"4":0,"11":0,"13":0,"17":0,"20":0,"30":0,"68":0,"73":0,"82":0,"114":0,"117":0},"lk":0,"lt_st":0,"sho":[0,0,0,0],"ver":1}
 ```

@@ -254,16 +254,34 @@ void NetworkManager::ActivateConnectionCB(GObject *client, GAsyncResult *result,
     GError *error = nullptr;
 
     NMActiveConnection *active;
-    active = nm_client_activate_connection_finish (NM_CLIENT (client), result, &error);
+    active = nm_client_activate_connection_finish(NM_CLIENT (client), result, &error);
 
+    auto endLoop = true;
     if (error) {
 		g_print("Error activation connection: %s", error->message);
         LOG(ERROR) << error->message;
-
 		g_error_free (error);
+        g_main_loop_quit(loop);
+    } else {
+        auto state = nm_active_connection_get_state(active);
+        if (state == NM_ACTIVE_CONNECTION_STATE_ACTIVATED) {
+            LOG(DEBUG) << "NM_ACTIVE_CONNECTION_STATE_ACTIVATED";
+
+        } else if(state == NM_ACTIVE_CONNECTION_STATE_DEACTIVATED) {
+            LOG(DEBUG) << "NM_ACTIVE_CONNECTION_STATE_DEACTIVATED";
+        
+        } else if(state == NM_ACTIVE_CONNECTION_STATE_UNKNOWN) {
+            LOG(DEBUG) << "NM_ACTIVE_CONNECTION_STATE_UNKNOWN";
+            
+        } else {
+            //g_signal_connect(active, "state-changed", G_CALLBACK (active_connection_state_cb), loop);
+        }
     }
-    /* Tell the mainloop we're done and we can quit now */
-    g_main_loop_quit(loop);
+
+    if(endLoop) {
+        /* Tell the mainloop we're done and we can quit now */
+        g_main_loop_quit(loop);
+    }
 }
 
 NetworkManager::NetworkManager(/* args */)
@@ -394,9 +412,15 @@ bool NetworkManager::ConnectAccessPoint(const std::string& connectionName, const
                     //Todo later find Networks without SSID Broadcast
 					//const char *candidate_bssid = nm_access_point_get_ssid (candidate_ap);
                     const auto ssid = nm_access_point_get_ssid (candidate_ap);
+                    if(ssid == nullptr) 
+                    {
+                        LOG(DEBUG) << "ssid is empty";
+                        continue;
+                    }
+
                     const auto ssid_str = nm_utils_ssid_to_utf8((guint8*)(g_bytes_get_data(ssid, NULL)), g_bytes_get_size(ssid));
 
-					if (strcmp (connectionName.c_str(), ssid_str) == 0) {
+					if (strcmp(connectionName.c_str(), ssid_str) == 0) {
                         ap_wpa_flags = nm_access_point_get_wpa_flags(candidate_ap);
                         ap_rsn_flags = nm_access_point_get_rsn_flags(candidate_ap);
 						found_device = device;
@@ -424,10 +448,16 @@ bool NetworkManager::ConnectAccessPoint(const std::string& connectionName, const
         //auto agent = nm_secret_agent_simple_new ("nmcli-connect");
         
         NMConnection* connection = nm_simple_connection_new();
-        auto s_wsec = (NMSettingWirelessSecurity *) nm_setting_wireless_security_new ();
-        nm_connection_add_setting (connection, NM_SETTING (s_wsec));
-        auto arg_connection = nm_connection_get_path(connection);
+        nm_connection_set_path(connection, "/");
+        
+        auto s_wireless = ( NMSettingWireless*) nm_setting_wireless_new();
+        nm_connection_add_setting (connection, NM_SETTING (s_wireless));
 
+        //g_object_set(G_OBJECT(s_wireless), "security", "802-11-wireless-security", NULL);
+
+        auto s_wsec = (NMSettingWirelessSecurity *) nm_setting_wireless_security_new();
+        nm_connection_add_setting (connection, NM_SETTING (s_wsec));
+ 
         if (ap_wpa_flags == NM_802_11_AP_SEC_NONE && ap_rsn_flags == NM_802_11_AP_SEC_NONE) {
             /* WEP */
             nm_setting_wireless_security_set_wep_key(s_wsec, 0, password.c_str());
@@ -439,14 +469,21 @@ bool NetworkManager::ConnectAccessPoint(const std::string& connectionName, const
                     || (ap_rsn_flags & NM_802_11_AP_SEC_KEY_MGMT_PSK)
                     || (ap_rsn_flags & NM_802_11_AP_SEC_KEY_MGMT_SAE)) {
             /* WPA PSK */
+            g_object_set(s_wsec, NM_SETTING_WIRELESS_SECURITY_KEY_MGMT, "wpa-psk", NULL);
+            g_object_set(s_wsec, NM_SETTING_WIRELESS_SECURITY_AUTH_ALG, "open", NULL);
             g_object_set(s_wsec, NM_SETTING_WIRELESS_SECURITY_PSK, password.c_str(), NULL);
         }
 
+        nm_connection_dump(connection);
+
         nm_client_activate_connection_async (_client, connection, found_device, spec_object, NULL, added_cb, loop);
+
+         /* Wait for the connection to be added */
+        g_main_loop_run(loop);
     }
 
-    /* Wait for the connection to be added */
-    g_main_loop_run(loop);
+    g_main_loop_unref(loop);
+   
 
     return false;
 }
