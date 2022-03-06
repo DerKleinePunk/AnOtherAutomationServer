@@ -44,6 +44,7 @@ https://github.com/CodeExMachina/BlockingCollection
 Web GUI
 https://reactjs.de/artikel/react-typescript/#typescript-installieren-und-konfigurieren
 https://code.visualstudio.com/docs/typescript/typescript-tutorial
+https://create-react-app.dev/docs/getting-started
 
 Windows
 https://github.com/microsoft/vcpkg/blob/master/docs/users/integration.md#cmake-integration
