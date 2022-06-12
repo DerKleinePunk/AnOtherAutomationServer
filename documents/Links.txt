@@ -45,6 +45,8 @@ Web GUI
 https://reactjs.de/artikel/react-typescript/#typescript-installieren-und-konfigurieren
 https://code.visualstudio.com/docs/typescript/typescript-tutorial
 https://create-react-app.dev/docs/getting-started
+https://code.visualstudio.com/docs/nodejs/reactjs-tutorial
+https://create-react-app.dev/docs/making-a-progressive-web-app/
 
 Windows
 https://github.com/microsoft/vcpkg/blob/master/docs/users/integration.md#cmake-integration

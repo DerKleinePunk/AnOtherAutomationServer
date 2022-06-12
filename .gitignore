@@ -215,3 +215,6 @@ docs/content/release-notes.md
 
 # Netbeans
 /nbproject/
+
+#Node
+*/**/node_modules
