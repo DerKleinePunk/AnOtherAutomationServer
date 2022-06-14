@@ -112,3 +112,8 @@ git reset --hard
 git clean -fx
 git checkout feature/4-mqtt-rewrite
 git submodule add https://github.com/DerKleinePunk/PiGPIOHelper.git
+
+## Gauge
+
+https://github.com/Mikhus/canvas-gauges
+https://www.bauer.uh.edu/parks/h5_gauge1.htm
