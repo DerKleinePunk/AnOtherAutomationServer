@@ -117,3 +117,7 @@ git submodule add https://github.com/DerKleinePunk/PiGPIOHelper.git
 
 https://github.com/Mikhus/canvas-gauges
 https://www.bauer.uh.edu/parks/h5_gauge1.htm
+## NodeJs Hints
+
+nvm install --lts
+nvm use --lts
