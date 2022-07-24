@@ -45,7 +45,26 @@ void WebServer::LogCallBack(int level, const char *line)
     utils::replaceAll(traceLine, "\r", "");
     
     //Todo Remove Date and interprat Level
-    VLOG(5) << traceLine;
+    if(!VLOG_IS_ON(5)) return;
+    traceLine = traceLine.substr(27);
+
+    switch (level)
+    {
+        case LLL_ERR:
+            LOG(ERROR) << traceLine.substr(3);
+            break;
+        case LLL_WARN:
+            LOG(WARNING) << traceLine.substr(3);
+            break;
+        case LLL_INFO:
+            LOG(INFO) << traceLine.substr(3);
+            break;
+        case LLL_DEBUG:
+            LOG(DEBUG) << traceLine.substr(3);
+            break;
+        default:
+            VLOG(5) << traceLine;
+    }
 }
 
 void WebServer::MainLoop()
@@ -106,6 +125,24 @@ HttpResponse* WebServer::HandleResource(struct lws *wsi, const std::string& url,
     }
 }
 
+std::string WebServer::GetReasonText(lws_callback_reasons reason)
+{
+    switch (reason)
+    {
+        case LWS_CALLBACK_HTTP:
+            return "LWS_CALLBACK_HTTP";
+        case LWS_CALLBACK_CLOSED_HTTP:
+            return "LWS_CALLBACK_CLOSED_HTTP";
+        case LWS_CALLBACK_CLIENT_WRITEABLE:
+            return "LWS_CALLBACK_CLIENT_WRITEABLE";
+        case LWS_CALLBACK_HTTP_FILE_COMPLETION:
+            return "LWS_CALLBACK_HTTP_FILE_COMPLETION";
+        default:
+            return "reason " + std::to_string(reason);
+    }
+
+}
+
 WebServer::WebServer(GlobalFunctions* globalFunctions)
 {
     el::Loggers::getLogger(ELPP_DEFAULT_LOGGER);
@@ -135,6 +172,14 @@ static int callback_main( struct lws *wsi, enum lws_callback_reasons reason, voi
     return 0;
 }
 
+static struct lws_protocol_vhost_options em3 = {
+        NULL, NULL, ".zip", "application/zip"
+}, em2 = {
+	&em3, NULL, ".pdf", "application/pdf"
+}, extra_mimetypes = {
+	&em2, NULL, "*", "plain/text"
+};
+
 static const struct lws_http_mount proxymount = {
 	/* .mount_next */		NULL,		/* linked-list "next" */
 	/* .mountpoint */		"/ha",		/* mountpoint URL */
@@ -156,16 +201,16 @@ static const struct lws_http_mount proxymount = {
 };
 
 static const struct lws_http_mount basemount = {
-	/* .mount_next */		    &proxymount,		/* linked-list "next" */
+	/* .mount_next */		    NULL,		/* linked-list "next" &proxymount*/
 	/* .mountpoint */		    "/",		/* mountpoint URL */
 	/* .origin */			    "./webpage", /* serve from dir */
 	/* .def */			        "index.html",	/* default filename */
 	/* .protocol */			    NULL,
 	/* .cgienv */			    NULL,
-	/* .extra_mimetypes */	    NULL,
+	/* .extra_mimetypes */	    &extra_mimetypes,
 	/* .interpret */		    NULL,
 	/* .cgi_timeout */		    0,
-	/* .cache_max_age */		0,
+	/* .cache_max_age */		3600, //1 Stunde
 	/* .auth_mask */		    0,
 	/* .cache_reusable */		0,
 	/* .cache_revalidate */		0,
@@ -200,7 +245,7 @@ bool WebServer::Start() {
     auto version = lws_get_library_version();
     LOG(INFO) << "LibWebSocket Version " << version;
 
-    int logs = LLL_ERR | LLL_WARN | LLL_NOTICE | LLL_USER | LLL_INFO 
+    int logs = LLL_ERR | LLL_WARN | LLL_NOTICE | LLL_USER | LLL_INFO | LLL_DEBUG
 			/* for LLL_ verbosity above NOTICE to be built into lws,
 			 * lws must have been configured and built with
 			 * -DCMAKE_BUILD_TYPE=DEBUG instead of =RELEASE */
@@ -236,7 +281,7 @@ bool WebServer::Start() {
     }
     info.gid = -1;
     info.uid = -1;
-    //info.error_document_404 = "/404.html";
+    info.error_document_404 = "/404.html";
     //Todo put T to Config
     //info.options = LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT | LWS_SERVER_OPTION_HTTP_HEADERS_SECURITY_BEST_PRACTICES_ENFORCE;
     info.options = LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT;
@@ -380,7 +425,9 @@ int WebServer::MainCallBack(struct lws *wsi, enum lws_callback_reasons reason, v
     char textBuffer[512];
     char textBuffer2[512];
     struct httpSesssionData *pss = (struct httpSesssionData *)user;
-        
+
+    VLOG(5) << "MainCallBack " << GetReasonText(reason);
+
     //Todo Understand
     uint8_t buf[LWS_PRE + 2048], *start = &buf[LWS_PRE], *p = start, *end = &buf[sizeof(buf) - LWS_PRE - 1];
 
@@ -467,8 +514,9 @@ int WebServer::MainCallBack(struct lws *wsi, enum lws_callback_reasons reason, v
                 * HTTP/2: stream ended, parent connection remains up
                 */
                 if (protState == LWS_WRITE_HTTP_FINAL) {
-                    if (lws_http_transaction_completed(wsi))
-                    return -1;
+                    if (lws_http_transaction_completed(wsi)) {
+                        return -1;
+                    }
                 } else
                     lws_callback_on_writable(wsi);
 
@@ -547,7 +595,7 @@ int WebServer::MainCallBack(struct lws *wsi, enum lws_callback_reasons reason, v
                 return 0;
             } else {
                 //Todo find way HTTP_STATUS_INTERNAL_SERVER_ERROR or HTTP_STATUS_NOT_FOUND
-                if (lws_add_http_common_headers(wsi, HTTP_STATUS_INTERNAL_SERVER_ERROR, "text/html", 0, &p, end))
+                if (lws_add_http_common_headers(wsi, HTTP_STATUS_INTERNAL_SERVER_ERROR, "text/html", LWS_ILLEGAL_HTTP_CONTENT_LEN, &p, end))
                 {
                     return 1;
                 }

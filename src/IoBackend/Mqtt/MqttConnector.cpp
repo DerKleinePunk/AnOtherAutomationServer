@@ -25,7 +25,7 @@ void my_log_callback(struct mosquitto* mosq, void* userdata, int level, const ch
     } else if(level == MOSQ_LOG_ERR) {
         LOG(ERROR) << str;
     } else {
-        VLOG(5) << str;
+        VLOG(7) << str;
     }
 }
 

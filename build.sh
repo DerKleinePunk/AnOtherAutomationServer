@@ -273,6 +273,8 @@ if [ $exitCode -ne 0 ] ; then
 fi
 cd ..
 
+buildFlutter.sh
+
 cd bin/Linux
 #./TestApp.bin -createconfig
 

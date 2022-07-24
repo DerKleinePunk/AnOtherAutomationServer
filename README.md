@@ -18,6 +18,8 @@ sieh [DebianPackages](DebianPackages.txt) and [PythonPackages](PythonPackages.tx
 
 I developing with Visual Studio Code
 
+add --v=9 to command for log everythink
+
 ### VSCode
 
 settings.json

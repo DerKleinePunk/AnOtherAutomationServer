@@ -71,6 +71,7 @@ int main(int argc, char** argv)
     }
 
     el::Helpers::setThreadName("MainThread");
+    el::Helpers::installPreRollOutCallback(PreRollOutCallback);
 
     utils::CommandLineArgs commandLineArgs;
     commandLineArgs.Pharse(argc, argv);
