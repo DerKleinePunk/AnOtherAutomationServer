@@ -1,5 +1,5 @@
 name: automation_ui
-description: A new Flutter project.
+description: The UI for Simple Home Server
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -37,7 +37,16 @@ dependencies:
   cupertino_icons: ^1.0.2
   http: ^0.13.4
   shared_preferences: ^2.0.13
-  
+  flutter_bloc: ^8.0.1
+  intl: ^0.17.0
+  web_socket_channel: ^2.1.0
+  package_info_plus: ^1.4.0
+  audioplayers: ^0.20.1
+  flutter_neumorphic: ^3.2.0
+  flutter_colorpicker: ^1.0.3
+  bloc: ^8.0.0
+  meta: ^1.7.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -54,6 +63,8 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  # Genrate Localization
+  generate: true
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

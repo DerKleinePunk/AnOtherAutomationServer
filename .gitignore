@@ -32,7 +32,6 @@ build/
 [Dd]eploy/
 .codelite/
 .clang/
-[Ll]ib/
 [Ll]ibs/
 .vs/
 .vscode/
