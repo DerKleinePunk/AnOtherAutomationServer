@@ -43,7 +43,7 @@ class AudioPlayerService {
 
     _audioPlayer.onDurationChanged.listen((Duration d) {
       _maxduration = d.inMilliseconds;
-      debugPrint("_maxduration " + _maxduration.toString());
+      debugPrint("_maxduration $_maxduration");
     });
 
     _audioPlayer.onAudioPositionChanged.listen((Duration d) {
@@ -159,7 +159,7 @@ class AudioPlayerService {
       _maxduration = await _audioPlayer.getDuration();
     }
     double ready = ((_currentDuration / _maxduration) * 100);
-    debugPrint("played " + ready.toString());
+    debugPrint("played $ready");
     if (ready == 100) {
       await _audioPlayer.stop();
     }
@@ -171,7 +171,7 @@ class AudioPlayerService {
     }
     double ready =
         ((_currentDurationNotification / _maxdurationNotification) * 100);
-    debugPrint("played Notification " + ready.toString());
+    debugPrint("played Notification $ready");
     if (ready == 100) {
       await _audioPlayerNotification.stop();
       if (_audioPlayer.state == PlayerState.PLAYING) {

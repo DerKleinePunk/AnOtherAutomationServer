@@ -8,6 +8,7 @@
 #include "resources/ApiResource.hpp"
 #include "resources/MqttResource.hpp"
 #include "resources/AuthResource.hpp"
+#include "resources/ConfigResource.hpp"
 #include "GlobalFunctions.hpp"
 #include "WebServer/WebServer.hpp"
 #include "PythonRunner/PythonRunner.hpp"
@@ -121,14 +122,19 @@ int main(int argc, char** argv)
         LOG(ERROR) << "RegisterResource failed";
     }
 
-    if(!ownWebServer->RegisterResource("/api/test/*", new ApiResource(&globalFunctions))){
-        LOG(ERROR) << "RegisterResource failed";
-    }
-
     if(!ownWebServer->RegisterResource("/api/auth/*", new AuthResource(&globalFunctions))){
         LOG(ERROR) << "RegisterResource failed";
     }
 
+    if(!ownWebServer->RegisterResource("/api/config/*", new ConfigResource(&globalFunctions))){
+        LOG(ERROR) << "RegisterResource failed";
+    }
+
+    if(!ownWebServer->RegisterResource("/api/test/*", new ApiResource(&globalFunctions))){
+        LOG(ERROR) << "RegisterResource failed";
+    }
+
+    
     if(ownWebServer->Start()) {
         LOG(INFO) << "Own WebServer Running";
     }

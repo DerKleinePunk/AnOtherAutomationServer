@@ -32,7 +32,7 @@ class AppRouter {
       data = (settings.name ?? '').getRoutingData; //route to url
     }
 
-    debugPrint("generateRoute " + data.route.first);
+    debugPrint("generateRoute ${data.route.first}");
 
     //Only the first segment defines the route
     switch (data.route.first) {

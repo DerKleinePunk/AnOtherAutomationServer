@@ -9,6 +9,7 @@ private:
     std::string _content;
     unsigned int _code;
     std::map<const std::string,std::string> _cookies;
+    std::map<const std::string,std::string> _headers;
 
 public: 
     HttpResponse(/* args */);
@@ -22,8 +23,10 @@ public:
     void SetContent(const std::string& type, const std::string& content);
     void SetCode(unsigned int code);
     void SetCookie(const std::string& name, const std::string& value);
+    void SetHeader(const std::string& name, const std::string& value);
 
     //Getter
     unsigned int GetCode();
     std::map<const std::string,std::string> GetCookies();
+    std::map<const std::string,std::string> GetHeaders();
 };

@@ -86,7 +86,7 @@ class ServerClient {
 
     var sendString = jsonEncode(requestBody);
     final response = await httpClient.post(
-      HomeServerEndpoints.combine(serverUrl, HomeServerEndpoints.session),
+      HomeServerEndpoints.combine(serverUrl, HomeServerEndpoints.login),
       body: sendString,
     );
     if (autoLogin) {
@@ -142,7 +142,7 @@ class ServerClient {
 
     try {
       final authState = await apiHttpClient.get(
-          HomeServerEndpoints.combine(serverUrl, HomeServerEndpoints.session));
+          HomeServerEndpoints.combine(serverUrl, HomeServerEndpoints.login));
       if (authState != null) {
         if (authState['userCtx']['name'] != null) {
           lastSessionRequest = DateTime.now();
@@ -161,7 +161,7 @@ class ServerClient {
   Future removeSessionIfExists() async {
     try {
       await httpClient.delete(
-        HomeServerEndpoints.combine(serverUrl, HomeServerEndpoints.session),
+        HomeServerEndpoints.combine(serverUrl, HomeServerEndpoints.login),
       );
     } on FormatException catch (exp) {
       debugPrint(exp.message);
@@ -253,7 +253,7 @@ class ServerClient {
         resultList.add(entry);
       }
     } catch (exp) {
-      debugPrint("loadDestinations " + exp.toString());
+      debugPrint("loadDestinations $exp");
     }
 
     return resultList;
@@ -262,7 +262,7 @@ class ServerClient {
   Future<AutomationPageConfig?> loadAutomationPageConfig(String pageName) async {
     final uri = HomeServerEndpoints.combine(
         serverUrl, HomeServerEndpoints.automation,
-        path3: "page/" + pageName);
+        path3: "page/$pageName");
 
     try {
       var result = await apiHttpClient.get(uri);

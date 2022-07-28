@@ -61,7 +61,7 @@ public:
     void SendWebSocket(const std::string& message, uuid_t connectionId);
 
     //Internal Use Only
-    int MainCallBack(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len);
+    int MainCallBack(lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len);
 
     void WebSocketInitDone(per_vhost_data__minimal* webSocketVhostData);
     void NewWebSocketClient(bool consumer, uuid_t connectionId);

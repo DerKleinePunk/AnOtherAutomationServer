@@ -20,7 +20,7 @@ class ApiHttpClient {
       final response = await httpClient.get(url, headers: headers);
       responseJson = _returnResponse(response);
     } on SocketException catch(exp) {
-      throw FetchDataException("Internet Problem " + exp.message);
+      throw FetchDataException("Internet Problem ${exp.message}");
     } on Exception catch(exp) {
       throw FetchDataException(exp.toString());
     }
@@ -35,7 +35,7 @@ class ApiHttpClient {
       final response = await httpClient.post(url, headers: headers, body: body);
       responseJson = _returnResponse(response);
     } on SocketException catch(exp) {
-      throw FetchDataException("Internet Problem " + exp.message);
+      throw FetchDataException("Internet Problem ${exp.message}");
     } on Exception catch(exp) {
       throw FetchDataException(exp.toString());
     }

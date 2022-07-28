@@ -20,6 +20,7 @@ const std::string& HttpResponse::GetContentType()
 //Return true if last block
 bool HttpResponse::GetNextBlock(char* buffer)
 {
+    //Todo Handle Handle BufferSize !
     auto size = _content.size();
 
     strncpy(buffer, _content.c_str(), size);
@@ -49,6 +50,16 @@ void HttpResponse::SetCookie(const std::string& name, const std::string& value)
     
 }
 
+void HttpResponse::SetHeader(const std::string& name, const std::string& value)
+{
+    if(_headers.find(name) != _headers.end())
+    {
+        _headers[name] = value;
+        return;
+    }
+    _headers.insert(std::pair<const std::string, std::string>(name, value));
+}
+
 unsigned int HttpResponse::GetCode() 
 {
     return _code;
@@ -57,4 +68,9 @@ unsigned int HttpResponse::GetCode()
 std::map<const std::string,std::string> HttpResponse::GetCookies()
 {
     return _cookies;
+}
+
+std::map<const std::string,std::string> HttpResponse::GetHeaders()
+{
+    return _headers;
 }

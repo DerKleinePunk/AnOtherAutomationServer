@@ -69,11 +69,12 @@ class DashboardState extends State<Dashboard> {
         return Center(
             child: Column(children: const <Widget>[
           SizedBox(
+            width: 80,
+            height: 80,
             child: CircularProgressIndicator(
               color: Colors.blue,
             ),
-            width: 80,
-            height: 80,
+            
           ),
           Padding(
             padding: EdgeInsets.only(top: 30),
@@ -100,6 +101,7 @@ class DashboardState extends State<Dashboard> {
                 onPressed: () async {
                   await CoreClientHelper.getClient().removeSessionIfExists();
                   await CoreClientHelper.clearAuthStorage();
+                  if (!mounted) return;
                   await Navigator.of(context).pushReplacementNamed('dashboard');
                 }),
           ),
@@ -206,12 +208,12 @@ class DashboardState extends State<Dashboard> {
                                     children: [
                                       Text(onemsg.isme
                                           ? "ID: ME"
-                                          : "ID: " + onemsg.userid),
+                                          : "ID: ${onemsg.userid}"),
                                       Container(
                                         margin: const EdgeInsets.only(
                                             top: 10, bottom: 10),
                                         child: Text(
-                                            "Message: " + onemsg.msgtext,
+                                            "Message: ${onemsg.msgtext}", 
                                             style:
                                                 const TextStyle(fontSize: 17)),
                                       ),

@@ -11,6 +11,17 @@
 
 HttpResponse* AuthResource::HandleLogin(HttpRequest& request, const std::string& method, HttpResponse* result)
 {
+    if(method == "GET") {
+        //Todo Check Cookie if ok retrun User Name an OK
+        result->SetHeader("Access-Control-Allow-Origin", "http://localhost:8000");
+        result->SetHeader("Access-Control-Allow-Credentials", "true");
+        result->SetHeader("Access-Control-Allow-Methods", "DELETE, POST, GET");
+
+        result->SetCode(HTTP_STATUS_NOT_FOUND);
+        result->SetContent("application/json", "{\"error\" : \"Not Found\"}");
+        return result;
+    }
+
     if(method != "POST") {
         result->SetCode(HTTP_STATUS_BAD_REQUEST);
         result->SetContent("application/json", "{\"error\" : \"Bad Request\"}");
@@ -48,6 +59,8 @@ AuthResource::~AuthResource()
 
 HttpResponse* AuthResource::Process(HttpRequest& request, const std::string& url, const std::string& method)
 {
+    LOG(DEBUG) << url << " Api Call Get with " << url << " method " << method;
+
     auto result = new HttpResponse();
     if(url == "")
     {

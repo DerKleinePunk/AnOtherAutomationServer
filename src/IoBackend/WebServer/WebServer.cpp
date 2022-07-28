@@ -9,6 +9,7 @@
 #include "../../common/easylogging/easylogging++.h"
 #include "../../common/utils/commonutils.h"
 #include <functional>
+#include <libwebsockets.h>
 
 // 0 for unlimited
 #define MAX_BUFFER_SIZE 0
@@ -137,6 +138,10 @@ std::string WebServer::GetReasonText(lws_callback_reasons reason)
             return "LWS_CALLBACK_CLIENT_WRITEABLE";
         case LWS_CALLBACK_HTTP_FILE_COMPLETION:
             return "LWS_CALLBACK_HTTP_FILE_COMPLETION";
+        case LWS_CALLBACK_EVENT_WAIT_CANCELLED:
+            return "LWS_CALLBACK_EVENT_WAIT_CANCELLED";
+        case LWS_CALLBACK_FILTER_NETWORK_CONNECTION:
+            return "LWS_CALLBACK_FILTER_NETWORK_CONNECTION";
         default:
             return "reason " + std::to_string(reason);
     }
@@ -200,7 +205,7 @@ static const struct lws_http_mount proxymount = {
 	/* .basic_auth_login_file */	NULL,
 };
 
-static const struct lws_http_mount basemount = {
+static const struct lws_http_mount webpage = {
 	/* .mount_next */		    NULL,		/* linked-list "next" &proxymount*/
 	/* .mountpoint */		    "/",		/* mountpoint URL */
 	/* .origin */			    "./webpage", /* serve from dir */
@@ -220,9 +225,29 @@ static const struct lws_http_mount basemount = {
 	/* .basic_auth_login_file*/	NULL,
 };
 
+static const struct lws_http_mount basemount = {
+	/* .mount_next */		    &webpage,		/* linked-list "next" &proxymount*/
+	/* .mountpoint */		    "/api",		/* mountpoint URL */
+	/* .origin */			    NULL, /* serve from dir */
+	/* .def */			        NULL,	/* default filename */
+	/* .protocol */			    "httpRest",
+	/* .cgienv */			    NULL,
+	/* .extra_mimetypes */	    &extra_mimetypes,
+	/* .interpret */		    NULL,
+	/* .cgi_timeout */		    0,
+	/* .cache_max_age */		3600, //1 Stunde
+	/* .auth_mask */		    0,
+	/* .cache_reusable */		0,
+	/* .cache_revalidate */		0,
+	/* .cache_intermediaries */	0,
+	/* .origin_protocol */		LWSMPRO_CALLBACK,	/* files in a dir */
+	/* .mountpoint_len */		4,		/* char count */
+	/* .basic_auth_login_file*/	NULL,
+};
 
 static struct lws_protocols protocols[] = {
-    { "http", callback_main, sizeof(struct httpSesssionData), 0, 0, NULL, 0 },//{ "http", lws_callback_http_dummy, 0, 0, 0, NULL, 0 },
+    { "http", callback_main, sizeof(struct httpSesssionData), 0, 1, NULL, 0 },//{ "http", lws_callback_http_dummy, 0, 0, 0, NULL, 0 },
+    { "httpRest", callback_main, sizeof(struct httpSesssionData), 0, 2, NULL, 0 },
     { "websocket",
         callback_websocket,
         sizeof(per_session_data__minimal),
@@ -291,7 +316,6 @@ bool WebServer::Start() {
     info.ka_time = 60; // 60 seconds until connection is suspicious
     info.ka_probes = 10; // 10 probes after ^ time
     info.ka_interval = 10; // 10s interval for sending probes
-
 
     _context = lws_create_context( &info );
     if( !_context) {
@@ -417,7 +441,7 @@ void WebServer::SendWebSocket(const std::string& message, uuid_t connectionId)
     } lws_end_foreach_llp(ppss, pss_list);
 }
 
-int WebServer::MainCallBack(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len)
+int WebServer::MainCallBack(lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len)
 {
     auto weHandleIt = false;
     auto readyToHandle = false;
@@ -425,8 +449,14 @@ int WebServer::MainCallBack(struct lws *wsi, enum lws_callback_reasons reason, v
     char textBuffer[512];
     char textBuffer2[512];
     struct httpSesssionData *pss = (struct httpSesssionData *)user;
+    
+    auto protocolId = -1;
+    const auto protocol = lws_get_protocol(wsi);
+    if(protocol != nullptr) {
+        protocolId = protocol->id;
+    }
 
-    VLOG(5) << "MainCallBack " << GetReasonText(reason);
+    VLOG(5) << "MainCallBack " << GetReasonText(reason) << " protocol id " << std::to_string(protocolId);
 
     //Todo Understand
     uint8_t buf[LWS_PRE + 2048], *start = &buf[LWS_PRE], *p = start, *end = &buf[sizeof(buf) - LWS_PRE - 1];
@@ -553,10 +583,21 @@ int WebServer::MainCallBack(struct lws *wsi, enum lws_callback_reasons reason, v
             if(response != nullptr)
             {
                 pss->response = response;
-                
+                                
                 if (lws_add_http_common_headers(wsi, response->GetCode(), response->GetContentType().c_str(), LWS_ILLEGAL_HTTP_CONTENT_LEN, /* no content len */ &p, end))
                 {
                     return 1;
+                }
+                
+                //TODO Handle Cors Handers global
+                
+                const auto headers = response->GetHeaders();
+                for(auto header : headers) {
+                    if(lws_add_http_header_by_name(wsi,(unsigned char*)header.first.c_str(), (unsigned char*)header.second.c_str(), header.second.length(), &p, end))
+                    {
+                        LOG(WARNING) << "failed write header";
+                        return 1;
+                    }
                 }
 
                 const auto cookies = response->GetCookies();

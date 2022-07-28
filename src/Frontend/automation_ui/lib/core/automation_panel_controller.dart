@@ -46,7 +46,7 @@ class AutomationPanelController {
           return;
         }
 
-        debugPrint("new Page Config get " + value.name);
+        debugPrint("new Page Config get ${value.name}");
         _panels[value.name] = List.empty(growable: true);
         for (AutomationElement entry in value.elements) {
           if (entry.typeName == "ONOFFBUTTON") {
@@ -56,10 +56,10 @@ class AutomationPanelController {
           }
         }
       } catch (exp) {
-        debugPrint("loadPage " + exp.toString());
+        debugPrint("loadPage $exp");
       }
     }, onError: (error, stack) {
-      debugPrint("loadPage Error" + error.toString());
+      debugPrint("loadPage Error $error");
     });
   }
 
