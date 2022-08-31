@@ -88,6 +88,9 @@ class ServerClient {
     final response = await httpClient.post(
       HomeServerEndpoints.combine(serverUrl, HomeServerEndpoints.login),
       body: sendString,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
     );
     if (autoLogin) {
       this.username = username;
@@ -98,7 +101,7 @@ class ServerClient {
       this.password = null;
     }
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200 || response.statusCode == 201) {
       if (response.headers.containsKey('set-cookie') &&
           response.headers['set-cookie'] != null) {
         cookieSave = CookieSave(

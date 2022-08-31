@@ -203,8 +203,8 @@ function sendLogin() {
 	xhttp.open("POST", "/api/auth/login", true);
 	xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 	var obj = new Object();
-	obj.user = document.getElementById("topic").value;
-	obj.pass = document.getElementById("value").value;
+	obj.name = document.getElementById("topic").value;
+	obj.password = document.getElementById("value").value;
 	xhttp.send(JSON.stringify(obj));
 }
 

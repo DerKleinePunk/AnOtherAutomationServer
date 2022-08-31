@@ -11,14 +11,29 @@
 
 HttpResponse* AuthResource::HandleLogin(HttpRequest& request, const std::string& method, HttpResponse* result)
 {
+    if(method == "OPTIONS") {
+        //Only Response Cors Headers from Main
+        //Chrome Use this Checking Cors
+        result->SetCode(HTTP_STATUS_NO_CONTENT);
+        result->SetContent("", "");
+        result->SetHeader("Access-Control-Max-Age", "120"); // duration (in seconds)
+        return result;
+    }
+
     if(method == "GET") {
         //Todo Check Cookie if ok retrun User Name an OK
-        result->SetHeader("Access-Control-Allow-Origin", "http://localhost:8000");
-        result->SetHeader("Access-Control-Allow-Credentials", "true");
-        result->SetHeader("Access-Control-Allow-Methods", "DELETE, POST, GET");
-
+        
         result->SetCode(HTTP_STATUS_NOT_FOUND);
         result->SetContent("application/json", "{\"error\" : \"Not Found\"}");
+        return result;
+    }
+
+    if(method == "DELETE") {
+        //Todo Remove Session Killed WebSocket 
+        //https://restfulapi.net/http-methods/#delete
+
+        result->SetCode(HTTP_STATUS_OK);
+        result->SetContent("application/json", "{\"sessionState\" : \"killed\"}");
         return result;
     }
 
@@ -28,10 +43,10 @@ HttpResponse* AuthResource::HandleLogin(HttpRequest& request, const std::string&
         return result;
     }
 
-    const auto user = request.GetParameter(std::string("user"));
-    const auto pass = request.GetHeader(std::string("pass"));
+    const auto user = request.GetParameter(std::string("name"));
+    const auto pass = request.GetParameter(std::string("password"));
 
-    if(user != "mn" && pass != "mn") {
+    if(user != "mn" || pass != "mn") {
         result->SetContent("application/json", "{\"error\" : \"UNAUTHORIZED\"}");
         result->SetCode(HTTP_STATUS_UNAUTHORIZED);
         return result; 

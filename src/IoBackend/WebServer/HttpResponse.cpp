@@ -1,5 +1,6 @@
 #include "HttpResponse.hpp"
 #include <libwebsockets.h>
+#include "../../common/utils/commonutils.h"
 
 HttpResponse::HttpResponse(/* args */)
 {
@@ -52,12 +53,17 @@ void HttpResponse::SetCookie(const std::string& name, const std::string& value)
 
 void HttpResponse::SetHeader(const std::string& name, const std::string& value)
 {
-    if(_headers.find(name) != _headers.end())
+    auto headerName(name);
+    if(!utils::hasEnding(headerName, ":")) {
+        headerName = headerName + ":";
+    }
+
+    if(_headers.find(headerName) != _headers.end())
     {
-        _headers[name] = value;
+        _headers[headerName] = value;
         return;
     }
-    _headers.insert(std::pair<const std::string, std::string>(name, value));
+    _headers.insert(std::pair<const std::string, std::string>(headerName, value));
 }
 
 unsigned int HttpResponse::GetCode() 

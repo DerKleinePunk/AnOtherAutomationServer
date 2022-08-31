@@ -117,7 +117,15 @@ HttpResponse* WebServer::HandleResource(struct lws *wsi, const std::string& url,
     HttpRequest request(wsi, body);
     try
     {
-        return resource->Process(request, urlForResource, method);
+        const auto result = resource->Process(request, urlForResource, method);
+        //Todo Put it to Config
+        //Handle Cors Headers global
+        result->SetHeader("Access-Control-Allow-Origin", "http://localhost:8000");
+        result->SetHeader("Access-Control-Allow-Credentials", "true");
+        result->SetHeader("Access-Control-Allow-Methods", "DELETE, POST, GET, PUT");
+        result->SetHeader("Access-Control-Allow-Headers", "Content-Type");
+
+        return result;
     }
     catch(const std::exception& exp)
     {
@@ -481,7 +489,6 @@ int WebServer::MainCallBack(lws *wsi, enum lws_callback_reasons reason, void *us
                 pss->method = new std::string("GET");
                 pss->url = new std::string(textBuffer);
                 weHandleIt = true;
-                readyToHandle = true;
             } else if(lws_hdr_copy(wsi, textBuffer, sizeof(textBuffer), WSI_TOKEN_POST_URI) > 0) {
                 if(lws_hdr_copy(wsi, textBuffer2, sizeof(textBuffer2), WSI_TOKEN_HTTP_CONTENT_LENGTH) > 0) {
                     pss->bodyLength = atoi(textBuffer2);
@@ -493,12 +500,22 @@ int WebServer::MainCallBack(lws *wsi, enum lws_callback_reasons reason, void *us
                 pss->url = new std::string(textBuffer);
                 weHandleIt = true;
             } else if(lws_hdr_copy(wsi, textBuffer, sizeof(textBuffer), WSI_TOKEN_PATCH_URI) > 0) {
-                LOG(INFO) << "PATCH Url " << textBuffer;
+                if(lws_hdr_copy(wsi, textBuffer2, sizeof(textBuffer2), WSI_TOKEN_HTTP_CONTENT_LENGTH) > 0) {
+                    pss->bodyLength = atoi(textBuffer2);
+                    LOG(INFO) << "PATCH Url " << textBuffer << " content-length " << textBuffer2;
+                } else {
+                    LOG(INFO) << "PATCH Url " << textBuffer;
+                }
                 pss->method = new std::string("PATCH");
                 pss->url = new std::string(textBuffer);
                 weHandleIt = true;                
             } else if(lws_hdr_copy(wsi, textBuffer, sizeof(textBuffer), WSI_TOKEN_PUT_URI) > 0) {
-                LOG(INFO) << "PUT Url " << textBuffer;
+                if(lws_hdr_copy(wsi, textBuffer2, sizeof(textBuffer2), WSI_TOKEN_HTTP_CONTENT_LENGTH) > 0) {
+                    pss->bodyLength = atoi(textBuffer2);
+                    LOG(INFO) << "PUT Url " << textBuffer << " content-length " << textBuffer2;
+                } else {
+                    LOG(INFO) << "PUT Url " << textBuffer;
+                }
                 pss->method = new std::string("PUT");
                 pss->url = new std::string(textBuffer);
                 weHandleIt = true;
@@ -507,9 +524,19 @@ int WebServer::MainCallBack(lws *wsi, enum lws_callback_reasons reason, void *us
                 pss->method = new std::string("DELETE");
                 pss->url = new std::string(textBuffer);
                 weHandleIt = true;
+            } else if(lws_hdr_copy(wsi, textBuffer, sizeof(textBuffer), WSI_TOKEN_OPTIONS_URI) > 0) {
+                LOG(INFO) << "OPTIONS Url " << textBuffer;
+                pss->method = new std::string("OPTIONS");
+                pss->url = new std::string(textBuffer);
+                weHandleIt = true;
             } else {
                 LOG(WARNING) << "Unkown Url Type";
             }
+
+            if(weHandleIt && pss->bodyLength == 0) {
+                readyToHandle = true;
+            }
+
             break;
         case LWS_CALLBACK_HTTP_BODY:
             weHandleIt = true;
@@ -531,11 +558,13 @@ int WebServer::MainCallBack(lws *wsi, enum lws_callback_reasons reason, void *us
                     protState = LWS_WRITE_HTTP_FINAL;
                 }
 
-                p += lws_snprintf((char *)p, lws_ptr_diff_size_t(end, p), pss->responseData);
+                if(strlen(pss->responseData) > 0) {
+                    p += lws_snprintf((char *)p, lws_ptr_diff_size_t(end, p), pss->responseData);
 
-                if (lws_write(wsi, (uint8_t *)start, lws_ptr_diff_size_t(p, start), protState) != lws_ptr_diff(p, start)) {
-                    //Error
-                    return 1;
+                    if (lws_write(wsi, (uint8_t *)start, lws_ptr_diff_size_t(p, start), protState) != lws_ptr_diff(p, start)) {
+                        //Error
+                        return 1;
+                    }
                 }
 
                 /*
@@ -583,14 +612,17 @@ int WebServer::MainCallBack(lws *wsi, enum lws_callback_reasons reason, void *us
             if(response != nullptr)
             {
                 pss->response = response;
-                                
-                if (lws_add_http_common_headers(wsi, response->GetCode(), response->GetContentType().c_str(), LWS_ILLEGAL_HTTP_CONTENT_LEN, /* no content len */ &p, end))
+                const char* contentType = nullptr;
+                if(!response->GetContentType().empty())
+                {
+                    contentType = response->GetContentType().c_str();
+                }
+
+                if (lws_add_http_common_headers(wsi, response->GetCode(), contentType, LWS_ILLEGAL_HTTP_CONTENT_LEN, /* no content len */ &p, end))
                 {
                     return 1;
                 }
-                
-                //TODO Handle Cors Handers global
-                
+                               
                 const auto headers = response->GetHeaders();
                 for(auto header : headers) {
                     if(lws_add_http_header_by_name(wsi,(unsigned char*)header.first.c_str(), (unsigned char*)header.second.c_str(), header.second.length(), &p, end))

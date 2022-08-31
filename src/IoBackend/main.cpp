@@ -1,22 +1,24 @@
 #include <iostream>
+
 #include "../common/easylogging/easylogging++.h"
-#include "../common/utils/commonutils.h"
 #include "../common/utils/CommandLineArgs.h"
+#include "../common/utils/commonutils.h"
+#include "Backend.hpp"
 #include "Config.hpp"
-#include "Mqtt/MqttConnector.h"
-#include "resources/TestResource.hpp"
-#include "resources/ApiResource.hpp"
-#include "resources/MqttResource.hpp"
-#include "resources/AuthResource.hpp"
-#include "resources/ConfigResource.hpp"
 #include "GlobalFunctions.hpp"
-#include "WebServer/WebServer.hpp"
+#include "Mqtt/MqttConnector.h"
 #include "PythonRunner/PythonRunner.hpp"
-#include "SystemFunktions/NetworkManager.hpp"
+#include "ServiceEvents/ServiceEventManager.hpp"
 #include "SystemFunktions/GPIOManager.hpp"
 #include "SystemFunktions/IODeviceManager.hpp"
-#include "ServiceEvents/ServiceEventManager.hpp"
-#include "Backend.hpp"
+#include "SystemFunktions/NetworkManager.hpp"
+#include "WebServer/WebServer.hpp"
+#include "resources/ApiResource.hpp"
+#include "resources/AuthResource.hpp"
+#include "resources/AutomationResource.hpp"
+#include "resources/ConfigResource.hpp"
+#include "resources/MqttResource.hpp"
+#include "resources/TestResource.hpp"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -85,7 +87,7 @@ int main(int argc, char** argv)
     auto networkManager = new NetworkManager();
     auto eventManager = new ServiceEventManager();
     eventManager->Init();
-    
+
     GlobalFunctions globalFunctions(config, eventManager, networkManager);
 
     const auto ownWebServer = new WebServer(&globalFunctions);
@@ -96,7 +98,7 @@ int main(int argc, char** argv)
     } else {
         LOG(INFO) << "Mqtt Connecting";
     }
-   
+
     auto runner = new PythonRunner(commandLineArgs.GetBasePath() + "/SimpelIoBackend.bin", &globalFunctions);
     runner->Init();
 
@@ -114,27 +116,31 @@ int main(int argc, char** argv)
         LOG(ERROR) << "io device manager starting Failed";
     }
 
-    if(!ownWebServer->RegisterResource("/dynpage", new TestResource())){
+    if(!ownWebServer->RegisterResource("/dynpage", new TestResource())) {
         LOG(ERROR) << "RegisterResource failed";
     }
 
-    if(!ownWebServer->RegisterResource("/api/mqtt/*", new MqttResource(&globalFunctions))){
+    if(!ownWebServer->RegisterResource("/api/mqtt/*", new MqttResource(&globalFunctions))) {
         LOG(ERROR) << "RegisterResource failed";
     }
 
-    if(!ownWebServer->RegisterResource("/api/auth/*", new AuthResource(&globalFunctions))){
+    if(!ownWebServer->RegisterResource("/api/auth/*", new AuthResource(&globalFunctions))) {
         LOG(ERROR) << "RegisterResource failed";
     }
 
-    if(!ownWebServer->RegisterResource("/api/config/*", new ConfigResource(&globalFunctions))){
+    if(!ownWebServer->RegisterResource("/api/config/*", new ConfigResource(&globalFunctions))) {
         LOG(ERROR) << "RegisterResource failed";
     }
 
-    if(!ownWebServer->RegisterResource("/api/test/*", new ApiResource(&globalFunctions))){
+    if(!ownWebServer->RegisterResource("/api/automation/*", new AutomationResource(&globalFunctions))) {
         LOG(ERROR) << "RegisterResource failed";
     }
 
-    
+    if(!ownWebServer->RegisterResource("/api/test/*", new ApiResource(&globalFunctions))) {
+        LOG(ERROR) << "RegisterResource failed";
+    }
+
+
     if(ownWebServer->Start()) {
         LOG(INFO) << "Own WebServer Running";
     }
@@ -147,8 +153,7 @@ int main(int argc, char** argv)
     std::string input;
     std::cin >> input;
 
-    try
-    {
+    try {
         while(input != "q") {
             if(input == "t") {
                 ownWebServer->SendWebSocketBroadcast("Hello from Server");
@@ -158,9 +163,9 @@ int main(int argc, char** argv)
                 runner->RunScript("sample", "simpleFunc");
             } else if(input == "s") {
                 const auto result = networkManager->ScanAccessPoints();
-                for ( const auto device : result) {
+                for(const auto device : result) {
                     std::cout << device.Iface << std::endl;
-                    for (const auto apInfo : device.AccessPoints) {
+                    for(const auto apInfo : device.AccessPoints) {
                         std::cout << "     " << apInfo.Ssid << std::endl;
                     }
                 }
@@ -182,14 +187,12 @@ int main(int argc, char** argv)
             WriteFunktionText();
             std::cin >> input;
         }
-    }
-    catch(const std::exception& e)
-    {
+    } catch(const std::exception& e) {
         LOG(ERROR) << e.what();
     }
-    
+
     delete backend;
-    
+
     gpioManager->Deinit();
     delete gpioManager;
 
@@ -203,7 +206,7 @@ int main(int argc, char** argv)
 
     runner->Deinit();
     delete runner;
-    
+
     connector->Deinit();
     delete connector;
 
