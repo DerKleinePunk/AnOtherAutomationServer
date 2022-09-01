@@ -82,6 +82,7 @@ int callback_websocket(struct lws *wsi, enum lws_callback_reasons reason, void *
 			if(!connectOk) {
 				if (lws_add_http_common_headers(wsi, HTTP_STATUS_UNAUTHORIZED, "", 0, /* no content len */ &p, end))
 				{
+					lwsl_warn("WebSocket No Cookie found");
 					return 1;
 				}
 

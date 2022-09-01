@@ -1,6 +1,12 @@
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 
-typedef GetStateCallback = bool Function(String id);
+enum SwitchPanelValue { 
+   on, 
+   off, 
+   waiting
+}  
+
+typedef GetStateCallback = SwitchPanelValue Function(String id);
 typedef SetStateCallback = void Function(String id, bool value);
 
 class Panels {
@@ -27,7 +33,17 @@ class SwitchPanel extends StatefulWidget {
 class SwitchPanelState extends State<SwitchPanel> {
   @override
   Widget build(BuildContext context) {
-    bool isOn = widget._getcallback(widget._id);
+    SwitchPanelValue value = widget._getcallback(widget._id);
+    bool isOn = true;
+    bool visible = false;
+    if(value == SwitchPanelValue.off)
+    {
+      isOn = false;
+    } 
+    else if(value == SwitchPanelValue.waiting)
+    {
+      visible = true;
+    }
     return InkWell(
       child: Neumorphic(
           style: NeumorphicStyle(
@@ -43,6 +59,7 @@ class SwitchPanelState extends State<SwitchPanel> {
                     depth: 0, //customize depth here
                     color: Colors.black),
                 textStyle: NeumorphicTextStyle(fontSize: 18)),
+                Visibility( visible: visible, child: const CircularProgressIndicator(color: Colors.blue))
             /*NeumorphicSwitch(
                       style: const NeumorphicSwitchStyle(
                           lightSource: LightSource.left),
@@ -54,7 +71,7 @@ class SwitchPanelState extends State<SwitchPanel> {
                     ),*/
           ])),
       onTap: () {
-        widget._setcallback(widget._id, !widget._getcallback(widget._id));
+        widget._setcallback(widget._id, !isOn);
         setState(() {});
       },
     );

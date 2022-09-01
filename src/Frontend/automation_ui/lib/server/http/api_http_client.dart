@@ -13,7 +13,6 @@ class ApiHttpClient {
   final http.Client httpClient = getClient();
 
   Future<dynamic> get(Uri url) async {
-    //Todo solved cookie/auth Problem
     Map<String, String> headers = {"Accept": "application/json"};
     dynamic responseJson;
     try {
@@ -28,8 +27,7 @@ class ApiHttpClient {
   }
 
   Future<dynamic> post(Uri url, dynamic body) async {
-    //Todo solved cookie/auth Problem
-    Map<String, String> headers = {"Accept": "application/json"};
+    Map<String, String> headers = {"Accept": "application/json", "Content-Type": "application/json; charset=UTF-8"};
     dynamic responseJson;
     try {
       final response = await httpClient.post(url, headers: headers, body: body);

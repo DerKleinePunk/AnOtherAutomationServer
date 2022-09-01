@@ -8,6 +8,7 @@ class AutomationResource : public HttpResource
 private:
     GlobalFunctions* _globalFunctions;
     HttpResponse* HandlePages(HttpRequest& request, const std::string& method, HttpResponse* result);
+    HttpResponse* HandleLoadPage(HttpRequest& request, const std::string& method, HttpResponse* result, const std::string& pageName);
 
 public:
     AutomationResource(GlobalFunctions* globalFunctions);

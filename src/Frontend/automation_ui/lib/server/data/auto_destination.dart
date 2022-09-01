@@ -35,15 +35,17 @@ class AutomationElement {
   final String description;
   final String id;
   final String typeName;
+  final String value;
 
   AutomationElement(
-      {required this.description, required this.id, required this.typeName});
+      {required this.description, required this.id, required this.typeName, required this.value});
 
   factory AutomationElement.fromJson(Map<String, dynamic> json) {
     return AutomationElement(
         description: json['description'],
         id: json['id'],
-        typeName: json['typeName']);
+        typeName: json['typeName'],
+        value: json['value']);
   }
 }
 

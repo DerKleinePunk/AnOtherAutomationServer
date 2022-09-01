@@ -6,9 +6,11 @@
 #endif
 
 #include "Backend.hpp"
+
+#include <map>
+
 #include "../common/easylogging/easylogging++.h"
 #include "../common/json/json.hpp"
-#include <map>
 
 using json = nlohmann::json;
 
@@ -19,7 +21,7 @@ void Backend::EventCallback(const SystemEvent event, const std::string& paramete
         jsonText["Event"] = "MqttValue";
         _webServer->SendWebSocketBroadcast(jsonText.dump());
     } else if(event == SystemEvent::ValueChanged) {
-         auto jsonText = json::parse(parameter);
+        auto jsonText = json::parse(parameter);
         jsonText["Event"] = "ValueChanged";
         _webServer->SendWebSocketBroadcast(jsonText.dump());
     }
@@ -29,7 +31,7 @@ void Backend::EventCallback(const SystemEvent event, const std::string& paramete
             auto jsonText = json::parse(parameter);
             auto currentParameter = jsonText.get<std::map<std::string, std::string>>();
             entry.Parameters.insert(currentParameter.begin(), currentParameter.end());
-            
+
             Run(entry.Function, entry.Parameters);
         }
     }
@@ -37,31 +39,31 @@ void Backend::EventCallback(const SystemEvent event, const std::string& paramete
 
 void Backend::Run(const std::string& function, const std::map<std::string, std::string>& parameters)
 {
-    LOG(DEBUG) << "Try to run " << function << " with ";// << parameters;
+    LOG(DEBUG) << "Try to run " << function << " with "; // << parameters;
     if(function == "CallPython") {
         std::string script;
         std::string function;
-        
+
         auto entry = parameters.find("Script");
-        if( entry != parameters.end()) {
+        if(entry != parameters.end()) {
             script = entry->second;
         }
 
         entry = parameters.find("Function");
-        if( entry != parameters.end()) {
+        if(entry != parameters.end()) {
             function = entry->second;
         }
 
         json parameterJson = parameters;
 
-        if(script.size() > 0 && function.size() > 0 ) {
+        if(script.size() > 0 && function.size() > 0) {
             _runner->RunScript(script, function, parameterJson.dump());
         } else {
             LOG(ERROR) << "missing Parameter to Run Function CallPython";
         }
-        
+
     } else if(function == "SetVar") {
-        //Todo ?!?
+        // Todo ?!?
     }
 }
 

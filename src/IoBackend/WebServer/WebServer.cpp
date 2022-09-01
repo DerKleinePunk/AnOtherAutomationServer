@@ -213,8 +213,28 @@ static const struct lws_http_mount proxymount = {
 	/* .basic_auth_login_file */	NULL,
 };
 
+static const struct lws_http_mount mountWebsocket = {
+	/* .mount_next */		    NULL,		/* linked-list "next" */
+	/* .mountpoint */		    "/messages",		/* mountpoint URL */
+	/* .origin */			    NULL, /* serve from dir */
+	/* .def */			        NULL,	/* default filename */
+	/* .protocol */			    "websocket",
+	/* .cgienv */			    NULL,
+	/* .extra_mimetypes */		NULL,
+	/* .interpret */		    NULL,
+	/* .cgi_timeout */		    0,
+	/* .cache_max_age */		0,
+	/* .auth_mask */		    0,
+	/* .cache_reusable */		0,
+	/* .cache_revalidate */		0,
+	/* .cache_intermediaries */	0,
+	/* .origin_protocol */		LWSMPRO_CALLBACK,	/* files in a dir */
+	/* .mountpoint_len */		9,		/* char count */
+	/* .basic_auth_login_file */	NULL,
+};
+
 static const struct lws_http_mount webpage = {
-	/* .mount_next */		    NULL,		/* linked-list "next" &proxymount*/
+	/* .mount_next */		    &mountWebsocket,		/* linked-list "next" &proxymount*/
 	/* .mountpoint */		    "/",		/* mountpoint URL */
 	/* .origin */			    "./webpage", /* serve from dir */
 	/* .def */			        "index.html",	/* default filename */
@@ -254,14 +274,10 @@ static const struct lws_http_mount basemount = {
 };
 
 static struct lws_protocols protocols[] = {
-    { "http", callback_main, sizeof(struct httpSesssionData), 0, 1, NULL, 0 },//{ "http", lws_callback_http_dummy, 0, 0, 0, NULL, 0 },
-    { "httpRest", callback_main, sizeof(struct httpSesssionData), 0, 2, NULL, 0 },
-    { "websocket",
-        callback_websocket,
-        sizeof(per_session_data__minimal),
-        MAX_BUFFER_SIZE,
-    },
-    { NULL, NULL, 0, 0 } /* terminator */
+    { "http", callback_main, sizeof(struct httpSesssionData), MAX_BUFFER_SIZE, 1, NULL, 0 },//{ "http", lws_callback_http_dummy, 0, 0, 0, NULL, 0 },
+    { "httpRest", callback_main, sizeof(struct httpSesssionData), MAX_BUFFER_SIZE, 2, NULL, 0 },
+    { "websocket", callback_websocket, sizeof(per_session_data__minimal), MAX_BUFFER_SIZE, 3, NULL, 0 },
+    LWS_PROTOCOL_LIST_TERM
 };
 
 /**

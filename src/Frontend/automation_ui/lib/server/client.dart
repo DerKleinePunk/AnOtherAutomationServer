@@ -25,7 +25,7 @@ class ServerClient {
   bool autoLogin = true;
   DateTime? lastSessionRequest;
   int ensureSessionsEveryXMinutes = 5;
-  CookieSave? cookieSave;
+  CookieSave? _cookieSave;
   ServerMessageClient? _messageClient;
   AudioPlayerService? _audioPlayerService;
   final UserSettings _userSettings = UserSettings();
@@ -68,7 +68,7 @@ class ServerClient {
 
   Future<bool> authenticate(String? username, String? password,
       {bool autoLogin = true}) async {
-    if ((cookieSave?.cookieStillValid() ?? false) &&
+    if ((_cookieSave?.cookieStillValid() ?? false) &&
         username == this.username &&
         password == this.password) return true;
     //If we have a set of auth details like the requested probe the server
@@ -104,7 +104,7 @@ class ServerClient {
     if (response.statusCode == 200 || response.statusCode == 201) {
       if (response.headers.containsKey('set-cookie') &&
           response.headers['set-cookie'] != null) {
-        cookieSave = CookieSave(
+        _cookieSave = CookieSave(
           response.headers['set-cookie'] ?? '',
           DateTime.now().add(
             const Duration(
@@ -272,10 +272,27 @@ class ServerClient {
       var automationPageConfig = AutomationPageConfig.fromJson(result);
       return automationPageConfig;
     } catch (exp) {
-      debugPrint("loadAutomationPageConfig " + exp.toString());
+      debugPrint("loadAutomationPageConfig $exp");
     }
 
     return null;
+  }
+
+  Future setValueForId(String id, String value) async {
+    final uri = HomeServerEndpoints.combine(
+        serverUrl, HomeServerEndpoints.automation,
+        path3: "Variable");
+    
+    var requestBody = {
+      'id': id,
+      'value': value,
+    };
+
+    try {
+      await apiHttpClient.post(uri, jsonEncode(requestBody));
+    } catch (exp) {
+      debugPrint("loadAutomationPageConfig $exp");
+    }
   }
 }
 

@@ -103,6 +103,20 @@ std::string GlobalFunctions::GetInternalVariable(const std::string& name) const
     return result;
 }
 
+std::string GlobalFunctions::GetInternalVariable(const std::string& name, const std::string& defaultValue)
+{
+    std::string result(defaultValue);
+
+    const auto findIt = _internalVariables.find(name);
+    if( findIt != _internalVariables.end()) {
+        result = findIt->second; 
+    } else {
+        _internalVariables.insert(std::pair<std::string, std::string>(name, defaultValue));
+    }
+
+    return result;
+}
+
 void GlobalFunctions::ShowInternalVars()
 {
     for(const auto entry : _internalVariables) {

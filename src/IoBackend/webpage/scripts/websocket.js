@@ -12,11 +12,11 @@ function get_appropriate_ws_url(extra_url)
 
 	if (u.substring(0, 5) === "https") {
 		pcol = "wss://";
-		u = u.substr(8);
+		u = u.substring(8);
 	} else {
 		pcol = "ws://";
 		if (u.substring(0, 4) === "http")
-			u = u.substr(7);
+			u = u.substring(7);
 	}
 
 	u = u.split("/");
@@ -32,7 +32,7 @@ function new_ws(urlpath, protocol)
 }
 
 function createSubscriber() {
-	subscriber_ws = new_ws(get_appropriate_ws_url(""), "websocket");
+	subscriber_ws = new_ws(get_appropriate_ws_url("messages"), "websocket");
 	try {
 		subscriber_ws.onopen = function() {
 			document.getElementById("b").disabled = 0;

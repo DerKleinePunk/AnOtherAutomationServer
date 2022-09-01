@@ -31,7 +31,7 @@ class DashboardState extends State<Dashboard> {
     CoreClientHelper.getClient().addListener(_onWebSocketMessage);
     CoreClientHelper.getClient().addListnerPlayerState(_onPLayerState);
     _panelController = AutomationPanelController();
-    _panelController.init();
+    _panelController.init(context);
     super.initState();
   }
 

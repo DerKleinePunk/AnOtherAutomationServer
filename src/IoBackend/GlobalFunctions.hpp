@@ -31,6 +31,7 @@ public:
 
     void SetInternalVariable(const std::string& name, const std::string& value);
     std::string GetInternalVariable(const std::string& name) const;
+    std::string GetInternalVariable(const std::string& name, const std::string& defaultValue);
     void ShowInternalVars();
 
 };

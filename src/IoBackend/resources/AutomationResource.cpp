@@ -6,12 +6,66 @@
 #endif
 
 #include "AutomationResource.hpp"
+
 #include "../../common/easylogging/easylogging++.h"
 #include "../../common/utils/commonutils.h"
+#include "../Dtos/AutomationElement.hpp"
+#include "../Dtos/AutomationPage.hpp"
 
 HttpResponse* AutomationResource::HandlePages(HttpRequest& request, const std::string& method, HttpResponse* result)
 {
-    result->SetContent("application/json", "[{\"description\" : \"Page 1\", \"name\" : \"page1\", \"icon\" : \"http://localhost:8000/resources/icon1.png\"}]");
+    std::vector<AutomationPage> pages;
+    AutomationPage page1;
+    AutomationPage page2;
+    pages.push_back(page1);
+    pages.push_back(page2);
+    pages[0].Description = "Page 1";
+    pages[0].Name = "page1";
+    pages[0].Icon = "http://localhost:8000/resources/icon1.png";
+    pages[1].Description = "Stall";
+    pages[1].Name = "pageStall";
+    pages[1].Icon = "http://localhost:8000/resources/icon2.png";
+
+    const json jResult = pages;
+
+    result->SetContent("application/json", jResult.dump());
+    result->SetCode(HTTP_STATUS_OK);
+
+    return result;
+}
+
+HttpResponse*
+AutomationResource::HandleLoadPage(HttpRequest& request, const std::string& method, HttpResponse* result, const std::string& pageName)
+{
+    AutomationElements elements;
+    if(pageName == "page1") {
+
+        elements.Name = "page1";
+        AutomationElement element;
+        element.Description = "Hof beleuchtung";
+        element.Id = "hofbel";
+        element.TypeName = AutomationElementType::ONOFFBUTTON;
+        element.Value = _globalFunctions->GetInternalVariable(element.Id, "OFF");
+        elements.Elements.push_back(element);
+
+    } else if(pageName == "pageStall") {
+        elements.Name = "pageStall";
+        AutomationElement element;
+        element.Description = "Offenstall Beleuchtung";
+        element.Id = "offenstallbel";
+        element.TypeName = AutomationElementType::ONOFFBUTTON;
+        element.Value = _globalFunctions->GetInternalVariable(element.Id, "ON");
+        elements.Elements.push_back(element);
+    }
+
+    if(elements.Elements.size() == 0) {
+        result->SetCode(HTTP_STATUS_NOT_FOUND);
+        return result;
+    }
+
+    const json jResult = elements;
+
+    result->SetContent("application/json", jResult.dump());
     result->SetCode(HTTP_STATUS_OK);
 
     return result;
@@ -30,21 +84,56 @@ AutomationResource::~AutomationResource()
 HttpResponse* AutomationResource::Process(HttpRequest& request, const std::string& url, const std::string& method)
 {
     auto result = new HttpResponse();
-    const auto arg = request.GetParameter(std::string("a"));
     const auto apiKey = request.GetHeader(std::string("X-API-KEY"), true);
 
-    LOG(DEBUG) << url << " Api Call Get with " << arg << " apiKey " << apiKey;
+    LOG(DEBUG) << url << " Api Call Get with apiKey " << apiKey;
+
+    if(method == "OPTIONS") {
+        //Only Response Cors Headers from Main
+        //Chrome Use this Checking Cors
+        result->SetCode(HTTP_STATUS_NO_CONTENT);
+        result->SetContent("", "");
+        result->SetHeader("Access-Control-Max-Age", "120"); // duration (in seconds)
+        return result;
+    }
 
     if(!_globalFunctions->IsApiKeyOk(apiKey)) {
         result->SetContent("application/json", "{\"error\" : \"UNAUTHORIZED\"}");
         result->SetCode(HTTP_STATUS_UNAUTHORIZED);
-        return result; 
+        return result;
     }
 
-    if(url == "pages")
-    {
+    if(url == "pages") {
         return HandlePages(request, method, result);
     }
+
+    if(utils::hasBegining(url, "page/")) {
+        auto pageName = url;
+        utils::replaceAll(pageName, "page/", "");
+        return HandleLoadPage(request, method, result, pageName);
+    }
+
+    if(utils::hasBegining(url, "Variable")) {
+        if(method == "POST") {
+            const auto id = request.GetParameter("id");
+            const auto value = request.GetParameter("value");
+            if(!id.empty() && !value.empty())
+            {
+                _globalFunctions->SetInternalVariable(id, value);
+                result->SetContent("application/json", "{\"error\" : \"NONE\"}");
+                result->SetCode(201);
+                return result;
+            }
+            else
+            {
+                 _globalFunctions->SetInternalVariable(id, value);
+                result->SetContent("application/json", "{\"error\" : \"BAD REQUEST\"}");
+                result->SetCode(HTTP_STATUS_BAD_REQUEST);
+                return result;
+            }
+        }
+    }
+
     result->SetCode(HTTP_STATUS_FOUND);
     return result;
 }
