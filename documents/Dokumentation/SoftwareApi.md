@@ -69,5 +69,6 @@ MqttValue -> Ein Wert im Mqtt wurde geändert Überwachte Mqtt bereiche werden i
 ChangeValue -> Ändere eine eine Interne Variable
 ValueChanged -> Interne / Gobale Variable wurde geändert
 ChatMessage -> Eine Text Nachricht die durchs System Läuft
+Action -> Tu was Whath 2 Parameter zb Notification alle UI Spielen einen Sound
 
 siehe GlobalTypes.hpp

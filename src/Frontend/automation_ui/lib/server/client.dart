@@ -181,7 +181,7 @@ class ServerClient {
     if (_messageClient == null) {
       debugPrint("messageClient is null");
     } else {
-      _messageClient?.addListener(callback);
+      _messageClient?.addListenerMessage(callback);
     }
   }
 
@@ -189,7 +189,7 @@ class ServerClient {
     if (_messageClient == null) {
       debugPrint("messageClient is null");
     } else {
-      _messageClient?.removeListener(callback);
+      _messageClient?.removeListenerMessage(callback);
     }
   }
 

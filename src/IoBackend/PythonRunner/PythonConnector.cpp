@@ -75,11 +75,30 @@ static PyObject* ConnectorChangeValue(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+static PyObject* ConnectorAction(PyObject *self, PyObject *args)
+{
+    const char* name;
+    const char* text;
+
+    //https://docstore.mik.ua/orelly/other/python/0596001886_pythonian-chp-24-sect-1.html PyArg_ParseTuple
+    if (!PyArg_ParseTuple(args, "ss", &name, &text)) {
+        Py_RETURN_NONE;
+    }
+
+    auto dictionary = PyModule_GetDict(self);
+    auto classPointer = PyDict_GetItemString(dictionary, CLASSKEY);
+    auto parent = (PythonConnector*)PyLong_AsVoidPtr(classPointer);
+    parent->Action(std::string(name), std::string(text));
+
+    Py_RETURN_NONE;
+}
+
 static PyMethodDef ConnectorMethods[] = {
     {"Ver", ConnectorVer, METH_VARARGS, "Return the Version from Backend"},
     {"LogEntry", ConnectorLogEntry, METH_VARARGS, "Write Logfile Entry"},
     {"WriteMqtt", ConnectorWriteMqtt, METH_VARARGS, "Write Value to Mqtt Topic"},
     {"ChangeValue", ConnectorChangeValue, METH_VARARGS, "Write Value to Internal Variable"},
+    {"Action", ConnectorAction, METH_VARARGS, "SendAction to System"},
     {NULL, NULL, 0, NULL}
 };
 
@@ -100,11 +119,12 @@ PyObject* PythonConnector::ModuleInit()
  * 
  * @param writeMqttEvent 
  */
-PythonConnector::PythonConnector(WriteMqttDelegate writeMqttEvent, ChangeValueDelegate changeValueDelegate)
+PythonConnector::PythonConnector(WriteMqttDelegate writeMqttEvent, ChangeValueDelegate changeValueDelegate, ActionDelegate actionDelegate)
 {
     el::Loggers::getLogger(ELPP_DEFAULT_LOGGER);
     _writeMqttEvent = writeMqttEvent;
     _changeValueDelegate = changeValueDelegate;
+    _actionDelegate = actionDelegate;
 }
 
 PythonConnector::~PythonConnector()
@@ -149,5 +169,14 @@ void PythonConnector::ChangeValue(const std::string& name, const std::string& va
         _changeValueDelegate(name, value);
     } else {
         LOG(WARNING) << "changeValueDelegate is nullptr";
+    }
+}
+
+void PythonConnector::Action(const std::string& what, const std::string& value)
+{
+    if(_actionDelegate != nullptr) {
+        _actionDelegate(what, value);
+    } else {
+        LOG(WARNING) << "actionDelegate is nullptr";
     }
 }

@@ -41,6 +41,7 @@ mosquitto_pub -h 192.168.2.99 -t "test/message" -m "Hello, from Desktop"
 
 mosquitto_pub -h 192.168.2.99 -t "devices/wb-adc/controls/text" -m "Hello, from Desktop"
 mosquitto_pub -h 192.168.2.49 -t "SimpleIo/Variable/hofbel" -m "ON"
+mosquitto_pub -h 192.168.2.49 -t "SimpleIo/Variable/notify" -m "ON"
 
 whatch all
 

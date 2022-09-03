@@ -20,6 +20,9 @@ std::ostream& operator<<(std::ostream& os, const SystemEvent type)
         case SystemEvent::PublishMqtt:
             os << "PublishMqtt";
             break;
+        case SystemEvent::Action:
+            os << "Action";
+            break;
         default:
             os.setstate(std::ios_base::failbit);
     }

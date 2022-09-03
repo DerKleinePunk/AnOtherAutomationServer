@@ -109,13 +109,14 @@ class AudioPlayerService {
     debugPrint("AudioPlayerService Websocket $wath $message");
     if (wath == "data") {
       var jsondata = jsonDecode(message);
-      if (jsondata["action"] == "playSound") {
+      if (jsondata["Event"] == "Action" && jsondata["what"] == "Notification") {
         _playNotification();
       }
     }
   }
 
   void _playNotification() async {
+    debugPrint("_playNotification");
     final uri =
         await _audioCache.load("http://localhost:8000/rainforest-ambient.mp3");
 

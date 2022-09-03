@@ -24,6 +24,10 @@ void Backend::EventCallback(const SystemEvent event, const std::string& paramete
         auto jsonText = json::parse(parameter);
         jsonText["Event"] = "ValueChanged";
         _webServer->SendWebSocketBroadcast(jsonText.dump());
+    } else if(event == SystemEvent::Action) {
+        auto jsonText = json::parse(parameter);
+        jsonText["Event"] = "Action";
+        _webServer->SendWebSocketBroadcast(jsonText.dump());
     }
 
     for(auto entry : _config->GetEventRoot()) {

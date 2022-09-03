@@ -70,6 +70,15 @@ void PythonRunner::ChangeValue(const std::string& name, const std::string& value
     _globalFunctions->SetInternalVariable(name, value);
 }
 
+void PythonRunner::Action(const std::string& what, const std::string& value)
+{
+    json j;
+    j["what"] = what;
+    j["value"] = value;
+
+    _globalFunctions->FireNewEvent(SystemEvent::Action, j.dump());
+}
+
 PythonRunner::PythonRunner(const std::string& appName, GlobalFunctions* globalFunctions)
 {
     el::Loggers::getLogger(ELPP_DEFAULT_LOGGER);
@@ -91,8 +100,9 @@ bool PythonRunner::Init()
 
     WriteMqttDelegate delegate = std::bind(&PythonRunner::WriteMqtt, this, std::placeholders::_1, std::placeholders::_2);
     ChangeValueDelegate delegate2 = std::bind(&PythonRunner::ChangeValue, this, std::placeholders::_1, std::placeholders::_2);
+    ChangeValueDelegate delegate3 = std::bind(&PythonRunner::Action, this, std::placeholders::_1, std::placeholders::_2);
 
-    _connector = new PythonConnector(delegate, delegate2);
+    _connector = new PythonConnector(delegate, delegate2, delegate3);
     bool init_signal_handlers = false;
     bool add_program_dir_to_path = true;
 

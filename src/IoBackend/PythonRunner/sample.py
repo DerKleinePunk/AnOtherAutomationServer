@@ -42,6 +42,11 @@ def callbackMqtt(text):
     if(params["topic"] == "SimpleIo/Variable/hofbel"):
         connector.LogEntry("DEBUG", params["value"])
         connector.ChangeValue("hofbel", params["value"])
+    if(params["topic"] == "SimpleIo/Variable/notify"):
+        connector.LogEntry("DEBUG", params["value"])
+        if(params["value"] == "ON"):
+            connector.Action("Notification", params["value"])
+            connector.WriteMqtt("SimpleIo/Variable/notify", "OFF")
     return
 
 def callbackValueChanged(text):

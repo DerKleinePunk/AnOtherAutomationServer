@@ -3,12 +3,16 @@ import 'http/websocket_client_stup.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 typedef OnMessageCallback = void Function(String type, String message);
+typedef OnCloseCallback = void Function();
 
 class ServerMessageClient {
   WebSocketChannel? _channel; // =
   bool _connected = false;
 
-  final ObserverList<OnMessageCallback> _listeners = ObserverList<OnMessageCallback>();
+  final ObserverList<OnMessageCallback> _listenersMessage =
+      ObserverList<OnMessageCallback>();
+  final ObserverList<OnCloseCallback> _listenersClose =
+      ObserverList<OnCloseCallback>();
 
   ServerMessageClient(String server) {
     Uri serverUri = Uri.parse(server);
@@ -23,8 +27,7 @@ class ServerMessageClient {
       messageUri += ":${serverUri.port.toString()}";
     }
     messageUri += "/messages";
-    try
-    {
+    try {
       _channel = makeWsClient(messageUri);
       _channel!.stream.listen(
         (message) {
@@ -41,12 +44,12 @@ class ServerMessageClient {
               debugPrint("Message data $message");
               message = message.replaceAll(RegExp("'"), '"');
               //var jsondata = json.decode(message);
-              for (var callback in _listeners) {
+              for (var callback in _listenersMessage) {
                 callback("data", message);
               }
             } else {
               debugPrint("Message Text $message");
-              for (var callback in _listeners) {
+              for (var callback in _listenersMessage) {
                 callback("Text", message);
               }
             }
@@ -58,6 +61,9 @@ class ServerMessageClient {
           //if WebSocket is disconnected
           debugPrint("Web socket is closed");
           _connected = false;
+          for (var callback in _listenersClose) {
+            callback();
+          }
         },
         onError: (error) {
           debugPrint(error.toString());
@@ -73,12 +79,12 @@ class ServerMessageClient {
     _channel?.sink.close();
   }
 
-  addListener(OnMessageCallback callback) {
-    _listeners.add(callback);
+  addListenerMessage(OnMessageCallback callback) {
+    _listenersMessage.add(callback);
   }
 
-  removeListener(OnMessageCallback callback) {
-    _listeners.remove(callback);
+  removeListenerMessage(OnMessageCallback callback) {
+    _listenersMessage.remove(callback);
   }
 
   isConnected() {
