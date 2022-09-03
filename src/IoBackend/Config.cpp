@@ -317,6 +317,7 @@ void Config::Load()
         _configFile.ServerPort = 8080;
         _configFile.ApiKey = "12345678";
         _configFile.WatchTopics.push_back("devices/#");
+        _configFile.WatchTopics.push_back("SimpleIo/Variable/#");
         
         EventNode node;
         node.Event = SystemEvent::MqttValue;

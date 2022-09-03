@@ -63,6 +63,13 @@ class AppRouter {
 }
 
 class RoutingData {
+
+  @override
+  bool operator ==(Object other) =>
+      other is RoutingData &&
+      other.runtimeType == runtimeType &&
+      other.route == route;
+
   @override
   int get hashCode => route.hashCode;
 

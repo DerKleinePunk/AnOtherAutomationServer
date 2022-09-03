@@ -19,7 +19,7 @@ Wiederum massiv zu vereinfachen. Der kleinst gemeisame Nenner ist in meinen Auge
 5 Grad. Wir fahren in die Richtung 270°.
 Der Service soll aber auch die Entwicklung / Anpassungen auf ein Minimum an Technisches wissen reduzieren um viele Abzuholen.
 Bzw den ein oder Anderen Geräte Treiber einfach per Konfiguration ein und ausschalten können.
-Um das zu Erreichen ist die die Einbettung von Pyhton3 gedacht aber auch ein C++ Addon Schnittstelle. Auch ein Template mit dem man in PlattformI0 
+Um das zu Erreichen ist die die Einbettung von Pyhton3 gedacht aber auch ein C++ Addon Schnittstelle. Auch ein Template mit dem man in PlattformI0
 eigene Mircocontroller Programmieren kann und so in das gesamt System Integierien.
 Desweiteren ist der Service ein Html Seiten Host für die Konfiguration per Webbrowser und eine sehr einfache GUI.
 Auch ein Websocket Server steht zu verfügung über den man bei Events im System Informiert wird.
@@ -40,7 +40,8 @@ Karte aus den Openstreet Map daten.
 
 ### Die GUI
 
-Vielleicht wir es auch eine GUI mit React und Typescript geben wäre etwas was ich noch Lernen möchte.
+Vielleicht wird es auch eine GUI mit React und Typescript geben wäre etwas was ich noch Lernen möchte. Habe mich für Flutter entschieden.
+Weil ich das jetzt auch für den Job brauche
 
 ## Ziele
 

@@ -8,10 +8,8 @@ class CorsHelp extends StatelessWidget {
   Widget build(BuildContext context) {
     final route = ModalRoute.of(context);
     final firstRoute = route?.isFirst ?? true;
-    final RoutingData? args = route?.settings.arguments as RoutingData;
-    if (args != null) {
-      debugPrint(args.fullRoute);
-    }
+    final RoutingData args = route?.settings.arguments as RoutingData;
+    debugPrint(args.fullRoute);
 
     List<Widget>? actions = [];
     if (firstRoute) {

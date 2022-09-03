@@ -20,8 +20,10 @@ void ServiceEventManager::WorkerLoop()
             for( auto consumer : _eventConsumer) {
                 if(consumer.EventFilter.size() == 0 || 
                     std::find(consumer.EventFilter.begin(), consumer.EventFilter.end(), event.Event) != consumer.EventFilter.end()) {
-                    LOG(DEBUG) << "Fire Event " << event.Event << " " << event.Parameter;
+                    LOG(DEBUG) << "send to " << consumer.Name << " Event " << event.Event << " " << event.Parameter;
                     consumer.EventConsumer(event.Event, event.Parameter);
+                } else {
+                    LOG(DEBUG) << "EventFiltered for " << consumer.Name;
                 }
             }
         } else {
@@ -31,6 +33,8 @@ void ServiceEventManager::WorkerLoop()
                     if(consumer.EventFilter.size() == 0 || 
                         std::find(consumer.EventFilter.begin(), consumer.EventFilter.end(), SystemEvent::Idle) != consumer.EventFilter.end()) {
                         consumer.EventConsumer(SystemEvent::Idle, "");
+                    } else {
+                        LOG(DEBUG) << "EventFiltered for " << consumer.Name;
                     }
                 }
             }
@@ -87,22 +91,31 @@ void ServiceEventManager::FireNewEvent(const SystemEvent event, const std::strin
 /**
  * @brief Register Callback for System Events
  * 
- * @param eventFilter the Filter for EvemtTypes
+ * @param eventFilter array of the Filter for EvemtTypes
  * @param function the callback function
+ * @param Name the Name Consumer (Loging)
  */
-void ServiceEventManager::RegisterMe(const std::vector<SystemEvent>& eventFilter, EventDelegate function)
+void ServiceEventManager::RegisterMe(const std::vector<SystemEvent>& eventFilter, EventDelegate function, const std::string& name)
 {
     EventConsumers consumer;
     consumer.EventFilter = eventFilter;
     consumer.EventConsumer = function;
+    consumer.Name = name;
 
     _eventConsumer.push_back(consumer);
 }
 
-void ServiceEventManager::RegisterMe(const SystemEvent eventFilter, EventDelegate function)
+/**
+ * @brief Register Callback for System Events
+ * 
+ * @param eventFilter the Filter for EvemtTypes
+ * @param function the callback function
+ * @param Name the Name Consumer (Loging)
+ */
+void ServiceEventManager::RegisterMe(const SystemEvent eventFilter, EventDelegate function, const std::string& name)
 {
     std::vector<SystemEvent> myEvents;
     myEvents.push_back(eventFilter);
 
-    RegisterMe(myEvents, function);
+    RegisterMe(myEvents, function, name);
 }

@@ -27,7 +27,7 @@ def simpleFunc():
 
 def callbackMqtt(text):
     print("callbackMqtt called " + text)
-    connector.LogEntry("DEBUG", "callbackMqtt")
+    connector.LogEntry("DEBUG", "callbackMqtt with " + text)
     params = json.loads(text)
     if(params["topic"] == "SimpleIo/Io/RelaisBoard"):
         connector.LogEntry("DEBUG", params["value"])
@@ -39,6 +39,9 @@ def callbackMqtt(text):
             connector.ChangeValue("RelaisBoard0", "on")
         if(value["state"] == "OFF"):
             connector.ChangeValue("RelaisBoard0", "off")
+    if(params["topic"] == "SimpleIo/Variable/hofbel"):
+        connector.LogEntry("DEBUG", params["value"])
+        connector.ChangeValue("hofbel", params["value"])
     return
 
 def callbackValueChanged(text):

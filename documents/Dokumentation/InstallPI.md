@@ -28,7 +28,7 @@ docker run hello-world
 REM Ersten Docker Container installieren und so testen obs läuft
 ```
 
-https://docs.docker.com/engine/install/debian/#install-using-the-convenience-script
+[install-using-the-convenience-script](https://docs.docker.com/engine/install/debian/#install-using-the-convenience-script)
 
 ### Container auf die Festplatte
 
@@ -50,7 +50,7 @@ docker info | grep "Root Dir"
 sudo rm -r /var/lib/docker/ -> den platz wollen wir ja nicht verschenken
 ```
 
-https://stackoverflow.com/questions/55344896/attempt-to-change-docker-data-root-fails-why
+[attempt-to-change-docker-data-root-fails-why](https://stackoverflow.com/questions/55344896/attempt-to-change-docker-data-root-fails-why)
 
 ### HA Container Installieren
 
@@ -79,9 +79,9 @@ docker stop homeassistant
 docker rm homeassistant < remove it from Docker's list of containers
 reinstall container
 
-https://www.home-assistant.io/installation/raspberrypi
+[HA on PI](https://www.home-assistant.io/installation/raspberrypi)
 
-http://192.168.2.99:8123
+[Local Link](http://192.168.2.99:8123)
 
 ## Mqtt
 

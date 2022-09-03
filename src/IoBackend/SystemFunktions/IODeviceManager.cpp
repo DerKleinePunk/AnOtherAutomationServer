@@ -81,7 +81,7 @@ bool IODeviceManager::Init()
     std::vector<SystemEvent> myEvents;
     myEvents.push_back(SystemEvent::ChangeValue);
     myEvents.push_back(SystemEvent::Idle);
-    _globalFunctions->RegisterForEvent(myEvents, callback);
+    _globalFunctions->RegisterForEvent(myEvents, callback, "IODeviceManager");
 
     if(_mneaReader != nullptr) {
         

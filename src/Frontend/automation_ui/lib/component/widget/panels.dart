@@ -1,10 +1,9 @@
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:provider/provider.dart';
 
-enum SwitchPanelValue { 
-   on, 
-   off, 
-   waiting
-}  
+import '../../models/panel_value_model.dart';
+
+enum SwitchPanelValue { on, off, waiting }
 
 typedef GetStateCallback = SwitchPanelValue Function(String id);
 typedef SetStateCallback = void Function(String id, bool value);
@@ -33,34 +32,33 @@ class SwitchPanel extends StatefulWidget {
 class SwitchPanelState extends State<SwitchPanel> {
   @override
   Widget build(BuildContext context) {
-    SwitchPanelValue value = widget._getcallback(widget._id);
-    bool isOn = true;
-    bool visible = false;
-    if(value == SwitchPanelValue.off)
-    {
-      isOn = false;
-    } 
-    else if(value == SwitchPanelValue.waiting)
-    {
-      visible = true;
-    }
-    return InkWell(
-      child: Neumorphic(
-          style: NeumorphicStyle(
-              shape: NeumorphicShape.concave,
-              boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(12)),
-              depth: !isOn ? 8 : -6,
-              lightSource: LightSource.topLeft,
-              shadowLightColorEmboss: const Color(0xFFEBF6FC),
-              shadowDarkColorEmboss: const Color(0xFF0F9DEF)),
-          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            NeumorphicText(widget._title,
-                style: const NeumorphicStyle(
-                    depth: 0, //customize depth here
-                    color: Colors.black),
-                textStyle: NeumorphicTextStyle(fontSize: 18)),
-                Visibility( visible: visible, child: const CircularProgressIndicator(color: Colors.blue))
-            /*NeumorphicSwitch(
+    return Consumer<PanelValueMap>(builder: (context, value, child) {
+      SwitchPanelValue switchValue = widget._getcallback(widget._id);
+      bool isOn = true;
+      if (switchValue == SwitchPanelValue.off) {
+        isOn = false;
+      }
+      return InkWell(
+        child: Neumorphic(
+            style: NeumorphicStyle(
+                shape: NeumorphicShape.concave,
+                boxShape:
+                    NeumorphicBoxShape.roundRect(BorderRadius.circular(12)),
+                depth: !isOn ? 8 : -6,
+                lightSource: LightSource.topLeft,
+                shadowLightColorEmboss: const Color(0xFFEBF6FC),
+                shadowDarkColorEmboss: const Color(0xFF0F9DEF)),
+            child:
+                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              NeumorphicText(widget._title,
+                  style: const NeumorphicStyle(
+                      depth: 0, //customize depth here
+                      color: Colors.black),
+                  textStyle: NeumorphicTextStyle(fontSize: 18)),
+              Visibility(
+                  visible: value.getValue(widget._id) == "WAIT",
+                  child: const CircularProgressIndicator(color: Colors.blue))
+              /*NeumorphicSwitch(
                       style: const NeumorphicSwitchStyle(
                           lightSource: LightSource.left),
                       value: isOn,
@@ -69,11 +67,11 @@ class SwitchPanelState extends State<SwitchPanel> {
                         setState(() {});
                       },
                     ),*/
-          ])),
-      onTap: () {
-        widget._setcallback(widget._id, !isOn);
-        setState(() {});
-      },
-    );
+            ])),
+        onTap: () {
+          widget._setcallback(widget._id, !isOn);
+        },
+      );
+    });
   }
 }

@@ -6,6 +6,8 @@ import '../component/widget/automation_form.dart';
 import '../component/widget/settings_form.dart';
 import '../core/automation_panel_controller.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:provider/provider.dart';
+import '../models/chat_message_model.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
@@ -74,7 +76,6 @@ class DashboardState extends State<Dashboard> {
             child: CircularProgressIndicator(
               color: Colors.blue,
             ),
-            
           ),
           Padding(
             padding: EdgeInsets.only(top: 30),
@@ -182,48 +183,59 @@ class DashboardState extends State<Dashboard> {
             right: 0,
             child: Container(
                 padding: const EdgeInsets.all(15),
-                child: SingleChildScrollView(
-                    child: Column(
-                  children: [
-                    Column(
-                      children: _msglist.map((onemsg) {
-                        return Container(
-                            margin: EdgeInsets.only(
-                              //if is my message, then it has margin 40 at left
-                              left: onemsg.isme ? 40 : 0,
-                              right:
-                                  onemsg.isme ? 0 : 40, //else margin at right
-                            ),
-                            child: Card(
-                                color: onemsg.isme
-                                    ? Colors.blue[100]
-                                    : Colors.red[100],
-                                //if its my message then, blue background else red background
-                                child: Container(
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.all(15),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(onemsg.isme
-                                          ? "ID: ME"
-                                          : "ID: ${onemsg.userid}"),
-                                      Container(
-                                        margin: const EdgeInsets.only(
-                                            top: 10, bottom: 10),
-                                        child: Text(
-                                            "Message: ${onemsg.msgtext}", 
-                                            style:
-                                                const TextStyle(fontSize: 17)),
-                                      ),
-                                    ],
-                                  ),
-                                )));
-                      }).toList(),
-                    )
-                  ],
-                )))),
+                child:
+                    Consumer<ChatMessageList>(builder: (context, value, child) {
+                  return SingleChildScrollView(
+                      child: Column(
+                    children: [
+                      Column(
+                        children: value.getMessages.map((onemsg) {
+                          return Container(
+                              margin: EdgeInsets.only(
+                                //if is my message, then it has margin 40 at left
+                                left: onemsg.isMe ? 40 : 0,
+                                right:
+                                    onemsg.isMe ? 0 : 40, //else margin at right
+                              ),
+                              child: Card(
+                                  color: onemsg.isMe
+                                      ? const Color.fromARGB(255, 60, 149, 250)
+                                      : const Color.fromARGB(
+                                          255, 233, 255, 205),
+                                  //if its my message then, blue background else red background
+                                  child: Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.all(15),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          onemsg.isMe
+                                              ? "ID: ME"
+                                              : "ID: ${onemsg.userId}",
+                                          style: const TextStyle(
+                                              color:
+                                                  Color.fromARGB(255, 0, 0, 0)),
+                                        ),
+                                        Container(
+                                          margin: const EdgeInsets.only(
+                                              top: 10, bottom: 10),
+                                          child: Text(
+                                              "Message: ${onemsg.mesageText}",
+                                              style: const TextStyle(
+                                                  fontSize: 17,
+                                                  color: Color.fromARGB(
+                                                      255, 0, 0, 0))),
+                                        ),
+                                      ],
+                                    ),
+                                  )));
+                        }).toList(),
+                      )
+                    ],
+                  ));
+                }))),
         Positioned(
           //position text field at bottom of screen
 
@@ -272,10 +284,12 @@ class DashboardState extends State<Dashboard> {
   }
 
   _onWebSocketMessage(String wath, String message) {
-    debugPrint("Dashboard Websocket " + wath + " " + message);
+    debugPrint("Dashboard Websocket $wath $message");
     if (wath == "Text") {
-      _msglist.add(MessageData(message, "", false));
-      setState(() {});
+      var chatMessageNotifier =
+          Provider.of<ChatMessageList>(context, listen: false);
+      var textMessage = ChatMessage(false, "user", message);
+      chatMessageNotifier.addMessage(textMessage);
     }
   }
 
@@ -321,7 +335,7 @@ class DashboardState extends State<Dashboard> {
       return _listPages[pageIndex].title;
     }
 
-    return "Missing Tile for Index " + pageIndex.toString();
+    return "Missing Tile for Index $pageIndex";
   }
 
   //TODO Later us this to Update Screen when Pages Updatet in DB (Message Inform Us)

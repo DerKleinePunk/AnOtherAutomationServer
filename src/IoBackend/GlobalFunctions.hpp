@@ -23,8 +23,8 @@ public:
     uint16_t GetServerPort() const;
 
     void FireNewEvent(const SystemEvent event, const std::string& parameter);
-    void RegisterForEvent(const std::vector<SystemEvent>& eventFilter, EventDelegate function);
-    void RegisterForEvent(const SystemEvent event, EventDelegate function);
+    void RegisterForEvent(const std::vector<SystemEvent>& eventFilter, EventDelegate function, const std::string name);
+    void RegisterForEvent(const SystemEvent event, EventDelegate function, const std::string name);
 
 
     std::string ScanAccessPoints(const std::string& interfaceName = "");

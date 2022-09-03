@@ -11,6 +11,7 @@
 
 GlobalFunctions::GlobalFunctions(Config* config, ServiceEventManager* serviceEventManager, NetworkManager* networkManager)
 {
+    el::Loggers::getLogger(ELPP_DEFAULT_LOGGER);
     _config = config;
     _serviceEventManager = serviceEventManager;
     _networkManager = networkManager;
@@ -55,13 +56,27 @@ void GlobalFunctions::FireNewEvent(const SystemEvent event, const std::string& p
     _serviceEventManager->FireNewEvent(event, parameter); 
 }
 
-void GlobalFunctions::RegisterForEvent(const std::vector<SystemEvent>& eventFilter, EventDelegate function) {
-    _serviceEventManager->RegisterMe(eventFilter, function);
+/**
+ * @brief Register Callback for System Events
+ * 
+ * @param eventFilter array of the Filter for EvemtTypes empty array => All Events
+ * @param function the callback function
+ * @param Name the Name Consumer (Loging)
+ */
+void GlobalFunctions::RegisterForEvent(const std::vector<SystemEvent>& eventFilter, EventDelegate function, const std::string name) {
+    _serviceEventManager->RegisterMe(eventFilter, function, name);
 }
 
-void GlobalFunctions::RegisterForEvent(const SystemEvent event, EventDelegate function)
+/**
+ * @brief Register Callback for System Events
+ * 
+ * @param eventFilter the Filter for EvemtTypes
+ * @param function the callback function
+ * @param Name the Name Consumer (Loging)
+ */
+void GlobalFunctions::RegisterForEvent(const SystemEvent event, EventDelegate function, const std::string name)
 {
-    _serviceEventManager->RegisterMe(event, function);
+    _serviceEventManager->RegisterMe(event, function, name);
 }
 
 std::string GlobalFunctions::ScanAccessPoints(const std::string& interfaceName)
@@ -72,6 +87,8 @@ std::string GlobalFunctions::ScanAccessPoints(const std::string& interfaceName)
 
 void GlobalFunctions::SetInternalVariable(const std::string& name, const std::string& value)
 {
+    LOG(DEBUG) << "SetInternalVariable " << name << " to " << value;
+
     auto changed = false;
     if(_internalVariables.find(name) != _internalVariables.end()) {
         if(_internalVariables[name] != value) {

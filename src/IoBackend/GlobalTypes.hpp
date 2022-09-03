@@ -6,7 +6,8 @@ enum class SystemEvent {
     ChangeValue,
     ValueChanged,
     Idle,
-    PublishMqtt
+    PublishMqtt,
+    ChatMessage
 };
 
 std::ostream& operator<<(std::ostream& os, const SystemEvent type);

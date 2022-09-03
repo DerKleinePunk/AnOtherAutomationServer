@@ -170,7 +170,7 @@ bool GPIOManager::Init()
     }
 
     auto callback = std::bind(&GPIOManager::EventCallback, this, std::placeholders::_1, std::placeholders::_2);
-    _globalFunctions->RegisterForEvent(SystemEvent::ChangeValue, callback);
+    _globalFunctions->RegisterForEvent(SystemEvent::ChangeValue, callback, "GPIOManager");
 
     LOG(DEBUG) << "Init <- success";
     return true;

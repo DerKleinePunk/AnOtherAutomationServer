@@ -19,8 +19,8 @@ HttpResponse* AutomationResource::HandlePages(HttpRequest& request, const std::s
     AutomationPage page2;
     pages.push_back(page1);
     pages.push_back(page2);
-    pages[0].Description = "Page 1";
-    pages[0].Name = "page1";
+    pages[0].Description = "Haus";
+    pages[0].Name = "pageHaus";
     pages[0].Icon = "http://localhost:8000/resources/icon1.png";
     pages[1].Description = "Stall";
     pages[1].Name = "pageStall";
@@ -38,9 +38,9 @@ HttpResponse*
 AutomationResource::HandleLoadPage(HttpRequest& request, const std::string& method, HttpResponse* result, const std::string& pageName)
 {
     AutomationElements elements;
-    if(pageName == "page1") {
+    if(pageName == "pageHaus") {
 
-        elements.Name = "page1";
+        elements.Name = "pageHaus";
         AutomationElement element;
         element.Description = "Hof beleuchtung";
         element.Id = "hofbel";

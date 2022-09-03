@@ -67,11 +67,7 @@ void PythonRunner::WriteMqtt(const std::string& topic, const std::string& value)
 
 void PythonRunner::ChangeValue(const std::string& name, const std::string& value)
 {
-    json j;
-    j["name"] = name;
-    j["value"] = value;
-
-    _globalFunctions->FireNewEvent(SystemEvent::ChangeValue, j.dump());
+    _globalFunctions->SetInternalVariable(name, value);
 }
 
 PythonRunner::PythonRunner(const std::string& appName, GlobalFunctions* globalFunctions)

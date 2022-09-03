@@ -209,7 +209,7 @@ void MqttConnector::Connected()
     _initOk = true;
 
     auto callback = std::bind(&MqttConnector::EventCallback, this, std::placeholders::_1, std::placeholders::_2);
-    _serviceEventManager->RegisterMe(SystemEvent::PublishMqtt, callback);
+    _serviceEventManager->RegisterMe(SystemEvent::PublishMqtt, callback, "MqttConnector");
 }
 
 bool MqttConnector::Publish(std::string topic, std::string value)

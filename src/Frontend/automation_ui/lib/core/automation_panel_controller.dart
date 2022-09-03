@@ -1,71 +1,64 @@
 import 'package:flutter/material.dart';
+import '../models/panel_value_model.dart';
 import 'client_helper.dart';
 import '../server/data/auto_destination.dart';
 import '../component/widget/panels.dart';
 import 'dart:convert';
-
-class ValueChangeNotification extends Notification {
-  final String id;
-  final String value;
-
-  const ValueChangeNotification({required this.id, required this.value});
-}
+import 'package:provider/provider.dart';
 
 class AutomationPanelController {
   final Map<String, List<Widget>> _panels = <String, List<Widget>>{};
-  final Map<String, String> _valueMap = <String, String>{};
   BuildContext? _context;
 
   AutomationPanelController();
 
   void init(BuildContext context) {
-    /*for (int i = 0; i < 16; i++) {
-      _valueMap["panel" + i.toString()] = false;
-      _panels.add(Panels.getSwitchPanel("Panel " + i.toString(),
-          "panel" + i.toString(), switchPanelGet, switchPanelSet, false));
-    }*/
     _context = context;
     CoreClientHelper.getClient().addListener(_onWebSocketMessage);
   }
 
   void _onWebSocketMessage(String wath, String message) {
-    debugPrint("AudioPlayerService Websocket $wath $message");
+    debugPrint("AutomationPanelController Websocket $wath $message");
     if (wath == "data") {
       var jsondata = jsonDecode(message);
       if (jsondata["Event"] == "ValueChanged") {
         debugPrint("ValueChanged $message");
-        const ValueChangeNotification(id: "Foo", value: "ON").dispatch(_context);
+        var valueMapNotifier = Provider.of<PanelValueMap>(_context!, listen: false);
+        valueMapNotifier.updateEntry(jsondata["name"], jsondata["value"]);
       }
     }
   }
 
   List<Widget> getPanels(String pageName) {
     if (_panels[pageName] == null || _panels[pageName]!.isEmpty) {
-      var list = [const CircularProgressIndicator(color: Colors.blue)];
+      var list = [
+          const CircularProgressIndicator(color: Colors.blue)
+      ];
       return list;
     }
     return _panels[pageName]!;
   }
 
   SwitchPanelValue switchPanelGet(String id) {
-    if(_valueMap[id]! == "ON") {
+    var valueMapNotifier = Provider.of<PanelValueMap>(_context!, listen: false);
+    var value = valueMapNotifier.getValue(id);
+    if (value == "ON") {
       return SwitchPanelValue.on;
-    } else if(_valueMap[id]! == "OFF"){
+    } else if (value == "OFF") {
       return SwitchPanelValue.off;
     }
     return SwitchPanelValue.waiting;
   }
 
   void switchPanelSet(String id, bool value) {
-    if(value && _valueMap[id] != "WAIT")
-    {
+    var valueMapNotifier = Provider.of<PanelValueMap>(_context!, listen: false);
+    var oldValue = valueMapNotifier.getValue(id);
+    if (value && oldValue != "WAIT") {
       CoreClientHelper.getClient().setValueForId(id, "ON");
-      _valueMap[id] = "WAIT";
-    }
-    else if(_valueMap[id] != "WAIT")
-    {
+      valueMapNotifier.updateEntry(id, "WAIT");
+    } else if (oldValue != "WAIT") {
       CoreClientHelper.getClient().setValueForId(id, "OFF");
-      _valueMap[id] = "WAIT";
+      valueMapNotifier.updateEntry(id, "WAIT");
     }
   }
 
@@ -83,13 +76,14 @@ class AutomationPanelController {
         }
 
         debugPrint("new Page Config get ${value.name}");
-        _panels[value.name] = List.empty(growable: true);
+        _panels[value.name] = List.empty(growable: true); 
         for (AutomationElement entry in value.elements) {
-          _valueMap[entry.id] = entry.value;
           if (entry.typeName == "ONOFFBUTTON") {
-            var panel = Panels.getSwitchPanel(
-                entry.description, entry.id, switchPanelGet, switchPanelSet, false);
+            var panel = Panels.getSwitchPanel(entry.description, entry.id,
+                switchPanelGet, switchPanelSet, false);
             _panels[value.name]!.add(panel);
+            var valueMapNotifier = Provider.of<PanelValueMap>(_context!, listen: false);
+            valueMapNotifier.addEntry(entry.id, PanelValueEntry(entry.value, ""));
           }
         }
       } catch (exp) {
@@ -103,6 +97,5 @@ class AutomationPanelController {
   void dispose() {
     CoreClientHelper.getClient().removeListener(_onWebSocketMessage);
     _panels.clear();
-    _valueMap.clear();
   }
 }

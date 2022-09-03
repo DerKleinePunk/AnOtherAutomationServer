@@ -84,5 +84,5 @@ void Backend::Init()
 {
     auto callback = std::bind(&Backend::EventCallback, this, std::placeholders::_1, std::placeholders::_2);
     std::vector<SystemEvent> eventList;
-    _serviceEventManager->RegisterMe(eventList, callback);
+    _serviceEventManager->RegisterMe(eventList, callback, "Backend");
 };

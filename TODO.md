@@ -40,6 +40,7 @@ https://techtutorialsx.com/2021/11/02/esp32-dynamic-sensor-network/
 mosquitto_pub -h 192.168.2.99 -t "test/message" -m "Hello, from Desktop"
 
 mosquitto_pub -h 192.168.2.99 -t "devices/wb-adc/controls/text" -m "Hello, from Desktop"
+mosquitto_pub -h 192.168.2.49 -t "SimpleIo/Variable/hofbel" -m "ON"
 
 whatch all
 
@@ -104,6 +105,7 @@ https://github.com/cterwilliger/VeDirectFrameHandler
 https://community.victronenergy.com/questions/63915/anyone-have-python-example-how-to-read-mqtt-values.html
 
 ## Automatik Build
+
 https://medium.com/swlh/how-to-create-an-automated-build-pipeline-for-your-arduino-project-1df9826f2a5e
 
 ## Git hints
@@ -117,7 +119,12 @@ git submodule add https://github.com/DerKleinePunk/PiGPIOHelper.git
 
 https://github.com/Mikhus/canvas-gauges
 https://www.bauer.uh.edu/parks/h5_gauge1.htm
+
 ## NodeJs Hints
 
 nvm install --lts
 nvm use --lts
+
+## Flutter Links
+
+https://sanjibsinha.com/notification-class-in-flutter/
