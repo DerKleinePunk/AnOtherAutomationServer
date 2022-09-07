@@ -42,7 +42,13 @@ ENDIF()
 #
 # Project Output Paths
 #
+
 SET (MAINFOLDER ${PROJECT_SOURCE_DIR})
+
+file(STRINGS "RELEASE_VERSION.txt" RELEASE_VERSION)
+SET(RELEASE_VERSION  "${RELEASE_VERSION}" CACHE INTERNAL "RELEASE_VERSION")
+configure_file("${MAINFOLDER}/src/common/version.hpp.in" "${MAINFOLDER}/src/common/version.hpp")
+
 IF("${TARGET}" STREQUAL "")
    message(WARNING "TARGET not set please add -DTRAGET to command line Suported Target are Linux,PI (crosscompile)")
    SET(TARGET ${CMAKE_SYSTEM_NAME})

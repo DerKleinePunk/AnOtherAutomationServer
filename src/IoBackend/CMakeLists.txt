@@ -25,6 +25,7 @@ TARGET_LINK_LIBRARIES(${project_BIN} PRIVATE ${Python3_LIBRARIES})
 TARGET_LINK_LIBRARIES(${project_BIN} PRIVATE ${MOSQUITTO_LIBRARIES} ${GLIB_LDFLAGS} ${NM_LIBRARIES})
 TARGET_LINK_LIBRARIES(${project_BIN} PRIVATE websockets)
 TARGET_LINK_LIBRARIES(${project_BIN} PRIVATE "stdc++fs" "uuid")
+TARGET_LINK_LIBRARIES(${project_BIN} PRIVATE "curl")
 
 set(MAINFONTSOURCE "${MAINFOLDER}/src/IoBackend/loggerIoBackend.conf")
 add_custom_command(TARGET ${project_BIN} POST_BUILD # Adds a post-build event to MyTest
