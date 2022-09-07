@@ -129,3 +129,18 @@ nvm use --lts
 ## Flutter Links
 
 https://sanjibsinha.com/notification-class-in-flutter/
+
+## Victoria Metrics for Hostrie Data
+
+docker pull victoriametrics/victoria-metrics -> Container get
+
+docker run -it --rm -v /path/to/victoria-metrics-data:/victoria-metrics-data -p 8428:8428 victoriametrics/victoria-metrics -> Start Container
+docker run -it --rm -v /home/punky/data/victoria-metrics-data:/victoria-metrics-data -p 8428:8428 victoriametrics/victoria-metrics -> Start Container
+http://localhost:8428/metrics -> Get Metrics
+
+Write Some data
+curl -d 'measurement,tag1=value1,tag2=value2 field1=123,field2=1.23' -X POST 'http://localhost:8428/write'
+
+https://grafana.com/docs/grafana/latest/setup-grafana/installation/debian/
+
+http://localhost:3000
