@@ -9,6 +9,8 @@ sudo systemctl enable mosquitto
 sudo apt-get install apache2 apache2-doc php php-pear
 sudo apt-get install libsystemd-dev libcurl4-openssl-dev
 
+https://github.com/mschlenstedt/Loxberry/issues/952
+
 ### Desktop
 
 sudo apt install mosquitto-clients
