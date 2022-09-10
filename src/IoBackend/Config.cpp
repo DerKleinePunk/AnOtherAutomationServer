@@ -104,9 +104,14 @@ void to_json(json& j, const ConfigFile& p)
 
 void from_json(const json& j, EventNode& p)
 {
-    p.Event = j.at("Event").get<SystemEvent>();
+    auto it_value = j.find("Event");
+    if(it_value != j.end()) {
+        p.Event = j.at("Event").get<SystemEvent>();
+    } else {
+        p.Event = SystemEvent::Idle;
+    }
 
-    auto it_value = j.find("Function");
+    it_value = j.find("Function");
     if(it_value != j.end()) {
         p.Function = j.at("Function").get<std::string>();
     } else {
