@@ -131,6 +131,7 @@ nvm use --lts
 ## Flutter Links
 
 https://sanjibsinha.com/notification-class-in-flutter/
+Big Problem No Build on Rasperry 32 Bit
 
 ## Victoria Metrics for Hostrie Data
 
@@ -146,3 +147,7 @@ curl -d 'measurement,tag1=value1,tag2=value2 field1=123,field2=1.23' -X POST 'ht
 https://grafana.com/docs/grafana/latest/setup-grafana/installation/debian/
 
 http://localhost:3000
+
+## PI Links
+
+https://gist.github.com/meinside/0538087cc60a2f0654bb
