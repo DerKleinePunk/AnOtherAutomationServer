@@ -149,3 +149,23 @@ void GlobalFunctions::ShowInternalVars()
         std::cout << entry.first << " => " << entry.second << std::endl;
     }
 }
+
+std::vector<AutomationPage> GlobalFunctions::GetAutomationPages()
+{
+    //Todo _databaseManager->GetAutomationPages();
+    //Todo Replace Server Name / Url
+
+    std::vector<AutomationPage> pages;
+    AutomationPage page1;
+    AutomationPage page2;
+    pages.push_back(page1);
+    pages.push_back(page2);
+    pages[0].Description = "Haus";
+    pages[0].Name = "pageHaus";
+    pages[0].Icon = "http://localhost:8080/resources/icon1.png";
+    pages[1].Description = "Stall";
+    pages[1].Name = "pageStall";
+    pages[1].Icon = "http://localhost:8080/resources/icon2.png";
+
+    return pages;
+}   

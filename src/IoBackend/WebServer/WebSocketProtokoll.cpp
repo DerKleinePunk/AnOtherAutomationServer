@@ -122,8 +122,13 @@ int callback_websocket(struct lws *wsi, enum lws_callback_reasons reason, void *
 			break;
 
 		pmsg = (msg*)(lws_ring_get_element(vhd->ring, &pss->tail));
-		if (!pmsg)
+		if (!pmsg) {
 			break;
+		}
+
+		if (!pmsg->payload) {
+			break;
+		}
 
 		/* notice we allowed for LWS_PRE in the payload already */
 		m = lws_write(wsi, ((unsigned char *)pmsg->payload) + LWS_PRE,

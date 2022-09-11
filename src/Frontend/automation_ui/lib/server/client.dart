@@ -6,6 +6,8 @@ import 'cookie_save.dart';
 import 'data/auto_destination.dart';
 import 'dart:convert';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:image_network/image_network.dart';
 
 import 'home_server_endpoints.dart';
 import 'http/http_stub.dart'
@@ -238,6 +240,17 @@ class ServerClient {
     return _userSettings;
   }
 
+/*ImageNetwork(
+              height: 24,
+              width: 24,
+              image: element.icon,
+              imageCache: CachedNetworkImageProvider(element.icon),
+              debugPrint: true,
+              fullScreen: false,
+              fitAndroidIos : BoxFit.none,
+              fitWeb: BoxFitWeb.contain
+            )
+            */
   Future<List<AdaptiveScaffoldDestination>> loadDestinations() async {
     final uri = HomeServerEndpoints.combine(
         serverUrl, HomeServerEndpoints.automation,
@@ -245,13 +258,14 @@ class ServerClient {
 
     List<AdaptiveScaffoldDestination> resultList = [];
 
+    //Todo Crash Failed Load Icon from Server
     try {
       var result = await apiHttpClient.get(uri);
       var autoDestinations = AutoDestinations.fromJson(result);
       for (var element in autoDestinations.autoDestinations) {
         var entry = AdaptiveScaffoldDestination(
             title: element.description,
-            icon: Icons.data_array,
+            icon: Image.network(element.icon, width: 24, height: 24,),
             name: element.name);
         resultList.add(entry);
       }
@@ -262,7 +276,8 @@ class ServerClient {
     return resultList;
   }
 
-  Future<AutomationPageConfig?> loadAutomationPageConfig(String pageName) async {
+  Future<AutomationPageConfig?> loadAutomationPageConfig(
+      String pageName) async {
     final uri = HomeServerEndpoints.combine(
         serverUrl, HomeServerEndpoints.automation,
         path3: "page/$pageName");
@@ -282,7 +297,7 @@ class ServerClient {
     final uri = HomeServerEndpoints.combine(
         serverUrl, HomeServerEndpoints.automation,
         path3: "Variable");
-    
+
     var requestBody = {
       'id': id,
       'value': value,

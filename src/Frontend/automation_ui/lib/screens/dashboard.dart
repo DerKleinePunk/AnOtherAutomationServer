@@ -349,9 +349,9 @@ class DashboardState extends State<Dashboard> {
   void _mergePages(List<AdaptiveScaffoldDestination> pagesWeb) {
     var newPagesList = [
       AdaptiveScaffoldDestination(
-          title: _getPageTitel(0), icon: Icons.home, name: "internal"),
+          title: _getPageTitel(0), icon: const Icon(Icons.home), name: "internal"),
       AdaptiveScaffoldDestination(
-          title: _getPageTitel(1), icon: Icons.settings, name: "internal"),
+          title: _getPageTitel(1), icon: const Icon(Icons.settings), name: "internal"),
     ];
 
     debugPrint("Add ${pagesWeb.length} pages to dashboard");

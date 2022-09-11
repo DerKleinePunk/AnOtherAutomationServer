@@ -4,6 +4,7 @@
 #include "ServiceEvents/ServiceEventManager.hpp"
 #include "SystemFunktions/NetworkManager.hpp"
 #include "../common/database/DatabaseManager.h"
+#include "Dtos/AutomationPage.hpp"
 
 class GlobalFunctions
 {
@@ -30,7 +31,6 @@ public:
     void RegisterForEvent(const std::vector<SystemEvent>& eventFilter, EventDelegate function, const std::string name);
     void RegisterForEvent(const SystemEvent event, EventDelegate function, const std::string name);
 
-
     std::string ScanAccessPoints(const std::string& interfaceName = "");
 
     void SetInternalVariable(const std::string& name, const std::string& value);
@@ -38,5 +38,6 @@ public:
     std::string GetInternalVariable(const std::string& name, const std::string& defaultValue);
     void ShowInternalVars();
 
+    std::vector<AutomationPage> GetAutomationPages();
 };
 

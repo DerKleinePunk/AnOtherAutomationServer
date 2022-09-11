@@ -2,13 +2,15 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'dart:html';
+
 import '../../../core/extensions.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 
 /// See bottomNavigationBarItem or NavigationRailDestination
 class AdaptiveScaffoldDestination {
   final String title;
-  final IconData icon;
+  final Widget icon;
   final String name;
 
   const AdaptiveScaffoldDestination({
@@ -63,7 +65,7 @@ class AdaptiveScaffoldState extends State<AdaptiveScaffold> {
                 ),
                 for (var d in widget.destinations)
                   ListTile(
-                    leading: Icon(d.icon),
+                    leading: d.icon,
                     title: Text(d.title),
                     selected:
                         widget.destinations.indexOf(d) == widget.currentIndex,
@@ -106,7 +108,7 @@ class AdaptiveScaffoldState extends State<AdaptiveScaffold> {
               destinations: [
                 ...widget.destinations.map(
                   (d) => NavigationRailDestination(
-                    icon: Icon(d.icon),
+                    icon: d.icon,
                     label: Text(d.title),
                   ),
                 ),
@@ -140,7 +142,7 @@ class AdaptiveScaffoldState extends State<AdaptiveScaffold> {
         items: [
           ...widget.destinations.map(
             (d) => BottomNavigationBarItem(
-              icon: Icon(d.icon),
+              icon: d.icon,
               label: d.title,
             ),
           ),

@@ -14,18 +14,7 @@
 
 HttpResponse* AutomationResource::HandlePages(HttpRequest& request, const std::string& method, HttpResponse* result)
 {
-    std::vector<AutomationPage> pages;
-    AutomationPage page1;
-    AutomationPage page2;
-    pages.push_back(page1);
-    pages.push_back(page2);
-    pages[0].Description = "Haus";
-    pages[0].Name = "pageHaus";
-    pages[0].Icon = "http://localhost:8000/resources/icon1.png";
-    pages[1].Description = "Stall";
-    pages[1].Name = "pageStall";
-    pages[1].Icon = "http://localhost:8000/resources/icon2.png";
-
+    const auto pages = _globalFunctions->GetAutomationPages();
     const json jResult = pages;
 
     result->SetContent("application/json", jResult.dump());

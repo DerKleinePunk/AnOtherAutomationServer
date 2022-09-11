@@ -208,7 +208,7 @@ static const struct lws_http_mount proxymount = {
 	/* .cache_reusable */		0,
 	/* .cache_revalidate */		0,
 	/* .cache_intermediaries */	0,
-	/* .origin_protocol */		LWSMPRO_HTTP,	/* files in a dir */
+	/* .origin_protocol */		LWSMPRO_HTTP,	/* this is an proxy */
 	/* .mountpoint_len */		3,		/* char count */
 	/* .basic_auth_login_file */	NULL,
 };
@@ -228,7 +228,7 @@ static const struct lws_http_mount mountWebsocket = {
 	/* .cache_reusable */		0,
 	/* .cache_revalidate */		0,
 	/* .cache_intermediaries */	0,
-	/* .origin_protocol */		LWSMPRO_CALLBACK,	/* files in a dir */
+	/* .origin_protocol */		LWSMPRO_CALLBACK,	/* handle in Code */
 	/* .mountpoint_len */		9,		/* char count */
 	/* .basic_auth_login_file */	NULL,
 };
@@ -238,7 +238,7 @@ static const struct lws_http_mount webpage = {
 	/* .mountpoint */		    "/",		/* mountpoint URL */
 	/* .origin */			    "./webpage", /* serve from dir */
 	/* .def */			        "index.html",	/* default filename */
-	/* .protocol */			    NULL,
+	/* .protocol */			    "http",
 	/* .cgienv */			    NULL,
 	/* .extra_mimetypes */	    &extra_mimetypes,
 	/* .interpret */		    NULL,
@@ -253,8 +253,28 @@ static const struct lws_http_mount webpage = {
 	/* .basic_auth_login_file*/	NULL,
 };
 
-static const struct lws_http_mount basemount = {
+static const struct lws_http_mount resources = {
 	/* .mount_next */		    &webpage,		/* linked-list "next" &proxymount*/
+	/* .mountpoint */		    "/resources",		/* mountpoint URL */
+	/* .origin */			    "./resources", /* serve from dir */
+	/* .def */			        nullptr,	/* default filename */
+	/* .protocol */			    "http",
+	/* .cgienv */			    nullptr,
+	/* .extra_mimetypes */	    &extra_mimetypes,
+	/* .interpret */		    nullptr,
+	/* .cgi_timeout */		    0,
+	/* .cache_max_age */		3600, //1 Stunde
+	/* .auth_mask */		    0,
+	/* .cache_reusable */		0,
+	/* .cache_revalidate */		0,
+	/* .cache_intermediaries */	0,
+	/* .origin_protocol */		LWSMPRO_FILE,	/* files in a dir */
+	/* .mountpoint_len */		10,		/* char count */
+	/* .basic_auth_login_file*/	NULL,
+};
+
+static const struct lws_http_mount basemount = {
+	/* .mount_next */		    &resources,		/* linked-list "next" &proxymount*/
 	/* .mountpoint */		    "/api",		/* mountpoint URL */
 	/* .origin */			    NULL, /* serve from dir */
 	/* .def */			        NULL,	/* default filename */
@@ -268,13 +288,13 @@ static const struct lws_http_mount basemount = {
 	/* .cache_reusable */		0,
 	/* .cache_revalidate */		0,
 	/* .cache_intermediaries */	0,
-	/* .origin_protocol */		LWSMPRO_CALLBACK,	/* files in a dir */
+	/* .origin_protocol */		LWSMPRO_CALLBACK,	/* handle in Code */
 	/* .mountpoint_len */		4,		/* char count */
 	/* .basic_auth_login_file*/	NULL,
 };
 
 static struct lws_protocols protocols[] = {
-    { "http", callback_main, sizeof(struct httpSesssionData), MAX_BUFFER_SIZE, 1, NULL, 0 },//{ "http", lws_callback_http_dummy, 0, 0, 0, NULL, 0 },
+    { "http", callback_main, sizeof(struct httpSesssionData), MAX_BUFFER_SIZE, 1, NULL, 0 },//{ "http", lws_callback_http_dummy, 0, 0, 0, NULL, 0 },//
     { "httpRest", callback_main, sizeof(struct httpSesssionData), MAX_BUFFER_SIZE, 2, NULL, 0 },
     { "websocket", callback_websocket, sizeof(per_session_data__minimal), MAX_BUFFER_SIZE, 3, NULL, 0 },
     LWS_PROTOCOL_LIST_TERM
@@ -495,6 +515,8 @@ int WebServer::MainCallBack(lws *wsi, enum lws_callback_reasons reason, void *us
             * lws_snprintf(pss->path, sizeof(pss->path), "%s",(const char *)in);
             */
 		    
+            //https://stackoverflow.com/questions/28453014/libwebsockets-how-to-store-ip-address-with-request
+
             lws_get_peer_simple(wsi, textBuffer, sizeof(textBuffer));
             LOG(INFO) << "peer_simple " << textBuffer;
 		    //lwsl_notice("%s: HTTP: connection %s, path %s\n", __func__,	(const char *)buf, pss->path);

@@ -55,4 +55,16 @@ set(MAINFONTSOURCE "${MAINFOLDER}/src/IoBackend/PythonRunner/sample.py")
 add_custom_command(TARGET ${project_BIN} POST_BUILD # Adds a post-build event to MyTest
                     COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
                     "${MAINFONTSOURCE}"      # <--this is in-file
-                    $<TARGET_FILE_DIR:${project_BIN}>/sample.py)   
+                    $<TARGET_FILE_DIR:${project_BIN}>/sample.py)
+
+set(MAINFONTSOURCE "${MAINFOLDER}/resources/icon1.png")
+add_custom_command(TARGET ${project_BIN} POST_BUILD # Adds a post-build event to MyTest
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
+                    "${MAINFONTSOURCE}"      # <--this is in-file
+                    $<TARGET_FILE_DIR:${project_BIN}>/resources/icon1.png)
+
+set(MAINFONTSOURCE "${MAINFOLDER}/resources/icon2.png")
+add_custom_command(TARGET ${project_BIN} POST_BUILD # Adds a post-build event to MyTest
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
+                    "${MAINFONTSOURCE}"      # <--this is in-file
+                    $<TARGET_FILE_DIR:${project_BIN}>/resources/icon2.png)
