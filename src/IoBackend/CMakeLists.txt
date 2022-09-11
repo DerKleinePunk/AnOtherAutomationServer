@@ -19,11 +19,11 @@ INCLUDE_DIRECTORIES(${GLIB_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${NM_INCLUDE_DIRS})
 # INCLUDE_DIRECTORIES(libwebsockets)
 
-add_executable(${project_BIN} ${SRCS} ${easylogging_SRCS} ${common_utils_SRCS} ${GPIOHelper_SRCS} ${exception_SRCS})
+add_executable(${project_BIN} ${SRCS} ${easylogging_SRCS} ${common_utils_SRCS} ${GPIOHelper_SRCS} ${exception_SRCS} ${common_database_SRCS} ${common_exceptions_SRCS})
 
 TARGET_LINK_LIBRARIES(${project_BIN} PRIVATE ${Python3_LIBRARIES})
-TARGET_LINK_LIBRARIES(${project_BIN} PRIVATE ${MOSQUITTO_LIBRARIES} ${GLIB_LDFLAGS} ${NM_LIBRARIES})
-TARGET_LINK_LIBRARIES(${project_BIN} PRIVATE websockets)
+TARGET_LINK_LIBRARIES(${project_BIN} PRIVATE ${MOSQUITTO_LIBRARIES} ${GLIB_LDFLAGS} ${NM_LIBRARIES} ${SQLITE3_LIBRARIES})
+TARGET_LINK_LIBRARIES(${project_BIN} PRIVATE websockets GSL)
 TARGET_LINK_LIBRARIES(${project_BIN} PRIVATE "stdc++fs" "uuid")
 TARGET_LINK_LIBRARIES(${project_BIN} PRIVATE "curl")
 

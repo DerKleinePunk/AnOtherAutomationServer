@@ -3,6 +3,8 @@
 #include "../common/easylogging/easylogging++.h"
 #include "../common/utils/CommandLineArgs.h"
 #include "../common/utils/commonutils.h"
+#include "../common/database/DatabaseManager.h"
+
 #include "Backend.hpp"
 #include "Config.hpp"
 #include "GlobalFunctions.hpp"
@@ -66,9 +68,14 @@ int main(int argc, char** argv)
     std::cout << "Starting Simple IO Backend Server" << std::endl;
     START_EASYLOGGINGPP(argc, argv);
 
-    if(utils::FileExists("loggerIoBackend.conf")) {
+    utils::CommandLineArgs commandLineArgs;
+    commandLineArgs.Pharse(argc, argv);
+
+    LOG(INFO) << "App Basepath is " << commandLineArgs.GetBasePath();
+
+    if(utils::FileExists(commandLineArgs.GetBasePath() + "/loggerIoBackend.conf")) {
         // Load configuration from file
-        el::Configurations conf("loggerIoBackend.conf");
+        el::Configurations conf(commandLineArgs.GetBasePath() + "/loggerIoBackend.conf");
         // Now all the loggers will use configuration from file and new loggers
         el::Loggers::setDefaultConfigurations(conf, true);
     }
@@ -76,17 +83,19 @@ int main(int argc, char** argv)
     el::Helpers::setThreadName("MainThread");
     el::Helpers::installPreRollOutCallback(PreRollOutCallback);
 
-    utils::CommandLineArgs commandLineArgs;
-    commandLineArgs.Pharse(argc, argv);
-
     LOG(INFO) << "Starting";
 
     Config* config = new Config();
     config->Load();
 
     auto networkManager = new NetworkManager();
+    LOG(INFO) << "NetworkManager started";
+
     auto eventManager = new ServiceEventManager();
     eventManager->Init();
+    LOG(INFO) << "ServiceEventManager started";
+
+    auto databaseManger = new DatabaseManager(commandLineArgs.GetBasePath() + "/");
 
     GlobalFunctions globalFunctions(config, eventManager, networkManager);
 

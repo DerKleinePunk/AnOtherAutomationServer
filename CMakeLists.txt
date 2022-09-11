@@ -93,6 +93,8 @@ ELSE()
 ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 
 MESSAGE(STATUS "Compiler Flags are ${CMAKE_CXX_FLAGS}")
+include(FetchContent)
+
 #
 # Add Build Targets
 #
