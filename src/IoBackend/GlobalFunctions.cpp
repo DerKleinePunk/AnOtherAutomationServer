@@ -9,12 +9,21 @@
 #include "../common/utils/commonutils.h"
 #include "GlobalFunctions.hpp"
 
-GlobalFunctions::GlobalFunctions(Config* config, ServiceEventManager* serviceEventManager, NetworkManager* networkManager)
+void GlobalFunctions::OnDatabaseStartup(DatabaseState state) const {
+	if(state == DatabaseState::StartupNew) {
+		//Todo CreateTablesMusikInfo();
+	}
+}
+
+GlobalFunctions::GlobalFunctions(Config* config, ServiceEventManager* serviceEventManager, NetworkManager* networkManager, DatabaseManager* databaseManager)
 {
     el::Loggers::getLogger(ELPP_DEFAULT_LOGGER);
     _config = config;
     _serviceEventManager = serviceEventManager;
     _networkManager = networkManager;
+    _databaseManager = databaseManager;
+    auto CDatabaseStartupdelegate = std::bind(&GlobalFunctions::OnDatabaseStartup, this, std::placeholders::_1);
+    _databaseManager->AddStateCallBack(CDatabaseStartupdelegate);
 }
 
 GlobalFunctions::~GlobalFunctions()

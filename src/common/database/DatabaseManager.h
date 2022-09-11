@@ -1,8 +1,10 @@
 #pragma once
 
 #include <sqlite3.h>
+#include "../easylogging/easylogging++.h"
+#include "../version.hpp"
 
-#define DATABASE_SCHEMA_VERSION std::string("0.0.1.0000")
+#define DATABASE_SCHEMA_VERSION std::string(PROJECT_VER".0000")
 
 enum class DatabaseState : unsigned char {
 	StartupNew,

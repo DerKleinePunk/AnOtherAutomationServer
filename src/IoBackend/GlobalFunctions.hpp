@@ -3,6 +3,7 @@
 #include "Config.hpp"
 #include "ServiceEvents/ServiceEventManager.hpp"
 #include "SystemFunktions/NetworkManager.hpp"
+#include "../common/database/DatabaseManager.h"
 
 class GlobalFunctions
 {
@@ -10,10 +11,13 @@ private:
     Config* _config;
     ServiceEventManager* _serviceEventManager;
     NetworkManager* _networkManager;
+    DatabaseManager* _databaseManager;
     std::map<std::string,std::string> _internalVariables;
 
+    void OnDatabaseStartup(DatabaseState state) const;
+
 public:
-    GlobalFunctions(Config* config, ServiceEventManager* serviceEventManager, NetworkManager* networkManager);
+    GlobalFunctions(Config* config, ServiceEventManager* serviceEventManager, NetworkManager* networkManager, DatabaseManager* databaseManager);
     ~GlobalFunctions();
 
     bool IsApiKeyOk(const std::string& value);

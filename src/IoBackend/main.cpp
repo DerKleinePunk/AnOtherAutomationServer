@@ -96,8 +96,8 @@ int main(int argc, char** argv)
     LOG(INFO) << "ServiceEventManager started";
 
     auto databaseManger = new DatabaseManager(commandLineArgs.GetBasePath() + "/");
-
-    GlobalFunctions globalFunctions(config, eventManager, networkManager);
+    
+    GlobalFunctions globalFunctions(config, eventManager, networkManager, databaseManger);
 
     const auto ownWebServer = new WebServer(&globalFunctions);
 
@@ -155,6 +155,8 @@ int main(int argc, char** argv)
     }
 
     auto backend = new Backend(ownWebServer, eventManager, config, runner);
+
+    databaseManger->Init();
     backend->Init();
 
     WriteFunktionText();
@@ -208,8 +210,6 @@ int main(int argc, char** argv)
     eventManager->Deinit();
     delete eventManager;
 
-    delete networkManager;
-
     ownWebServer->Deinit();
     delete ownWebServer;
 
@@ -220,7 +220,12 @@ int main(int argc, char** argv)
     delete connector;
 
     config->Save();
+    
+    databaseManger->Deinit();
+    delete databaseManger;
 
+    delete networkManager;
+    
     LOG(INFO) << "Last LogEntry";
     el::Helpers::uninstallPreRollOutCallback();
 
