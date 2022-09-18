@@ -60,6 +60,11 @@ uint16_t GlobalFunctions::GetServerPort() const
     return _config->GetServerPort();
 }
 
+std::map<const std::string,std::string> GlobalFunctions::GetGobalHttpHeaders()
+{
+    return _config->GetGobalHttpHeaders();
+}
+
 void GlobalFunctions::FireNewEvent(const SystemEvent event, const std::string& parameter)
 {
     _serviceEventManager->FireNewEvent(event, parameter); 

@@ -70,7 +70,7 @@ int callback_websocket(struct lws *wsi, enum lws_callback_reasons reason, void *
 				if(lws_http_cookie_get(wsi, "X-API-KEY", textBuffer, &max) == 0) {
 					apiKey = std::string(textBuffer, max);
 				} else {
-					//LOG(WARNING) << "X-API-KEY not found";
+					LOG(WARNING) << "X-API-KEY not found";
 				}
 
 			}
@@ -82,7 +82,7 @@ int callback_websocket(struct lws *wsi, enum lws_callback_reasons reason, void *
 			if(!connectOk) {
 				if (lws_add_http_common_headers(wsi, HTTP_STATUS_UNAUTHORIZED, "", 0, /* no content len */ &p, end))
 				{
-					lwsl_warn("WebSocket No Cookie found");
+					LOG(WARNING) << "WebSocket No Cookie found or not valid";
 					return 1;
 				}
 

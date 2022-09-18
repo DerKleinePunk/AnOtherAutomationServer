@@ -26,6 +26,7 @@ public:
 
     const std::string GetContentTypeFromFileName(const std::string& fileName) const;
     uint16_t GetServerPort() const;
+    std::map<const std::string,std::string> GetGobalHttpHeaders();
 
     void FireNewEvent(const SystemEvent event, const std::string& parameter);
     void RegisterForEvent(const std::vector<SystemEvent>& eventFilter, EventDelegate function, const std::string name);

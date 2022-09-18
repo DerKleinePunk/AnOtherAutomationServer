@@ -280,6 +280,16 @@ void from_json(const json& j, ConfigFile& p)
         entry2->ComPort = "none";
         p.Resources.push_back(entry2);
     }
+
+    it_value = j.find("GobalHttpHeaders");
+    if(it_value != j.end()) { 
+        p.GobalHttpHeaders = j.at("GobalHttpHeaders").get<std::map<const std::string,std::string>>();
+    } else {
+        p.GobalHttpHeaders.insert(std::pair<const std::string, std::string>("Access-Control-Allow-Origin:", "http://localhost:8000"));
+        p.GobalHttpHeaders.insert(std::pair<const std::string, std::string>("Access-Control-Allow-Credentials:", "true"));
+        p.GobalHttpHeaders.insert(std::pair<const std::string, std::string>("Access-Control-Allow-Methods:", "DELETE, POST, GET, PUT"));
+        p.GobalHttpHeaders.insert(std::pair<const std::string, std::string>("Access-Control-Allow-Headers:", "Content-Type"));
+    }
 }
 
 Config::Config(const std::string& filename)
@@ -388,4 +398,9 @@ std::vector<EventNode> Config::GetEventRoot() const
 std::vector<Resource*> Config::GetResources() const
 {
     return _configFile.Resources;
+}
+
+std::map<const std::string,std::string> Config::GetGobalHttpHeaders()
+{
+    return _configFile.GobalHttpHeaders;
 }

@@ -56,6 +56,7 @@ struct ConfigFile
     std::vector<std::string> WatchTopics;
     std::vector<EventNode> EventRoot;
     std::vector<Resource*> Resources;
+    std::map<const std::string,std::string> GobalHttpHeaders;
 };
 
 class Config
@@ -81,4 +82,5 @@ public:
     std::vector<std::string> GetWatchTopics() const;
     std::vector<EventNode> GetEventRoot() const;
     std::vector<Resource*> GetResources() const;
+    std::map<const std::string,std::string> GetGobalHttpHeaders();
 };

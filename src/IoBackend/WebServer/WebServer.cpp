@@ -13,6 +13,7 @@
 
 // 0 for unlimited
 #define MAX_BUFFER_SIZE 0
+const char* SERVERNAME = "MNEHOMESERVER";
 
 /*
  * Unlike ws, http is a stateless protocol.  This pss only exists for the
@@ -118,12 +119,9 @@ HttpResponse* WebServer::HandleResource(struct lws *wsi, const std::string& url,
     try
     {
         const auto result = resource->Process(request, urlForResource, method);
-        //Todo Put it to Config
-        //Handle Cors Headers global
-        result->SetHeader("Access-Control-Allow-Origin", "http://localhost:8000");
-        result->SetHeader("Access-Control-Allow-Credentials", "true");
-        result->SetHeader("Access-Control-Allow-Methods", "DELETE, POST, GET, PUT");
-        result->SetHeader("Access-Control-Allow-Headers", "Content-Type");
+        for(auto header : _globalHeaders) {
+            result->SetHeader(header.first, header.second);
+        }
 
         return result;
     }
@@ -150,6 +148,12 @@ std::string WebServer::GetReasonText(lws_callback_reasons reason)
             return "LWS_CALLBACK_EVENT_WAIT_CANCELLED";
         case LWS_CALLBACK_FILTER_NETWORK_CONNECTION:
             return "LWS_CALLBACK_FILTER_NETWORK_CONNECTION";
+        case LWS_CALLBACK_ADD_HEADERS:
+            return "LWS_CALLBACK_ADD_HEADERS";
+        case LWS_CALLBACK_HTTP_DROP_PROTOCOL:
+            return "LWS_CALLBACK_HTTP_DROP_PROTOCOL";
+        case LWS_CALLBACK_WSI_DESTROY:
+            return "LWS_CALLBACK_WSI_DESTROY";
         default:
             return "reason " + std::to_string(reason);
     }
@@ -163,6 +167,10 @@ WebServer::WebServer(GlobalFunctions* globalFunctions)
     _serverPort = _globalFunctions->GetServerPort();
     _run = true;
     _webSocketVhostData = nullptr;
+
+    for(auto header : _globalFunctions->GetGobalHttpHeaders()) {
+       _globalHeaders.insert(std::pair<const std::string, std::string>(header.first, header.second));
+    }
 }
 
 WebServer::~WebServer()
@@ -300,6 +308,14 @@ static struct lws_protocols protocols[] = {
     LWS_PROTOCOL_LIST_TERM
 };
 
+static struct lws_protocol_vhost_options mneheaders {
+    /**< *next linked list */ NULL,
+	/**< child linked-list of more options for this node  options*/ NULL,
+	/**< name of name=value pair *name*/ "Access-Control-Allow-Origin", 
+	/**< value of name=value pair value*/"http://localhost:8000"
+};
+
+
 /**
  * @brief Starts the Webserver
  * 
@@ -360,7 +376,8 @@ bool WebServer::Start() {
     info.ka_time = 60; // 60 seconds until connection is suspicious
     info.ka_probes = 10; // 10 probes after ^ time
     info.ka_interval = 10; // 10s interval for sending probes
-
+    info.server_string = SERVERNAME;
+    info.headers = &mneheaders;
     _context = lws_create_context( &info );
     if( !_context) {
         LOG(ERROR) << "libwebsocket init failed";
@@ -639,6 +656,17 @@ int WebServer::MainCallBack(lws *wsi, enum lws_callback_reasons reason, void *us
                 pss->url = nullptr;
             }
 		    break;
+        case LWS_CALLBACK_ADD_HEADERS:
+            if(protocolId == 1) {
+                for(auto header : _globalHeaders) {
+                    if(lws_add_http_header_by_name(wsi,(unsigned char*)header.first.c_str(), (unsigned char*)header.second.c_str(), header.second.length(), &p, end))
+                    {
+                        LOG(WARNING) << "failed write header";
+                        break;
+                    }
+                }
+            }
+            break;
         default:
             //Noting todo
             break;

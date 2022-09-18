@@ -40,7 +40,8 @@ private:
     std::map<const std::string , HttpResourceInfo> _httpResources;
     per_vhost_data__minimal* _webSocketVhostData;
     std::map<std::string, WebSocketClient> _webSocketClients;
-
+    std::map<const std::string,std::string> _globalHeaders;
+    
     void LogCallBack(int level, const char *line);
     void MainLoop();
     HttpResponse* HandleResource(struct lws *wsi, const std::string& url, const std::string& method, const std::string* body);
