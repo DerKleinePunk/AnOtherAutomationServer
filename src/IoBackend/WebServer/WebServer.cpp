@@ -658,8 +658,9 @@ int WebServer::MainCallBack(lws *wsi, enum lws_callback_reasons reason, void *us
 		    break;
         case LWS_CALLBACK_ADD_HEADERS:
             if(protocolId == 1) {
+                struct lws_process_html_args *args = (struct lws_process_html_args *)in;
                 for(auto header : _globalHeaders) {
-                    if(lws_add_http_header_by_name(wsi,(unsigned char*)header.first.c_str(), (unsigned char*)header.second.c_str(), header.second.length(), &p, end))
+                    if(lws_add_http_header_by_name(wsi,(unsigned char*)header.first.c_str(), (unsigned char*)header.second.c_str(), header.second.length(), (unsigned char **)&args->p, (unsigned char *)args->p + args->max_len))
                     {
                         LOG(WARNING) << "failed write header";
                         break;
