@@ -44,7 +44,7 @@ private:
     
     void LogCallBack(int level, const char *line);
     void MainLoop();
-    HttpResponse* HandleResource(struct lws *wsi, const std::string& url, const std::string& method, const std::string* body);
+    HttpResponse* HandleResource(struct lws *wsi, const std::string& url, const std::string& method, const std::string* body, const std::string* host);
     std::string GetReasonText(lws_callback_reasons reason);
 public:
     WebServer(GlobalFunctions* globalFunctions);

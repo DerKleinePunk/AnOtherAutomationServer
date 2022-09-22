@@ -35,6 +35,7 @@ struct httpSesssionData {
     int bodyLength;
     std::string* method;
     std::string* url;
+    std::string* host;
 };
 
 
@@ -91,7 +92,7 @@ void WebServer::MainLoop()
     LOG(DEBUG) << "WebServer Main Loop leaved";
 }
 
-HttpResponse* WebServer::HandleResource(struct lws *wsi, const std::string& url, const std::string& method, const std::string* body)
+HttpResponse* WebServer::HandleResource(struct lws *wsi, const std::string& url, const std::string& method, const std::string* body, const std::string* host)
 {
     HttpResource* resource = nullptr;
     auto urlForResource = url;
@@ -115,7 +116,7 @@ HttpResponse* WebServer::HandleResource(struct lws *wsi, const std::string& url,
         urlForResource = urlForResource.substr(resourceIter->first.size());
     }
 
-    HttpRequest request(wsi, body);
+    HttpRequest request(wsi, body, host);
     try
     {
         const auto result = resource->Process(request, urlForResource, method);
@@ -536,9 +537,12 @@ int WebServer::MainCallBack(lws *wsi, enum lws_callback_reasons reason, void *us
 
             lws_get_peer_simple(wsi, textBuffer, sizeof(textBuffer));
             LOG(INFO) << "peer_simple " << textBuffer;
-		    //lwsl_notice("%s: HTTP: connection %s, path %s\n", __func__,	(const char *)buf, pss->path);
+		    
+            if (lws_hdr_copy(wsi, textBuffer, sizeof(textBuffer), WSI_TOKEN_HOST) > 0) {
+                LOG(INFO) << "host " << textBuffer;
+                pss->host = new std::string(textBuffer);
+            }
 
-            
             if (lws_hdr_copy(wsi, textBuffer, sizeof(textBuffer), WSI_TOKEN_GET_URI) > 0) {
                 LOG(INFO) << "GET Url " << textBuffer;
                 pss->method = new std::string("GET");
@@ -655,6 +659,10 @@ int WebServer::MainCallBack(lws *wsi, enum lws_callback_reasons reason, void *us
                 delete pss->method;
                 pss->url = nullptr;
             }
+            if(pss->host != nullptr) {
+                delete pss->host;
+                pss->host = nullptr;
+            }
 		    break;
         case LWS_CALLBACK_ADD_HEADERS:
             if(protocolId == 1) {
@@ -675,7 +683,7 @@ int WebServer::MainCallBack(lws *wsi, enum lws_callback_reasons reason, void *us
     
     if(weHandleIt) {
         if(readyToHandle) {
-            const auto response = HandleResource(wsi, (*pss->url), (*pss->method), pss->body);
+            const auto response = HandleResource(wsi, (*pss->url), (*pss->method), pss->body, pss->host);
             if(response != nullptr)
             {
                 pss->response = response;

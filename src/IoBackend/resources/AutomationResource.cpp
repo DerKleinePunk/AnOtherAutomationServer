@@ -12,12 +12,18 @@
 #include "../Dtos/AutomationElement.hpp"
 #include "../Dtos/AutomationPage.hpp"
 
+/**
+ * @brief Retrun the List of Automatik pages as Json
+ **/
 HttpResponse* AutomationResource::HandlePages(HttpRequest& request, const std::string& method, HttpResponse* result)
 {
     const auto pages = _globalFunctions->GetAutomationPages();
     const json jResult = pages;
+    
+    auto content = jResult.dump();
+    utils::replaceAll(content, "@HOST@", request.GetHost());
 
-    result->SetContent("application/json", jResult.dump());
+    result->SetContent("application/json", content);
     result->SetCode(HTTP_STATUS_OK);
 
     return result;
