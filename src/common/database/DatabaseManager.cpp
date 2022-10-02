@@ -92,14 +92,14 @@ void DatabaseManager::CreateTable(const std::string &tableName, const std::vecto
 	auto field = fields.begin();
 	while (field != fields.end()) {
 		statementText += field->GetTypeDefText();
-		if (field->autoinc_) {
+		if (field->GetAutoInc()) {
 			statementText += " PRIMARY KEY AUTOINCREMENT";
 		}
 		if (field->notNull_) {
 			statementText += " NOT NULL";
 		}
-		if (field->adddeftext_.size() > 0) {
-			statementText += field->adddeftext_;
+		if (field->GetDefText().size() > 0) {
+			statementText += field->GetDefText();
 		}
 		if (field->IsKeyField()) {
 			if (addKeyText) {

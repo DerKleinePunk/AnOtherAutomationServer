@@ -12,21 +12,25 @@ enum class DatabaseFieldTypes : unsigned char {
 
 class TableField
 {
-	bool key_;
-	DatabaseFieldTypes type_;
+	bool _key;
+	DatabaseFieldTypes _type;
+	bool _autoInc;
+	std::string _addDefText;
 public:
 	std::string name_;
 	std::string value;
-	std::string adddeftext_;
 	bool notNull_;
-	bool autoinc_;
 	int size_;
-
+	
 	TableField();
 	void AddToKey();
-	void NoKey();
+	void SetNoKey();
 	bool IsKeyField() const;
 	void SetType(DatabaseFieldTypes type);
 	std::string GetTypeText() const;
 	std::string GetTypeDefText() const;
+	void SetAutoInc();
+	bool GetAutoInc() const;
+	void SetDefText(const std::string& text);
+	std::string GetDefText() const;
 };

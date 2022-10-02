@@ -2,8 +2,6 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import 'dart:html';
-
 import '../../../core/extensions.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 

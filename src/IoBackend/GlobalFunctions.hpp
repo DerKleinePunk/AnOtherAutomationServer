@@ -15,6 +15,9 @@ private:
     DatabaseManager* _databaseManager;
     std::map<std::string,std::string> _internalVariables;
 
+    void CreateAutoTables() const;
+    void CheckElementTypeTable() const;
+    void CreateDefaultData() const;
     void OnDatabaseStartup(DatabaseState state) const;
 
 public:
