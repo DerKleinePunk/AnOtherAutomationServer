@@ -541,6 +541,8 @@ int WebServer::MainCallBack(lws *wsi, enum lws_callback_reasons reason, void *us
             if (lws_hdr_copy(wsi, textBuffer, sizeof(textBuffer), WSI_TOKEN_HOST) > 0) {
                 LOG(INFO) << "host " << textBuffer;
                 pss->host = new std::string(textBuffer);
+                //Todo finde how Make right
+                *(pss->host) = "http://" + *(pss->host);
             }
 
             if (lws_hdr_copy(wsi, textBuffer, sizeof(textBuffer), WSI_TOKEN_GET_URI) > 0) {

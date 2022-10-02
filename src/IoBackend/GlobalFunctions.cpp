@@ -5,146 +5,153 @@
 #define ELPP_CURR_FILE_PERFORMANCE_LOGGER_ID ELPP_DEFAULT_LOGGER
 #endif
 
+#include "GlobalFunctions.hpp"
+
+#include "../common/database//Statement.h"
+#include "../common/database/TableField.h"
 #include "../common/easylogging/easylogging++.h"
 #include "../common/utils/commonutils.h"
-#include "../common/database/TableField.h"
-#include "../common/database//Statement.h"
-
-#include "GlobalFunctions.hpp"
 
 void GlobalFunctions::CreateAutoTables() const
 {
     std::vector<TableField> fields;
-	TableField field;
+    TableField field;
 
-	field.name_ = "ID";
-	field.SetType(DatabaseFieldTypes::INTEGER);
-	field.SetAutoInc();
+    field.name_ = "ID";
+    field.SetType(DatabaseFieldTypes::INTEGER);
+    field.SetAutoInc();
     fields.push_back(field);
 
-	field.name_ = "NAME";
-	field.SetType(DatabaseFieldTypes::VARCHAR);
-	field.SetNoKey();
-	field.size_ = 256;
-	field.notNull_ = true;
-	fields.push_back(field);
+    field.name_ = "NAME";
+    field.SetType(DatabaseFieldTypes::VARCHAR);
+    field.SetNoKey();
+    field.size_ = 256;
+    field.notNull_ = true;
+    fields.push_back(field);
 
     field.name_ = "DESCRIPTION";
-	field.SetType(DatabaseFieldTypes::VARCHAR);
-	field.SetNoKey();
-	field.size_ = 512;
-	field.notNull_ = true;
-	fields.push_back(field);
+    field.SetType(DatabaseFieldTypes::VARCHAR);
+    field.SetNoKey();
+    field.size_ = 512;
+    field.notNull_ = true;
+    fields.push_back(field);
 
     field.name_ = "ICON";
-	field.SetType(DatabaseFieldTypes::VARCHAR);
-	field.SetNoKey();
-	field.size_ = 512;
-	field.notNull_ = true;
-	fields.push_back(field);
+    field.SetType(DatabaseFieldTypes::VARCHAR);
+    field.SetNoKey();
+    field.size_ = 512;
+    field.notNull_ = true;
+    fields.push_back(field);
 
     _databaseManager->CreateTable("AUTOMATION_PAGES", fields);
-    
+
     auto strSQL = _databaseManager->PrepareSQL("CREATE UNIQUE INDEX AUTOMATION_PAGES_NAME ON AUTOMATION_PAGES(NAME);");
-	_databaseManager->DoDml(strSQL);
+    _databaseManager->DoDml(strSQL);
 
     fields.clear();
 
     field.name_ = "ID";
-	field.SetType(DatabaseFieldTypes::INTEGER);
-	field.SetAutoInc();
+    field.SetType(DatabaseFieldTypes::INTEGER);
+    field.SetAutoInc();
     field.SetNoKey();
-	fields.push_back(field);
+    fields.push_back(field);
 
     field.name_ = "NAME";
-	field.SetType(DatabaseFieldTypes::VARCHAR);
-	field.SetNoKey();
-	field.size_ = 256;
-	field.notNull_ = true;
-	fields.push_back(field);
+    field.SetType(DatabaseFieldTypes::VARCHAR);
+    field.SetNoKey();
+    field.size_ = 256;
+    field.notNull_ = true;
+    fields.push_back(field);
 
     _databaseManager->CreateTable("AUTOMATION_ELEMENT_TYPES", fields);
 
-    strSQL = _databaseManager->PrepareSQL("CREATE UNIQUE INDEX AUTOMATION_ELEMENT_TYPES_NAME ON AUTOMATION_PAGES(NAME);");
-	_databaseManager->DoDml(strSQL);
+    strSQL =
+    _databaseManager->PrepareSQL("CREATE UNIQUE INDEX AUTOMATION_ELEMENT_TYPES_NAME ON AUTOMATION_PAGES(NAME);");
+    _databaseManager->DoDml(strSQL);
 
-	fields.clear();
+    fields.clear();
 
     field.name_ = "ID";
-	field.SetType(DatabaseFieldTypes::INTEGER);
-	field.size_ = -1;
-	field.notNull_ = true;
-	field.SetNoKey();
-	fields.push_back(field);
+    field.SetType(DatabaseFieldTypes::INTEGER);
+    field.size_ = -1;
+    field.notNull_ = true;
+    field.SetNoKey();
+    fields.push_back(field);
 
     field.name_ = "PAGEID";
-	field.SetType(DatabaseFieldTypes::INTEGER);
-	field.size_ = -1;
-	field.notNull_ = true;
-	field.SetDefText(" REFERENCES AUTOMATION_PAGES(ID)");
-	field.SetNoKey();
-	fields.push_back(field);
+    field.SetType(DatabaseFieldTypes::INTEGER);
+    field.size_ = -1;
+    field.notNull_ = true;
+    field.SetDefText(" REFERENCES AUTOMATION_PAGES(ID)");
+    field.SetNoKey();
+    fields.push_back(field);
 
     field.name_ = "TYPEID";
-	field.SetType(DatabaseFieldTypes::INTEGER);
-	field.size_ = -1;
-	field.notNull_ = true;
-	field.SetDefText(" REFERENCES AUTOMATION_ELEMENT_TYPES(ID)");
-	field.SetNoKey();
-	fields.push_back(field);
+    field.SetType(DatabaseFieldTypes::INTEGER);
+    field.size_ = -1;
+    field.notNull_ = true;
+    field.SetDefText(" REFERENCES AUTOMATION_ELEMENT_TYPES(ID)");
+    field.SetNoKey();
+    fields.push_back(field);
 
     field.name_ = "NAME";
-	field.SetType(DatabaseFieldTypes::VARCHAR);
-	field.SetNoKey();
-	field.size_ = 256;
-	field.notNull_ = true;
-	fields.push_back(field);
+    field.SetType(DatabaseFieldTypes::VARCHAR);
+    field.SetNoKey();
+    field.size_ = 256;
+    field.notNull_ = true;
+    fields.push_back(field);
 
-	field.name_ = "DESCRIPTION";
-	field.SetType(DatabaseFieldTypes::VARCHAR);
-	field.SetNoKey();
-	field.size_ = 512;
-	field.notNull_ = false;
-	fields.push_back(field);
+    field.name_ = "DESCRIPTION";
+    field.SetType(DatabaseFieldTypes::VARCHAR);
+    field.SetNoKey();
+    field.size_ = 512;
+    field.notNull_ = false;
+    fields.push_back(field);
 
-	_databaseManager->CreateTable("AUTOMATION_ELEMENT", fields);
+    _databaseManager->CreateTable("AUTOMATION_ELEMENT", fields);
 
     strSQL = _databaseManager->PrepareSQL("CREATE UNIQUE INDEX AUTOMATION_ELEMENT_NAME ON AUTOMATION_ELEMENT(NAME);");
-	_databaseManager->DoDml(strSQL);
+    _databaseManager->DoDml(strSQL);
 }
 
 void GlobalFunctions::CheckElementTypeTable() const
 {
     auto typeId = _databaseManager->GetIdFromStringKey("AUTOMATION_ELEMENT_TYPES", "NAME", "ONOFFBUTTON");
-	if (typeId == -1) {
-        auto strSQL = _databaseManager->PrepareSQL("INSERT INTO AUTOMATION_ELEMENT_TYPES (NAME) VALUES ('ONOFFBUTTON')");
-	   _databaseManager->DoDml(strSQL);
+    if(typeId == -1) {
+        auto strSQL =
+        _databaseManager->PrepareSQL("INSERT INTO AUTOMATION_ELEMENT_TYPES (NAME) VALUES ('ONOFFBUTTON')");
+        _databaseManager->DoDml(strSQL);
     }
 }
 
 void GlobalFunctions::CreateDefaultData() const
 {
-    auto strSQL = _databaseManager->PrepareSQL("INSERT INTO AUTOMATION_PAGES (NAME, DESCRIPTION, ICON) VALUES ('pageHaus', 'Haus', '@HOST@/resources/icon1.png')");
-	_databaseManager->DoDml(strSQL);
+    auto strSQL = _databaseManager->PrepareSQL(
+    "INSERT INTO AUTOMATION_PAGES (NAME, DESCRIPTION, ICON) VALUES ('pageHaus', 'Haus', '@HOST@/resources/icon1.png')");
+    _databaseManager->DoDml(strSQL);
 
-    strSQL = _databaseManager->PrepareSQL("INSERT INTO AUTOMATION_ELEMENT (PAGEID, TYPEID, NAME, DESCRIPTION) VALUES (1, 1, 'lightYard', 'Licht Hof')");
-	_databaseManager->DoDml(strSQL);
+    strSQL = _databaseManager->PrepareSQL(
+    "INSERT INTO AUTOMATION_ELEMENT (PAGEID, TYPEID, NAME, DESCRIPTION) VALUES (1, 1, 'lightYard', 'Licht Hof')");
+    _databaseManager->DoDml(strSQL);
 
-    strSQL = _databaseManager->PrepareSQL("INSERT INTO AUTOMATION_PAGES (NAME, DESCRIPTION, ICON) VALUES ('pageBarn', 'Stall', '@HOST@/resources/icon2.png')");
-	_databaseManager->DoDml(strSQL);
+    strSQL = _databaseManager->PrepareSQL("INSERT INTO AUTOMATION_PAGES (NAME, DESCRIPTION, ICON) VALUES ('pageBarn', "
+                                          "'Stall', '@HOST@/resources/icon2.png')");
+    _databaseManager->DoDml(strSQL);
 
-    strSQL = _databaseManager->PrepareSQL("INSERT INTO AUTOMATION_ELEMENT (PAGEID, TYPEID, NAME, DESCRIPTION) VALUES (2, 1, 'lightLooseBarn', 'Licht Offenstall')");
-	_databaseManager->DoDml(strSQL);    
+    strSQL = _databaseManager->PrepareSQL("INSERT INTO AUTOMATION_ELEMENT (PAGEID, TYPEID, NAME, DESCRIPTION) VALUES "
+                                          "(2, 1, 'lightLooseBarn', 'Licht Offenstall')");
+    _databaseManager->DoDml(strSQL);
 }
 
-void GlobalFunctions::OnDatabaseStartup(DatabaseState state) const {
-	if(state == DatabaseState::StartupNew) {
-		LOG(DEBUG) << "Create New Database";
+void GlobalFunctions::OnDatabaseStartup(DatabaseState state) const
+{
+    if(state == DatabaseState::StartupNew) {
+        LOG(DEBUG) << "Create New Database";
 
         CreateAutoTables();
         CheckElementTypeTable();
         CreateDefaultData();
-	} else {
+    } else {
         CheckElementTypeTable();
     }
 }
@@ -176,13 +183,11 @@ std::string GlobalFunctions::GetApiKey() const
 
 const std::string GlobalFunctions::GetContentTypeFromFileName(const std::string& fileName) const
 {
-    if(utils::hasEnding(fileName, ".html") || utils::hasEnding(fileName, ".htm"))
-    {
+    if(utils::hasEnding(fileName, ".html") || utils::hasEnding(fileName, ".htm")) {
         return "text/html";
     }
 
-    if(utils::hasEnding(fileName, ".css"))
-    {
+    if(utils::hasEnding(fileName, ".css")) {
         return "text/css";
     }
 
@@ -194,30 +199,31 @@ uint16_t GlobalFunctions::GetServerPort() const
     return _config->GetServerPort();
 }
 
-std::map<const std::string,std::string> GlobalFunctions::GetGobalHttpHeaders()
+std::map<const std::string, std::string> GlobalFunctions::GetGobalHttpHeaders()
 {
     return _config->GetGobalHttpHeaders();
 }
 
 void GlobalFunctions::FireNewEvent(const SystemEvent event, const std::string& parameter)
 {
-    _serviceEventManager->FireNewEvent(event, parameter); 
+    _serviceEventManager->FireNewEvent(event, parameter);
 }
 
 /**
  * @brief Register Callback for System Events
- * 
+ *
  * @param eventFilter array of the Filter for EvemtTypes empty array => All Events
  * @param function the callback function
  * @param Name the Name Consumer (Loging)
  */
-void GlobalFunctions::RegisterForEvent(const std::vector<SystemEvent>& eventFilter, EventDelegate function, const std::string name) {
+void GlobalFunctions::RegisterForEvent(const std::vector<SystemEvent>& eventFilter, EventDelegate function, const std::string name)
+{
     _serviceEventManager->RegisterMe(eventFilter, function, name);
 }
 
 /**
  * @brief Register Callback for System Events
- * 
+ *
  * @param eventFilter the Filter for EvemtTypes
  * @param function the callback function
  * @param Name the Name Consumer (Loging)
@@ -261,8 +267,8 @@ std::string GlobalFunctions::GetInternalVariable(const std::string& name) const
     std::string result("");
 
     const auto findIt = _internalVariables.find(name);
-    if( findIt != _internalVariables.end()) {
-        result = findIt->second; 
+    if(findIt != _internalVariables.end()) {
+        result = findIt->second;
     }
 
     return result;
@@ -273,8 +279,8 @@ std::string GlobalFunctions::GetInternalVariable(const std::string& name, const 
     std::string result(defaultValue);
 
     const auto findIt = _internalVariables.find(name);
-    if( findIt != _internalVariables.end()) {
-        result = findIt->second; 
+    if(findIt != _internalVariables.end()) {
+        result = findIt->second;
     } else {
         _internalVariables.insert(std::pair<std::string, std::string>(name, defaultValue));
     }
@@ -294,19 +300,29 @@ void GlobalFunctions::ShowInternalVars()
  **/
 std::vector<AutomationPage> GlobalFunctions::GetAutomationPages()
 {
-    //Todo _databaseManager->GetAutomationPages();
+    // Todo _databaseManager->GetAutomationPages();
 
     std::vector<AutomationPage> pages;
-    AutomationPage page1;
-    AutomationPage page2;
-    pages.push_back(page1);
-    pages.push_back(page2);
-    pages[0].Description = "Haus";
-    pages[0].Name = "pageHaus";
-    pages[0].Icon = "http://@HOST@/resources/icon1.png";
-    pages[1].Description = "Stall";
-    pages[1].Name = "pageStall";
-    pages[1].Icon = "http://@HOST@/resources/icon2.png";
+    
+    auto sqlText = "select NAME, DESCRIPTION, ICON from AUTOMATION_PAGES";
+
+    auto query = _databaseManager->CreateQuery(sqlText);
+    if(query->Eof()) {
+        delete query;
+        return pages;
+    }
+
+    if(query->Execute() > 0) {
+        while(!query->Eof()) {
+            AutomationPage page;
+            page.Name = query->GetColumnText(0);
+            page.Description = query->GetColumnText(1);
+            page.Icon = query->GetColumnText(2);
+            pages.push_back(page);
+            query->NextRow();
+        }
+    }
+    delete query;
 
     return pages;
-}   
+}
