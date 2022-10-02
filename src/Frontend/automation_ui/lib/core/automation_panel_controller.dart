@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/panel_value_model.dart';
+import '../models/panel_page_changed.dart';
 import 'client_helper.dart';
 import '../server/data/auto_destination.dart';
 import '../component/widget/panels.dart';
@@ -86,6 +87,9 @@ class AutomationPanelController {
             valueMapNotifier.addEntry(entry.id, PanelValueEntry(entry.value, ""));
           }
         }
+        
+        var panelChangedNotifier = Provider.of<PanelChangedMap>(_context!, listen: false);
+        panelChangedNotifier.addEntry(pageName, "LOADED");
       } catch (exp) {
         debugPrint("loadPage $exp");
       }

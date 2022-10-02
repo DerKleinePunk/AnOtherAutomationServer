@@ -8,6 +8,7 @@ import '../core/automation_panel_controller.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:provider/provider.dart';
 import '../models/chat_message_model.dart';
+import '../models/panel_page_changed.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
@@ -39,6 +40,8 @@ class DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
+    var panelChangedNotifier = Provider.of<PanelChangedMap>(context, listen: false);
+    panelChangedNotifier.addListener(panelChanged);
     if (_listPages.isNotEmpty) {
       return _mainPage(_webPages);
     }
@@ -92,6 +95,7 @@ class DashboardState extends State<Dashboard> {
   Widget _mainPage(List<AdaptiveScaffoldDestination>? pages) {
     String title = _getPageTitel(_pageIndex);
     _mergePages(pages!);
+   
     return AdaptiveScaffold(
         title: Text(title),
         actions: [
@@ -349,9 +353,13 @@ class DashboardState extends State<Dashboard> {
   void _mergePages(List<AdaptiveScaffoldDestination> pagesWeb) {
     var newPagesList = [
       AdaptiveScaffoldDestination(
-          title: _getPageTitel(0), icon: const Icon(Icons.home), name: "internal"),
+          title: _getPageTitel(0),
+          icon: const Icon(Icons.home),
+          name: "internal"),
       AdaptiveScaffoldDestination(
-          title: _getPageTitel(1), icon: const Icon(Icons.settings), name: "internal"),
+          title: _getPageTitel(1),
+          icon: const Icon(Icons.settings),
+          name: "internal"),
     ];
 
     debugPrint("Add ${pagesWeb.length} pages to dashboard");
@@ -360,6 +368,12 @@ class DashboardState extends State<Dashboard> {
       newPagesList.add(entry);
     }
     _listPages = newPagesList;
+  }
+
+  void panelChanged()
+  {
+    debugPrint("panelChanged");
+    setState(() {});
   }
 } // Class
 

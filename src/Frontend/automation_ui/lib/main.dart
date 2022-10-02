@@ -12,6 +12,7 @@ import 'package:provider/provider.dart';
 
 import 'models/chat_message_model.dart';
 import 'models/panel_value_model.dart';
+import 'models/panel_page_changed.dart';
 
 late SharedPreferences preferences;
 
@@ -60,7 +61,8 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
          ChangeNotifierProvider(create: (context) => ChatMessageList()),
-         ChangeNotifierProvider(create: (context) => PanelValueMap())
+         ChangeNotifierProvider(create: (context) => PanelValueMap()),
+         ChangeNotifierProvider(create: (context) => PanelChangedMap())
       ],
       child: NeumorphicApp(
         onGenerateTitle: (context) {
