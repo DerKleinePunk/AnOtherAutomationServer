@@ -6,13 +6,18 @@
 using json = nlohmann::json;
 
 enum class AutomationElementType {
+    UNDEF,
     ONOFFBUTTON,
-    
 };
 
 NLOHMANN_JSON_SERIALIZE_ENUM( AutomationElementType, {
+    {AutomationElementType::UNDEF, "UNDEF"},
     {AutomationElementType::ONOFFBUTTON, "ONOFFBUTTON"},
+   
 })
+
+AutomationElementType StringToAutomationElementType(const std::string& value);
+std::ostream& operator<<(std::ostream& os, const AutomationElementType c);
 
 struct AutomationElement
 {
@@ -26,7 +31,6 @@ struct AutomationElements {
     std::string Name;
     std::vector<AutomationElement> Elements;
 };
-
 
 void to_json(json& j, const AutomationElement& p);
 void to_json(json& j, const AutomationElements& p);

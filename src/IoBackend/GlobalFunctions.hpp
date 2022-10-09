@@ -5,6 +5,7 @@
 #include "SystemFunktions/NetworkManager.hpp"
 #include "../common/database/DatabaseManager.h"
 #include "Dtos/AutomationPage.hpp"
+#include "Dtos/AutomationElement.hpp"
 
 class GlobalFunctions
 {
@@ -43,5 +44,6 @@ public:
     void ShowInternalVars();
 
     std::vector<AutomationPage> GetAutomationPages();
+    AutomationElements GetAutomationElements(const std::string& pageName);
 };
 

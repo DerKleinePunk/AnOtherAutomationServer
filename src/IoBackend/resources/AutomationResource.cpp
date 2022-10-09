@@ -32,35 +32,18 @@ HttpResponse* AutomationResource::HandlePages(HttpRequest& request, const std::s
 HttpResponse*
 AutomationResource::HandleLoadPage(HttpRequest& request, const std::string& method, HttpResponse* result, const std::string& pageName)
 {
-    AutomationElements elements;
-    if(pageName == "pageHaus") {
-
-        elements.Name = "pageHaus";
-        AutomationElement element;
-        element.Description = "Hof beleuchtung";
-        element.Id = "hofbel";
-        element.TypeName = AutomationElementType::ONOFFBUTTON;
-        element.Value = _globalFunctions->GetInternalVariable(element.Id, "OFF");
-        elements.Elements.push_back(element);
-
-    } else if(pageName == "pageStall") {
-        elements.Name = "pageStall";
-        AutomationElement element;
-        element.Description = "Offenstall Beleuchtung";
-        element.Id = "offenstallbel";
-        element.TypeName = AutomationElementType::ONOFFBUTTON;
-        element.Value = _globalFunctions->GetInternalVariable(element.Id, "ON");
-        elements.Elements.push_back(element);
-    }
-
+    const auto elements = _globalFunctions->GetAutomationElements(pageName);
+    
     if(elements.Elements.size() == 0) {
         result->SetCode(HTTP_STATUS_NOT_FOUND);
         return result;
     }
 
     const json jResult = elements;
+    auto content = jResult.dump();
+    utils::replaceAll(content, "@HOST@", request.GetHost());
 
-    result->SetContent("application/json", jResult.dump());
+    result->SetContent("application/json", content);
     result->SetCode(HTTP_STATUS_OK);
 
     return result;

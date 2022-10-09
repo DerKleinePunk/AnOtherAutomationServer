@@ -326,3 +326,52 @@ std::vector<AutomationPage> GlobalFunctions::GetAutomationPages()
 
     return pages;
 }
+
+/**
+ * @brief Retrun the List Elements of an Automatik Page
+ **/
+AutomationElements GlobalFunctions::GetAutomationElements(const std::string& pageName)
+{
+    AutomationElements elements;
+
+    std::string sqlText = "select ID from AUTOMATION_PAGES where NAME = '";
+    sqlText += pageName + "'";
+    
+    auto query = _databaseManager->CreateQuery(sqlText);
+    if(query->Eof()) {
+        delete query;
+        return elements;
+    }
+
+    std::string pageId;
+    if(query->Execute() > 0) {
+        if(!query->Eof()) {
+            pageId = query->GetColumnText(0);
+            query->NextRow();
+        }
+    }
+
+    sqlText = "select AUTOMATION_ELEMENT.NAME, DESCRIPTION, AUTOMATION_ELEMENT_TYPES.NAME from AUTOMATION_ELEMENT, AUTOMATION_ELEMENT_TYPES where TYPEID = AUTOMATION_ELEMENT_TYPES.ID and PAGEID = ";
+    sqlText += pageId + " order by AUTOMATION_ELEMENT.ID";
+
+    query = _databaseManager->CreateQuery(sqlText);
+    if(query->Eof()) {
+        delete query;
+        return elements;
+    }
+
+    if(query->Execute() > 0) {
+        while(!query->Eof()) {
+            elements.Name = pageName;
+            AutomationElement element;
+            element.Id = query->GetColumnText(0);
+            element.Description = query->GetColumnText(1);
+            element.TypeName = StringToAutomationElementType(query->GetColumnText(2));
+            element.Value = GetInternalVariable(element.Id, "OFF");
+            elements.Elements.push_back(element);
+            query->NextRow();
+        }
+    }
+
+    return elements;
+}

@@ -341,15 +341,7 @@ class DashboardState extends State<Dashboard> {
 
     return "Missing Tile for Index $pageIndex";
   }
-
-  //TODO Later us this to Update Screen when Pages Updatet in DB (Message Inform Us)
-  void _loadDestinations() async {
-    CoreClientHelper.getClient().loadDestinations().then((resultWeb) => () {
-          _mergePages(resultWeb);
-          //setState(() {});
-        });
-  }
-
+  
   void _mergePages(List<AdaptiveScaffoldDestination> pagesWeb) {
     var newPagesList = [
       AdaptiveScaffoldDestination(
