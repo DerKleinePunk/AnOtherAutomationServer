@@ -154,3 +154,8 @@ https://gist.github.com/meinside/0538087cc60a2f0654bb
 
 Deteckt USB Plugin in
 https://www.raspberry-pi-geek.com/Archive/2015/12/Controlling-the-Raspberry-Pi-with-Android-via-the-WebSocket-protocol/(offset)/4
+
+## Flutter as APP on PI
+
+https://mechatronicsblog.com/flutter-on-raspberry-pi-with-flutter-pi/
+https://github.com/ardera/flutter-pi
