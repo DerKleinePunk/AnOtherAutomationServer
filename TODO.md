@@ -158,4 +158,5 @@ https://www.raspberry-pi-geek.com/Archive/2015/12/Controlling-the-Raspberry-Pi-w
 ## Flutter as APP on PI
 
 https://mechatronicsblog.com/flutter-on-raspberry-pi-with-flutter-pi/
-https://github.com/ardera/flutter-pi
+[flutter-pi](https://github.com/ardera/flutter-pi)
+[reTerminal-build-UI-using-Flutter](https://wiki.seeedstudio.com/reTerminal-build-UI-using-Flutter/)
