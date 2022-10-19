@@ -31,7 +31,8 @@ class DashboardState extends State<Dashboard> {
   @override
   void initState() {
     _msgtext.text = "";
-    CoreClientHelper.getClient().addListener(_onWebSocketMessage);
+    CoreClientHelper.getClient().addListenerMessage(_onWebSocketMessage);
+    CoreClientHelper.getClient().addListenerClose(_onWebSocketClose);
     CoreClientHelper.getClient().addListnerPlayerState(_onPLayerState);
     _panelController = AutomationPanelController();
     _panelController.init(context);
@@ -287,7 +288,7 @@ class DashboardState extends State<Dashboard> {
     );
   }
 
-  _onWebSocketMessage(String wath, String message) {
+  void _onWebSocketMessage(String wath, String message) {
     debugPrint("Dashboard Websocket $wath $message");
     if (wath == "Text") {
       var chatMessageNotifier =
@@ -297,9 +298,20 @@ class DashboardState extends State<Dashboard> {
     }
   }
 
+  void _onWebSocketClose() async
+  {
+    await CoreClientHelper.getClient().removeSessionIfExists();
+    await CoreClientHelper.clearAuthStorage();
+    if (!mounted) return;
+    await Navigator.of(context).pushReplacementNamed('dashboard');
+  }
+
   @override
   void dispose() {
-    CoreClientHelper.getClient().removeListener(_onWebSocketMessage);
+    var panelChangedNotifier = Provider.of<PanelChangedMap>(context, listen: false);
+    panelChangedNotifier.removeListener(panelChanged);
+    CoreClientHelper.getClient().removeListenerMessage(_onWebSocketMessage);
+    CoreClientHelper.getClient().removeListenerClose(_onWebSocketClose);
     _panelController.dispose();
     super.dispose();
   }

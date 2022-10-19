@@ -1,3 +1,5 @@
+import 'dart:js_util';
+
 class AutoDestination {
   final String description;
   final String name;
@@ -35,16 +37,21 @@ class AutomationElement {
   final String description;
   final String id;
   final String typeName;
+  final String setParameter;
+  final String valueParameter;
   final String value;
+  
 
   AutomationElement(
-      {required this.description, required this.id, required this.typeName, required this.value});
+      {required this.description, required this.id, required this.typeName, required this.setParameter, required this.valueParameter, required this.value});
 
   factory AutomationElement.fromJson(Map<String, dynamic> json) {
     return AutomationElement(
         description: json['description'],
         id: json['id'],
         typeName: json['typeName'],
+        setParameter: json['setParameter'],
+        valueParameter: json['valueParameter'],
         value: json['value']);
   }
 }

@@ -24,6 +24,8 @@ struct AutomationElement
     std::string Description;
     std::string Id;
     AutomationElementType TypeName;
+    std::string SetParameter;
+    std::string ValueParameter;
     std::string Value;
 };
 

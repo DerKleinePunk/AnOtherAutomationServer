@@ -179,7 +179,7 @@ class ServerClient {
     password = null;
   }
 
-  addListener(OnMessageCallback callback) {
+  addListenerMessage(OnMessageCallback callback) {
     if (_messageClient == null) {
       debugPrint("messageClient is null");
     } else {
@@ -187,11 +187,27 @@ class ServerClient {
     }
   }
 
-  removeListener(OnMessageCallback callback) {
+  removeListenerMessage(OnMessageCallback callback) {
     if (_messageClient == null) {
       debugPrint("messageClient is null");
     } else {
       _messageClient?.removeListenerMessage(callback);
+    }
+  }
+
+  addListenerClose(OnCloseCallback callback) {
+    if (_messageClient == null) {
+      debugPrint("messageClient is null");
+    } else {
+      _messageClient?.addListenerClose(callback);
+    }
+  }
+
+  removeListenerClose(OnCloseCallback callback) {
+    if (_messageClient == null) {
+      debugPrint("messageClient is null");
+    } else {
+      _messageClient?.removeListenerClose(callback);
     }
   }
 

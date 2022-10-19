@@ -87,6 +87,14 @@ class ServerMessageClient {
     _listenersMessage.remove(callback);
   }
 
+  addListenerClose(OnCloseCallback callback) {
+    _listenersClose.add(callback);
+  }
+
+  removeListenerClose(OnCloseCallback callback) {
+    _listenersClose.remove(callback);
+  }
+  
   isConnected() {
     return _connected;
   }

@@ -25,6 +25,8 @@ void to_json(json& j, const AutomationElement& p)
         { "description", p.Description }, 
         { "id", p.Id },
         { "typeName", p.TypeName },
+        { "setParameter", p.SetParameter },
+        { "valueParameter", p.ValueParameter },
         { "value", p.Value},
     };
 }

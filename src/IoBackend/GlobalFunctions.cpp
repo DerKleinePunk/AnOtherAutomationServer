@@ -76,6 +76,7 @@ void GlobalFunctions::CreateAutoTables() const
     field.size_ = -1;
     field.notNull_ = true;
     field.SetNoKey();
+    field.SetAutoInc();
     fields.push_back(field);
 
     field.name_ = "PAGEID";
@@ -108,6 +109,20 @@ void GlobalFunctions::CreateAutoTables() const
     field.notNull_ = false;
     fields.push_back(field);
 
+    field.name_ = "SETPARAMETER";
+    field.SetType(DatabaseFieldTypes::VARCHAR);
+    field.SetNoKey();
+    field.size_ = 256;
+    field.notNull_ = true;
+    fields.push_back(field);
+
+    field.name_ = "VALUEPARAMETER";
+    field.SetType(DatabaseFieldTypes::VARCHAR);
+    field.SetNoKey();
+    field.size_ = 256;
+    field.notNull_ = true;
+    fields.push_back(field);
+
     _databaseManager->CreateTable("AUTOMATION_ELEMENT", fields);
 
     strSQL = _databaseManager->PrepareSQL("CREATE UNIQUE INDEX AUTOMATION_ELEMENT_NAME ON AUTOMATION_ELEMENT(NAME);");
@@ -131,15 +146,15 @@ void GlobalFunctions::CreateDefaultData() const
     _databaseManager->DoDml(strSQL);
 
     strSQL = _databaseManager->PrepareSQL(
-    "INSERT INTO AUTOMATION_ELEMENT (PAGEID, TYPEID, NAME, DESCRIPTION) VALUES (1, 1, 'lightYard', 'Licht Hof')");
+    "INSERT INTO AUTOMATION_ELEMENT (PAGEID, TYPEID, NAME, DESCRIPTION, SETPARAMETER, VALUEPARAMETER) VALUES (1, 1, 'lightYard', 'Licht Hof', 'SETHOFLIGHT', 'HOFLIGHT')");
     _databaseManager->DoDml(strSQL);
 
     strSQL = _databaseManager->PrepareSQL("INSERT INTO AUTOMATION_PAGES (NAME, DESCRIPTION, ICON) VALUES ('pageBarn', "
                                           "'Stall', '@HOST@/resources/icon2.png')");
     _databaseManager->DoDml(strSQL);
 
-    strSQL = _databaseManager->PrepareSQL("INSERT INTO AUTOMATION_ELEMENT (PAGEID, TYPEID, NAME, DESCRIPTION) VALUES "
-                                          "(2, 1, 'lightLooseBarn', 'Licht Offenstall')");
+    strSQL = _databaseManager->PrepareSQL("INSERT INTO AUTOMATION_ELEMENT (PAGEID, TYPEID, NAME, DESCRIPTION, SETPARAMETER, VALUEPARAMETER) VALUES "
+                                          "(2, 1, 'lightLooseBarn', 'Licht Offenstall', 'SETLOOSEBARN', 'LOOSEBARN')");
     _databaseManager->DoDml(strSQL);
 }
 
@@ -300,8 +315,6 @@ void GlobalFunctions::ShowInternalVars()
  **/
 std::vector<AutomationPage> GlobalFunctions::GetAutomationPages()
 {
-    // Todo _databaseManager->GetAutomationPages();
-
     std::vector<AutomationPage> pages;
     
     auto sqlText = "select NAME, DESCRIPTION, ICON from AUTOMATION_PAGES";
@@ -351,7 +364,9 @@ AutomationElements GlobalFunctions::GetAutomationElements(const std::string& pag
         }
     }
 
-    sqlText = "select AUTOMATION_ELEMENT.NAME, DESCRIPTION, AUTOMATION_ELEMENT_TYPES.NAME from AUTOMATION_ELEMENT, AUTOMATION_ELEMENT_TYPES where TYPEID = AUTOMATION_ELEMENT_TYPES.ID and PAGEID = ";
+    delete query;
+
+    sqlText = "select AUTOMATION_ELEMENT.NAME, DESCRIPTION, AUTOMATION_ELEMENT_TYPES.NAME, SETPARAMETER, VALUEPARAMETER from AUTOMATION_ELEMENT, AUTOMATION_ELEMENT_TYPES where TYPEID = AUTOMATION_ELEMENT_TYPES.ID and PAGEID = ";
     sqlText += pageId + " order by AUTOMATION_ELEMENT.ID";
 
     query = _databaseManager->CreateQuery(sqlText);
@@ -367,11 +382,14 @@ AutomationElements GlobalFunctions::GetAutomationElements(const std::string& pag
             element.Id = query->GetColumnText(0);
             element.Description = query->GetColumnText(1);
             element.TypeName = StringToAutomationElementType(query->GetColumnText(2));
+            element.SetParameter = query->GetColumnText(3);
+            element.ValueParameter = query->GetColumnText(4);
             element.Value = GetInternalVariable(element.Id, "OFF");
             elements.Elements.push_back(element);
             query->NextRow();
         }
     }
 
+    delete query;
     return elements;
 }

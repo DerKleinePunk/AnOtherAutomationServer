@@ -24,7 +24,7 @@ class AudioPlayerService {
   AudioPlayerService(this._serverClient);
 
   init() {
-    _serverClient.addListener(_onWebSocketMessage);
+    _serverClient.addListenerMessage(_onWebSocketMessage);
     _audioPlayer = AudioPlayer(
         mode: PlayerMode.MEDIA_PLAYER, playerId: 'mneHomeAppPLayer');
     _audioPlayerNotification = AudioPlayer(
@@ -149,6 +149,7 @@ class AudioPlayerService {
   }
 
   void dispose() {
+    _serverClient.removeListenerMessage(_onWebSocketMessage);
     //_audioPlayer.stop();
     _audioPlayer.dispose();
     //_audioPlayerNotification.stop();

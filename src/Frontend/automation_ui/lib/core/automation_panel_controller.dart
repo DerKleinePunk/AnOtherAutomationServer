@@ -15,7 +15,7 @@ class AutomationPanelController {
 
   void init(BuildContext context) {
     _context = context;
-    CoreClientHelper.getClient().addListener(_onWebSocketMessage);
+    CoreClientHelper.getClient().addListenerMessage(_onWebSocketMessage);
   }
 
   void _onWebSocketMessage(String wath, String message) {
@@ -51,15 +51,15 @@ class AutomationPanelController {
     return SwitchPanelValue.waiting;
   }
 
-  void switchPanelSet(String id, bool value) {
+  void switchPanelSet(String idSet, String idGet, bool value) {
     var valueMapNotifier = Provider.of<PanelValueMap>(_context!, listen: false);
-    var oldValue = valueMapNotifier.getValue(id);
+    var oldValue = valueMapNotifier.getValue(idGet);
     if (value && oldValue != "WAIT") {
-      CoreClientHelper.getClient().setValueForId(id, "ON");
-      valueMapNotifier.updateEntry(id, "WAIT");
+      CoreClientHelper.getClient().setValueForId(idSet, "ON");
+      valueMapNotifier.updateEntry(idGet, "WAIT");
     } else if (oldValue != "WAIT") {
-      CoreClientHelper.getClient().setValueForId(id, "OFF");
-      valueMapNotifier.updateEntry(id, "WAIT");
+      CoreClientHelper.getClient().setValueForId(idSet, "OFF");
+      valueMapNotifier.updateEntry(idGet, "WAIT");
     }
   }
 
@@ -80,11 +80,11 @@ class AutomationPanelController {
         _panels[value.name] = List.empty(growable: true); 
         for (AutomationElement entry in value.elements) {
           if (entry.typeName == "ONOFFBUTTON") {
-            var panel = Panels.getSwitchPanel(entry.description, entry.id,
-                switchPanelGet, switchPanelSet, false);
+            var panel = Panels.getSwitchPanel(entry.description, entry.id, entry.setParameter, entry.valueParameter,
+                switchPanelGet, switchPanelSet);
             _panels[value.name]!.add(panel);
             var valueMapNotifier = Provider.of<PanelValueMap>(_context!, listen: false);
-            valueMapNotifier.addEntry(entry.id, PanelValueEntry(entry.value, ""));
+            valueMapNotifier.addEntry(entry.valueParameter, PanelValueEntry(entry.value, ""));
           }
         }
         
@@ -99,7 +99,7 @@ class AutomationPanelController {
   }
 
   void dispose() {
-    CoreClientHelper.getClient().removeListener(_onWebSocketMessage);
+    CoreClientHelper.getClient().removeListenerMessage(_onWebSocketMessage);
     _panels.clear();
   }
 }

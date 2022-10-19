@@ -6,12 +6,12 @@ import '../../models/panel_value_model.dart';
 enum SwitchPanelValue { on, off, waiting }
 
 typedef GetStateCallback = SwitchPanelValue Function(String id);
-typedef SetStateCallback = void Function(String id, bool value);
+typedef SetStateCallback = void Function(String idSet, String idGet, bool value);
 
 class Panels {
-  static getSwitchPanel(String title, String id, GetStateCallback getcallback,
-      SetStateCallback setCallback, bool isOn) {
-    return SwitchPanel(title, id, getcallback, setCallback);
+  static getSwitchPanel(String title, String id, String setParameter, String valueParameter, GetStateCallback getcallback,
+      SetStateCallback setCallback) {
+    return SwitchPanel(title, id, getcallback, setCallback, setParameter, valueParameter);
   }
 }
 
@@ -20,8 +20,10 @@ class SwitchPanel extends StatefulWidget {
   final String _id;
   final GetStateCallback _getcallback;
   final SetStateCallback _setcallback;
+  final String _setParameter;
+  final String _valueParameter;
 
-  const SwitchPanel(this._title, this._id, this._getcallback, this._setcallback,
+  const SwitchPanel(this._title, this._id, this._getcallback, this._setcallback, this._setParameter, this._valueParameter,
       {Key? key})
       : super(key: key);
 
@@ -33,7 +35,7 @@ class SwitchPanelState extends State<SwitchPanel> {
   @override
   Widget build(BuildContext context) {
     return Consumer<PanelValueMap>(builder: (context, value, child) {
-      SwitchPanelValue switchValue = widget._getcallback(widget._id);
+      SwitchPanelValue switchValue = widget._getcallback(widget._valueParameter);
       bool isOn = true;
       if (switchValue == SwitchPanelValue.off) {
         isOn = false;
@@ -56,7 +58,7 @@ class SwitchPanelState extends State<SwitchPanel> {
                       color: Colors.black),
                   textStyle: NeumorphicTextStyle(fontSize: 18)),
               Visibility(
-                  visible: value.getValue(widget._id) == "WAIT",
+                  visible: value.getValue(widget._valueParameter) == "WAIT",
                   child: const CircularProgressIndicator(color: Colors.blue))
               /*NeumorphicSwitch(
                       style: const NeumorphicSwitchStyle(
@@ -69,7 +71,7 @@ class SwitchPanelState extends State<SwitchPanel> {
                     ),*/
             ])),
         onTap: () {
-          widget._setcallback(widget._id, !isOn);
+          widget._setcallback(widget._setParameter, widget._valueParameter, !isOn);
         },
       );
     });

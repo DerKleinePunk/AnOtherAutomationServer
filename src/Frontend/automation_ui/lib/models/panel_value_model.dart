@@ -20,7 +20,11 @@ class PanelValueMap extends ChangeNotifier {
   }
 
   String getValue(String varName) {
-    return _panelValueMap[varName]!.value;
+    if(_panelValueMap.containsKey(varName)) {
+      return _panelValueMap[varName]!.value;
+    }
+    debugPrint("getValue $varName not found");
+    return "";
   }
 }
 
