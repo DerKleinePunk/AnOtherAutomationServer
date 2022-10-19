@@ -43,7 +43,10 @@ void Backend::EventCallback(const SystemEvent event, const std::string& paramete
 
 void Backend::Run(const std::string& function, const std::map<std::string, std::string>& parameters)
 {
-    LOG(DEBUG) << "Try to run " << function << " with "; // << parameters;
+    json parameterJson = parameters;
+    
+    LOG(DEBUG) << "Try to run " << function << " with " << parameterJson.dump();
+
     if(function == "CallPython") {
         std::string script;
         std::string function;
@@ -57,8 +60,6 @@ void Backend::Run(const std::string& function, const std::map<std::string, std::
         if(entry != parameters.end()) {
             function = entry->second;
         }
-
-        json parameterJson = parameters;
 
         if(script.size() > 0 && function.size() > 0) {
             _runner->RunScript(script, function, parameterJson.dump());

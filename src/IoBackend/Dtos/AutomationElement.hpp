@@ -8,12 +8,13 @@ using json = nlohmann::json;
 enum class AutomationElementType {
     UNDEF,
     ONOFFBUTTON,
+    VALUETEXT,
 };
 
 NLOHMANN_JSON_SERIALIZE_ENUM( AutomationElementType, {
     {AutomationElementType::UNDEF, "UNDEF"},
     {AutomationElementType::ONOFFBUTTON, "ONOFFBUTTON"},
-   
+    {AutomationElementType::VALUETEXT, "VALUETEXT"},
 })
 
 AutomationElementType StringToAutomationElementType(const std::string& value);

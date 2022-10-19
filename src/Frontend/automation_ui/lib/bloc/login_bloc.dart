@@ -50,8 +50,11 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     try {
       final prefs = await SharedPreferences.getInstance();
       if (request.storeAuth) {
-        if (!kIsWeb) {
-          //Don't store on the web
+        if (kIsWeb) {
+          await prefs.setString('username', request.username);
+        }
+        else{
+          
           await prefs.setString('username', request.username);
           await prefs.setString('password', request.password);
         }

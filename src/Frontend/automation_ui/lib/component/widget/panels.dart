@@ -55,7 +55,7 @@ class SwitchPanelState extends State<SwitchPanel> {
               NeumorphicText(widget._title,
                   style: const NeumorphicStyle(
                       depth: 0, //customize depth here
-                      color: Colors.black),
+                      color: Colors.amber),
                   textStyle: NeumorphicTextStyle(fontSize: 18)),
               Visibility(
                   visible: value.getValue(widget._valueParameter) == "WAIT",

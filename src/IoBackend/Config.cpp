@@ -341,6 +341,12 @@ void Config::Load()
         node.Parameters.insert(std::pair<std::string, std::string>("Function", "callbackMqtt"));
         _configFile.EventRoot.push_back(node);
 
+        node.Event = SystemEvent::ValueChanged;
+        node.Function = "CallPython";
+        node.Parameters.insert(std::pair<std::string, std::string>("Script", "sample"));
+        node.Parameters.insert(std::pair<std::string, std::string>("Function", "callbackValueChanged"));
+        _configFile.EventRoot.push_back(node);
+
         MCP23017Resource* entry = new MCP23017Resource();
         entry->Type = ResourceType::MCP23017;
         entry->Address = 0x20;

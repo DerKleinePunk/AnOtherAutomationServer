@@ -59,6 +59,12 @@ def callbackValueChanged(text):
             connector.WriteMqtt("herbiOs/lights/Licht1/state", "{ \"state\" : \"OFF\" , \"brightness\" : 0 }" )
         if(params["value"] == "on"):
             connector.WriteMqtt("herbiOs/lights/Licht1/state", "{ \"state\" : \"ON\" , \"brightness\" :255 }" )
+    if(params["name"] == "SETHOFLIGHT"):
+        connector.LogEntry("DEBUG", params["value"])
+        if(params["value"] == "ON" ):
+            connector.ChangeValue("HOFLIGHT", "ON")
+        if(params["value"] == "OFF" ):
+            connector.ChangeValue("HOFLIGHT", "OFF")
     return
 
 

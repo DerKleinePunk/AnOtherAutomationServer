@@ -248,6 +248,11 @@ void GlobalFunctions::RegisterForEvent(const SystemEvent event, EventDelegate fu
     _serviceEventManager->RegisterMe(event, function, name);
 }
 
+/**
+ * @brief Scan Wifi Access Points
+ *
+ * @param interfaceName empty for all
+ */
 std::string GlobalFunctions::ScanAccessPoints(const std::string& interfaceName)
 {
     const json result = _networkManager->ScanAccessPoints(interfaceName);
@@ -274,6 +279,8 @@ void GlobalFunctions::SetInternalVariable(const std::string& name, const std::st
         j["name"] = name;
         j["value"] = value;
         FireNewEvent(SystemEvent::ValueChanged, j.dump());
+    } else {
+        LOG(DEBUG) << "not Changed";
     }
 }
 
@@ -384,7 +391,7 @@ AutomationElements GlobalFunctions::GetAutomationElements(const std::string& pag
             element.TypeName = StringToAutomationElementType(query->GetColumnText(2));
             element.SetParameter = query->GetColumnText(3);
             element.ValueParameter = query->GetColumnText(4);
-            element.Value = GetInternalVariable(element.Id, "OFF");
+            element.Value = GetInternalVariable(element.ValueParameter, "OFF");
             elements.Elements.push_back(element);
             query->NextRow();
         }
