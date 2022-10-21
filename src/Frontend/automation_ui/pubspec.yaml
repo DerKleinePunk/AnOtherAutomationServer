@@ -53,6 +53,7 @@ dependencies:
       path: plugins/window_size
   cached_network_image: ^3.2.2
   image_network: ^2.5.1
+  enum_to_string: ^2.0.1
 
 dev_dependencies:
   flutter_test:

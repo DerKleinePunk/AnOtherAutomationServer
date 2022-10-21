@@ -137,6 +137,13 @@ void GlobalFunctions::CheckElementTypeTable() const
         _databaseManager->PrepareSQL("INSERT INTO AUTOMATION_ELEMENT_TYPES (NAME) VALUES ('ONOFFBUTTON')");
         _databaseManager->DoDml(strSQL);
     }
+
+    typeId = _databaseManager->GetIdFromStringKey("AUTOMATION_ELEMENT_TYPES", "NAME", "VALUETEXT");
+    if(typeId == -1) {
+        auto strSQL =
+        _databaseManager->PrepareSQL("INSERT INTO AUTOMATION_ELEMENT_TYPES (NAME) VALUES ('VALUETEXT')");
+        _databaseManager->DoDml(strSQL);
+    }
 }
 
 void GlobalFunctions::CreateDefaultData() const

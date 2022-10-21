@@ -1,5 +1,6 @@
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:provider/provider.dart';
+import 'package:enum_to_string/enum_to_string.dart';
 
 import '../../models/panel_value_model.dart';
 
@@ -15,7 +16,7 @@ class Panels {
   }
 }
 
-class SwitchPanel extends StatefulWidget {
+class SwitchPanel extends StatelessWidget {
   final String _title;
   final String _id;
   final GetStateCallback _getcallback;
@@ -28,14 +29,9 @@ class SwitchPanel extends StatefulWidget {
       : super(key: key);
 
   @override
-  SwitchPanelState createState() => SwitchPanelState();
-}
-
-class SwitchPanelState extends State<SwitchPanel> {
-  @override
   Widget build(BuildContext context) {
     return Consumer<PanelValueMap>(builder: (context, value, child) {
-      SwitchPanelValue switchValue = widget._getcallback(widget._valueParameter);
+      SwitchPanelValue switchValue = _getcallback(_valueParameter);
       bool isOn = true;
       if (switchValue == SwitchPanelValue.off) {
         isOn = false;
@@ -46,34 +42,26 @@ class SwitchPanelState extends State<SwitchPanel> {
                 shape: NeumorphicShape.concave,
                 boxShape:
                     NeumorphicBoxShape.roundRect(BorderRadius.circular(12)),
-                depth: !isOn ? 8 : -6,
+                depth: !isOn ? 8 : 0,
                 lightSource: LightSource.topLeft,
                 shadowLightColorEmboss: const Color(0xFFEBF6FC),
                 shadowDarkColorEmboss: const Color(0xFF0F9DEF)),
             child:
                 Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              NeumorphicText(widget._title,
-                  style: const NeumorphicStyle(
+              NeumorphicText("$_title\n${EnumToString.convertToString(switchValue)}",
+                  style: NeumorphicStyle(
                       depth: 0, //customize depth here
-                      color: Colors.amber),
+                      color: isOn ? Colors.amber : Colors.white),
                   textStyle: NeumorphicTextStyle(fontSize: 18)),
               Visibility(
-                  visible: value.getValue(widget._valueParameter) == "WAIT",
+                  visible: value.getValue(_valueParameter) == "WAIT",
                   child: const CircularProgressIndicator(color: Colors.blue))
-              /*NeumorphicSwitch(
-                      style: const NeumorphicSwitchStyle(
-                          lightSource: LightSource.left),
-                      value: isOn,
-                      onChanged: (value) {
-                        widget._setcallback(widget._id, value);
-                        setState(() {});
-                      },
-                    ),*/
             ])),
         onTap: () {
-          widget._setcallback(widget._setParameter, widget._valueParameter, !isOn);
+          _setcallback(_setParameter, _valueParameter, !isOn);
         },
       );
     });
   }
 }
+

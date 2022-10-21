@@ -12,3 +12,11 @@ if [ $exitCode -ne 0 ] ; then
     echo "flutter give an error"
     exit $exitCode
 fi
+
+cd ./build/web
+
+#cd ../../../../../bin/Linux/webpage/ui
+echo "we are here"
+pwd
+
+cp -Rv * ../../../../../bin/Linux/webpage/ui
