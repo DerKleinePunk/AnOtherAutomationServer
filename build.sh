@@ -101,110 +101,6 @@ if [ "$reproBuild" = "true" ] ; then
   cd ..
 fi
 
-: <<KOMMENTARIO
-echo python depens
-INFO "python depens"
-pip3 install pyserial
-pip3 install RPi.gpio
-pip3 install pydbus
-pip3 install systemd
-
-echo "we are here"
-pwd
-
-DIRECTORY="SDL2-2.0.12"
-if [ ! -d "$DIRECTORY" ]; then
-	wget -N https://www.libsdl.org/release/$DIRECTORY.tar.gz
-	exitCode=$?
-	if [ $exitCode -ne 0 ] ; then
-	   echo "wget give an Error"
-	   ERROR "wget give an Error"
-	   exit $exitCode
-	fi
-	tar -xzf $DIRECTORY.tar.gz
-	exitCode=$?
-	if [ $exitCode -ne 0 ] ; then
-	   echo "tar give an Error"
-	   ERROR "wget give an Error"
-	   exit $exitCode
-	fi
-fi
-
-cd $DIRECTORY
-./autogen.sh
-if [ "$rpiversion" == "raspberrypi,4" ] ; then
-	./configure --enable-video-kmsdrm --disable-esd --disable-video-wayland --disable-video-opengl --disable-video-rpi --disable-kmsdrm-shared --enable-arm-neon
-elif [ "$rpiversion" == "raspberrypi,3" ] ; then
-	./configure --disable-esd --disable-video-wayland --disable-video-opengl --enable-arm-neon
-else
-	./configure
-fi
-exitCode=$?
-if [ $exitCode -ne 0 ] ; then
-   echo "configure give an Error"
-   exit $exitCode
-fi
-make -j$(nproc)
-sudo make install
-cd ..
-
-InstallSDLComponent SDL_image SDL2_image-2.0.5
-InstallSDLComponent SDL_mixer SDL2_mixer-2.0.4
-InstallSDLComponent SDL_net SDL2_net-2.0.1
-InstallSDLComponent SDL_ttf SDL2_ttf-2.0.15
-
-DIRECTORY="libosmscout"
-if [ ! -d "$DIRECTORY" ]; then
-	git clone https://github.com/Framstag/libosmscout.git
-	exitCode=$?
-	if [ $exitCode -ne 0 ] ; then
-	   echo "git give an Error"
-	   exit $exitCode
-	fi
-	cd libosmscout
-	git checkout 0462adad63df01eca7cc17f599d361b3762f543c
-	exitCode=$?
-	if [ $exitCode -ne 0 ] ; then
-	   echo "git give an Error"
-	   exit $exitCode
-	fi
-else
-	cd libosmscout
-	git pull
-	rm OSMScout2/translations/cs.ts
-	rm OSMScout2/translations/en.ts
-	git checkout 0462adad63df01eca7cc17f599d361b3762f543c
-	exitCode=$?
-	if [ $exitCode -ne 0 ] ; then
-	   echo "git give an Error"
-	   exit $exitCode
-	fi
-fi
-
-echo buildding libosmscout debug
-DIRECTORY="build"
-if [ ! -d "$DIRECTORY" ]; then
-	mkdir $DIRECTORY
-fi
-cd $DIRECTORY
-cmake .. -DCMAKE_BUILD_TYPE=Debug -DOSMSCOUT_ENABLE_SSE=ON -DOSMSCOUT_BUILD_DOC_API=OFF -DCMAKE_CXX_FLAGS="-Wno-psabi"
-cmake --build . -j $(nproc)
-sudo cmake --build . --target install
-cd ..
-
-echo buildding libosmscout release
-DIRECTORY="buildrelease"
-if [ ! -d "$DIRECTORY" ]; then
-	mkdir $DIRECTORY
-fi
-cd $DIRECTORY
-cmake .. -DCMAKE_BUILD_TYPE=Release -DOSMSCOUT_ENABLE_SSE=ON -DCMAKE_CXX_FLAGS="-Wno-psabi"
-cmake --build . -j $(nproc)
-sudo cmake --build . --target install
-cd ..
-cd ..
-KOMMENTARIO
-
 echo building IoBackend and Dependecy
 echo "we are here"
 pwd
@@ -217,6 +113,7 @@ if [ ! -d "$DIRECTORY" ]; then
 	   echo "git give an Error"
 	   exit $exitCode
 	fi
+	DEBUG "Repro Clone done"
 	cd $DIRECTORY
 	git submodule init
 	exitCode=$?
@@ -224,6 +121,12 @@ if [ ! -d "$DIRECTORY" ]; then
 	   echo "git give an Error"
 	   exit $exitCode
 	fi
+	git submodule update
+	if [ $exitCode -ne 0 ] ; then
+	   echo "git give an Error"
+	   exit $exitCode
+	fi
+	DEBUG "git submodule done"
 else
 	cd $DIRECTORY
 	if [ "$reproBuild" = "false" ] ; then
