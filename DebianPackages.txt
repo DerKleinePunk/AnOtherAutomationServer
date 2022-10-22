@@ -7,3 +7,4 @@ libsqlite3-dev
 libssl-dev
 uuid-dev
 libmosquitto-dev
+libcurl4-openssl-dev
