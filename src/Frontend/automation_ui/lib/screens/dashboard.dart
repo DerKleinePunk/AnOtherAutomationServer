@@ -26,6 +26,8 @@ class DashboardState extends State<Dashboard> {
   final TextEditingController _msgtext = TextEditingController();
   bool _isPlaying = false;
   late AutomationPanelController _panelController;
+  late PanelChangedMap _panelChangedNotifier;
+
   List<AdaptiveScaffoldDestination> _listPages =
       List<AdaptiveScaffoldDestination>.empty();
   List<AdaptiveScaffoldDestination> _webPages =
@@ -38,14 +40,24 @@ class DashboardState extends State<Dashboard> {
     CoreClientHelper.getClient().addListnerPlayerState(_onPLayerState);
     _panelController = AutomationPanelController();
     _panelController.init(context);
+    _panelChangedNotifier = Provider.of<PanelChangedMap>(context, listen: false);
+    _panelChangedNotifier.addListener(panelChanged);
     super.initState();
   }
 
   @override
+  void deactivate() {
+    _panelChangedNotifier.removeListener(panelChanged);
+    super.deactivate();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    var panelChangedNotifier =
-        Provider.of<PanelChangedMap>(context, listen: false);
-    panelChangedNotifier.addListener(panelChanged);
+    if(_userHasLoggedOut)
+    {
+      return const Text("Bye Bye");
+    }
+
     if (_listPages.isNotEmpty) {
       return _mainPage(_webPages);
     }
@@ -108,10 +120,10 @@ class DashboardState extends State<Dashboard> {
             child: IconButton(
                 icon: const Icon(Icons.logout),
                 onPressed: () async {
+                  _userHasLoggedOut = true;
                   await CoreClientHelper.getClient().removeSessionIfExists();
                   await CoreClientHelper.clearAuthStorage();
                   if (!mounted) return;
-                  _userHasLoggedOut = true;
                   await Navigator.of(context).pushReplacementNamed('dashboard');
                 }),
           ),
@@ -266,20 +278,18 @@ class DashboardState extends State<Dashboard> {
   }
 
   void _onWebSocketClose() async {
+    if (_userHasLoggedOut) return;
+
+    _userHasLoggedOut = true;
     await CoreClientHelper.getClient().removeSessionIfExists();
     await CoreClientHelper.clearAuthStorage();
 
     if (!mounted) return;
-    if (_userHasLoggedOut) return;
-
     await Navigator.of(context).pushReplacementNamed('dashboard');
   }
 
   @override
   void dispose() {
-    var panelChangedNotifier =
-        Provider.of<PanelChangedMap>(context, listen: false);
-    panelChangedNotifier.removeListener(panelChanged);
     CoreClientHelper.getClient().removeListenerMessage(_onWebSocketMessage);
     CoreClientHelper.getClient().removeListenerClose(_onWebSocketClose);
     _panelController.dispose();
