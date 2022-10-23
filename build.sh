@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # wget -O build.sh https://raw.githubusercontent.com/DerKleinePunk/AnOtherAutomationServer/master/build.sh
 # chmod +x build.sh
 

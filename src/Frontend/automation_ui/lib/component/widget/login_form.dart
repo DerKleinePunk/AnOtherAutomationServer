@@ -20,7 +20,7 @@ class LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
   var lastUserName = 'admin';
   var lastPassword = '';
-  var urlToCouchDb = '';
+  var urlToBackend = '';
   var sendAsBasicAuth = false;
   var storeAuthDataInClient = false;
 
@@ -31,8 +31,9 @@ class LoginFormState extends State<LoginForm> {
     sendAsBasicAuth = preferences.getBool('sendbasic') ?? false;
     lastUserName = preferences.getString('username') ?? 'admin';
     lastPassword = preferences.getString('password') ?? '';
-    urlToCouchDb =
+    urlToBackend =
         preferences.getString('serverUrl') ?? 'http://localhost:8080';
+    debugPrint("prefs get username $lastUserName");
   }
 
   @override
@@ -101,7 +102,7 @@ class LoginFormState extends State<LoginForm> {
                   decoration: const InputDecoration(
                     helperText: 'Server url',
                   ),
-                  initialValue: urlToCouchDb,
+                  initialValue: urlToBackend,
                   validator: (value) {
                     if (value?.isEmpty ?? true) {
                       return 'URL required';
@@ -109,7 +110,7 @@ class LoginFormState extends State<LoginForm> {
                     return null;
                   },
                   onSaved: (value) {
-                    urlToCouchDb = value ?? '';
+                    urlToBackend = value ?? '';
                   },
                 ),
                 TextFormField(
@@ -181,7 +182,7 @@ class LoginFormState extends State<LoginForm> {
                           //Let bloc request a login
                           BlocProvider.of<LoginBloc>(context).add(
                             LoginRequest(
-                              urlToCouchDb,
+                              urlToBackend,
                               lastUserName,
                               lastPassword,
                               sendAsBasicAuth,

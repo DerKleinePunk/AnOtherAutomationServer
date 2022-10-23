@@ -6,8 +6,6 @@ import 'cookie_save.dart';
 import 'data/auto_destination.dart';
 import 'dart:convert';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:image_network/image_network.dart';
 
 import 'home_server_endpoints.dart';
 import 'http/http_stub.dart'
@@ -129,22 +127,6 @@ class ServerClient {
         lastSessionRequest != null &&
         lastSessionRequest!.difference(DateTime.now()).inMinutes <
             ensureSessionsEveryXMinutes) return true;
-
-    /*final authTest = await httpClient.get(
-      HomeServerEndpoints.combine(serverUrl, HomeServerEndpoints.session),
-    );
-
-    if (authTest.statusCode == 200) {
-      final authState = jsonDecode(authTest.body);
-      if (authState != null) {
-        if (authState['userCtx']['name'] != null) {
-          lastSessionRequest = DateTime.now();
-          username = authState['userCtx']['name'];
-          return true;
-        }
-      }
-    }*/
-
     try {
       final authState = await apiHttpClient.get(
           HomeServerEndpoints.combine(serverUrl, HomeServerEndpoints.login));

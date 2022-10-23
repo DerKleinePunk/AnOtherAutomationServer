@@ -1,4 +1,3 @@
-import 'dart:js_util';
 
 class AutoDestination {
   final String description;

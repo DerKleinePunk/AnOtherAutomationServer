@@ -6,6 +6,7 @@
 #include "../common/database/DatabaseManager.h"
 #include "Dtos/AutomationPage.hpp"
 #include "Dtos/AutomationElement.hpp"
+#include "Dtos/CurrentUserData.hpp"
 
 class GlobalFunctions
 {
@@ -15,6 +16,7 @@ private:
     NetworkManager* _networkManager;
     DatabaseManager* _databaseManager;
     std::map<std::string,std::string> _internalVariables;
+    std::map<std::string,CurrentUserData> _mapCurrentUserData;
 
     void CreateAutoTables() const;
     void CheckElementTypeTable() const;
@@ -26,7 +28,10 @@ public:
     ~GlobalFunctions();
 
     bool IsApiKeyOk(const std::string& value);
-    std::string GetApiKey() const;
+    const std::string GetApiKey() const;
+    const std::string CreateUserSession(const std::string& user);
+    const std::string GetUserFromSession(const std::string& sessionId);
+    void DeleteUserSession(const std::string& sessionId);
 
     const std::string GetContentTypeFromFileName(const std::string& fileName) const;
     uint16_t GetServerPort() const;

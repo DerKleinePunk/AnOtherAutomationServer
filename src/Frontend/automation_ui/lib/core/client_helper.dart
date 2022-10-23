@@ -1,5 +1,6 @@
 import '../main.dart';
 import '../server/client.dart';
+import 'package:flutter/foundation.dart';
 
 class CoreClientHelper {
   static ServerClient? _pillowClient;
@@ -20,12 +21,18 @@ class CoreClientHelper {
     return getClient();
   }
 
-  static bool initNeeded() =>
-      _pillowClient == null ||
-      (_pillowClient?.username == null && _pillowClient?.password == null);
+  static bool initNeeded() {
+    bool need = _pillowClient == null ||
+      (_pillowClient?.username == null || _pillowClient?.password == null);
+    debugPrint("initNeeded $need");
+    return need;
+  }
 
   static Future clearAuthStorage() async {
-    await preferences.remove('username');
+    var storeAuthDataInClient = preferences.getBool('storeAuth') ?? false;
+    if(!storeAuthDataInClient) {
+      await preferences.remove('username');
+    }
     await preferences.remove('password');
   }
 }

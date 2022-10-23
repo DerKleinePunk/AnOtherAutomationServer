@@ -19,6 +19,8 @@ class Dashboard extends StatefulWidget {
 
 class DashboardState extends State<Dashboard> {
   int _pageIndex = 0;
+  bool _userHasLoggedOut = false;
+
   final List<MessageData> _msglist = [];
 
   final TextEditingController _msgtext = TextEditingController();
@@ -41,7 +43,8 @@ class DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
-    var panelChangedNotifier = Provider.of<PanelChangedMap>(context, listen: false);
+    var panelChangedNotifier =
+        Provider.of<PanelChangedMap>(context, listen: false);
     panelChangedNotifier.addListener(panelChanged);
     if (_listPages.isNotEmpty) {
       return _mainPage(_webPages);
@@ -96,7 +99,7 @@ class DashboardState extends State<Dashboard> {
   Widget _mainPage(List<AdaptiveScaffoldDestination>? pages) {
     String title = _getPageTitel(_pageIndex);
     _mergePages(pages!);
-   
+
     return AdaptiveScaffold(
         title: Text(title),
         actions: [
@@ -108,6 +111,7 @@ class DashboardState extends State<Dashboard> {
                   await CoreClientHelper.getClient().removeSessionIfExists();
                   await CoreClientHelper.clearAuthStorage();
                   if (!mounted) return;
+                  _userHasLoggedOut = true;
                   await Navigator.of(context).pushReplacementNamed('dashboard');
                 }),
           ),
@@ -140,43 +144,6 @@ class DashboardState extends State<Dashboard> {
     }
     return const Center(child: Text('Error'));
   }
-
-  /*@override
-  Widget build(BuildContext context) {
-    final mobileMode = widget.renderMobileMode(context);
-    return HomeServerBootstrap(() {
-      String title = HomeServerLocalizations.of(context)!.titleDashboard;
-
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(title),
-          actions: [
-            IconButton(
-                icon: const Icon(Icons.logout),
-                onPressed: () async {
-                  await CoreClientHelper.getClient().removeSessionIfExists();
-                  await CoreClientHelper.clearAuthStorage();
-                  await Navigator.of(context).pushReplacementNamed('dashboard');
-                }),
-          ],
-        ),
-        body: dashboardBody(),
-        floatingActionButton: mobileMode
-            ? FloatingActionButton(
-                onPressed: () async {
-                  /*final r = await showDatabaseAddDialog(context);
-                  if (r != null) {
-                    setState(() {
-                      totalDbs?.add(r);
-                    });
-                  }*/
-                },
-                child: const Icon(Icons.add),
-              )
-            : null,
-      );
-    });
-  }*/
 
   Widget dashboardBody() {
     return Stack(
@@ -298,17 +265,20 @@ class DashboardState extends State<Dashboard> {
     }
   }
 
-  void _onWebSocketClose() async
-  {
+  void _onWebSocketClose() async {
     await CoreClientHelper.getClient().removeSessionIfExists();
     await CoreClientHelper.clearAuthStorage();
+
     if (!mounted) return;
+    if (_userHasLoggedOut) return;
+
     await Navigator.of(context).pushReplacementNamed('dashboard');
   }
 
   @override
   void dispose() {
-    var panelChangedNotifier = Provider.of<PanelChangedMap>(context, listen: false);
+    var panelChangedNotifier =
+        Provider.of<PanelChangedMap>(context, listen: false);
     panelChangedNotifier.removeListener(panelChanged);
     CoreClientHelper.getClient().removeListenerMessage(_onWebSocketMessage);
     CoreClientHelper.getClient().removeListenerClose(_onWebSocketClose);
@@ -353,7 +323,7 @@ class DashboardState extends State<Dashboard> {
 
     return "Missing Tile for Index $pageIndex";
   }
-  
+
   void _mergePages(List<AdaptiveScaffoldDestination> pagesWeb) {
     var newPagesList = [
       AdaptiveScaffoldDestination(
@@ -374,8 +344,7 @@ class DashboardState extends State<Dashboard> {
     _listPages = newPagesList;
   }
 
-  void panelChanged()
-  {
+  void panelChanged() {
     debugPrint("panelChanged");
     setState(() {});
   }

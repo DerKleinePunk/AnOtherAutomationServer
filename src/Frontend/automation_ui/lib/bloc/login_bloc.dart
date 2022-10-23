@@ -1,9 +1,8 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
 import '../core/client_helper.dart';
-import 'package:meta/meta.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart';
 import '../server/http/http_exceptions.dart';
 
 part 'login_event.dart';
@@ -21,18 +20,9 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     if (event is LoginRequest) {
       emit(LoginRunning());
       var state = await tryLogin(event);
-      //await Future.delayed(const Duration(seconds: 1));
       emit(state);
     }
   }
-
-  /*Stream<LoginState> mapEventToState(
-    LoginEvent event,
-  ) async* {
-    if (event is LoginRequest) {
-      yield* tryLogin(event);
-    }
-  }*/
 
   void ensureClientIsReady(LoginRequest request) {
     if (CoreClientHelper.initNeeded()) {
@@ -52,9 +42,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       if (request.storeAuth) {
         if (kIsWeb) {
           await prefs.setString('username', request.username);
-        }
-        else{
-          
+          debugPrint("prefs save username ${request.username}");
+        } else {
           await prefs.setString('username', request.username);
           await prefs.setString('password', request.password);
         }

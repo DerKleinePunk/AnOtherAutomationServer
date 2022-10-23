@@ -198,9 +198,65 @@ bool GlobalFunctions::IsApiKeyOk(const std::string& value)
     return value == _config->GetApiKey();
 }
 
-std::string GlobalFunctions::GetApiKey() const
+const std::string GlobalFunctions::GetApiKey() const
 {
     return _config->GetApiKey();
+}
+
+/**
+ * @brief Create an user Session or Give exits back
+ *
+ * @param user the user name
+ */
+const std::string GlobalFunctions::CreateUserSession(const std::string& user)
+{
+    if(_mapCurrentUserData.find(user) != _mapCurrentUserData.end()) {
+        return _mapCurrentUserData[user].GetSession();
+    }
+
+    CurrentUserData data;
+    auto result = data.CreateSession(user);
+    _mapCurrentUserData.insert(std::pair<std::string, CurrentUserData>(user, data));
+
+    return result;
+}
+
+/**
+ * @brief Get User From Session empty when not found
+ *
+ * @param sessionId the session Id
+ */
+const std::string GlobalFunctions::GetUserFromSession(const std::string& sessionId)
+{
+    for(const auto entry : _mapCurrentUserData)
+    {
+        if(entry.second.GetSession() == sessionId)
+        {
+            return entry.first;
+        }
+    }
+
+    return std::string("");
+}
+
+/**
+ * @brief Delete User Session
+ *
+ * @param sessionId the session Id
+ */
+void GlobalFunctions::DeleteUserSession(const std::string& sessionId)
+{
+    //TODO Problem with 1 User on 2 or more devices
+
+    for(const auto entry : _mapCurrentUserData)
+    {
+        if(entry.second.GetSession() == sessionId)
+        {
+            _mapCurrentUserData.erase(entry.first);
+            break;
+        }
+    }
+    
 }
 
 const std::string GlobalFunctions::GetContentTypeFromFileName(const std::string& fileName) const

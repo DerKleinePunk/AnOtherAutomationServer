@@ -73,15 +73,18 @@ std::string HttpRequest::GetHeader(const std::string& name, bool canbeCookie)
         delete[] value;
     } else if(size < 0) {
         if(canbeCookie) {
-            size_t max = 32;
-            char textBuffer[32];
-            if(lws_http_cookie_get(_wsi, name.c_str(), textBuffer, &max) == 0) {
+            size_t max = 50;
+            char textBuffer[max];
+            const auto getCookieResult = lws_http_cookie_get(_wsi, name.c_str(), textBuffer, &max);
+            if( getCookieResult == 0) {
                 result = std::string(textBuffer, max);
+            } else if(getCookieResult == 1) {
+                LOG(DEBUG) << nameIntern << " cookie not found";
             } else {
-                LOG(WARNING) << nameIntern << " header or cookie not found";
+                 LOG(WARNING) << nameIntern << " buffer to small";
             }
         } else {
-            LOG(WARNING) << nameIntern << " header or cookie not found";
+            LOG(WARNING) << nameIntern << " header found";
         }
     }
     return result;

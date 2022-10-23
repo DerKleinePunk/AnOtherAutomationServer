@@ -6,31 +6,49 @@
 #endif
 
 #include "AuthResource.hpp"
+
 #include "../../common/easylogging/easylogging++.h"
 #include "../../common/utils/commonutils.h"
 
 HttpResponse* AuthResource::HandleLogin(HttpRequest& request, const std::string& method, HttpResponse* result)
 {
     if(method == "OPTIONS") {
-        //Only Response Cors Headers from Main
-        //Chrome Use this Checking Cors
+        // Only Response Cors Headers from Main
+        // Chrome Use this Checking Cors
         result->SetCode(HTTP_STATUS_NO_CONTENT);
         result->SetContent("", "");
         result->SetHeader("Access-Control-Max-Age", "120"); // duration (in seconds)
         return result;
     }
 
+    const auto token = _globalFunctions->GetApiKey();
+
     if(method == "GET") {
-        //Todo Check Cookie if ok retrun User Name an OK
-        
-        result->SetCode(HTTP_STATUS_NOT_FOUND);
-        result->SetContent("application/json", "{\"error\" : \"Not Found\"}");
+        // Todo Check Cookie if ok retrun User Name an OK
+
+        const auto sessionId = request.GetHeader("X-USER-SESSION-ID", true);
+        if(sessionId.empty()) {
+            result->SetCode(HTTP_STATUS_NOT_FOUND);
+            result->SetContent("application/json", "{\"error\" : \"Not Found\"}");
+        } else {
+            const auto user = _globalFunctions->GetUserFromSession(sessionId);
+            if(user.empty()) {
+                result->SetCode(HTTP_STATUS_NOT_FOUND);
+                result->SetContent("application/json", "{\"error\" : \"Not Found\"}");
+            } else {
+                result->SetContent("application/json", "{\"token\" : \"" + token + "\", \"session\" : \"" + sessionId + "\"}");
+                result->SetCode(HTTP_STATUS_OK);
+            }
+        }
         return result;
     }
 
     if(method == "DELETE") {
-        //Todo Remove Session Killed WebSocket 
-        //https://restfulapi.net/http-methods/#delete
+        // Todo Remove Session Killed WebSocket
+        // https://restfulapi.net/http-methods/#delete
+
+        const auto sessionId = request.GetHeader("X-USER-SESSION-ID", true);
+        _globalFunctions->DeleteUserSession(sessionId);
 
         result->SetCode(HTTP_STATUS_OK);
         result->SetContent("application/json", "{\"sessionState\" : \"killed\"}");
@@ -49,17 +67,17 @@ HttpResponse* AuthResource::HandleLogin(HttpRequest& request, const std::string&
     if(user != "mn" || pass != "mn") {
         result->SetContent("application/json", "{\"error\" : \"UNAUTHORIZED\"}");
         result->SetCode(HTTP_STATUS_UNAUTHORIZED);
-        return result; 
+        return result;
     }
-
-    const auto token = _globalFunctions->GetApiKey();
-
-    //"X-API-KEY=123456789;SameSite=Strict;path=/"
+    
     result->SetCookie("X-API-KEY", token);
 
-    result->SetContent("application/json", "{\"token\" : \"" + token + "\"}");
-    result->SetCode(201); //Created
-    return result; 
+    const auto sessionId = _globalFunctions->CreateUserSession(user);
+    result->SetCookie("X-USER-SESSION-ID", sessionId);
+
+    result->SetContent("application/json", "{\"token\" : \"" + token + "\", \"session\" : \"" + sessionId + "\"}");
+    result->SetCode(201); // Created
+    return result;
 }
 
 AuthResource::AuthResource(GlobalFunctions* globalFunctions)
@@ -77,15 +95,13 @@ HttpResponse* AuthResource::Process(HttpRequest& request, const std::string& url
     LOG(DEBUG) << url << " Api Call Get with " << url << " method " << method;
 
     auto result = new HttpResponse();
-    if(url == "")
-    {
+    if(url == "") {
         result->SetCode(HTTP_STATUS_BAD_REQUEST);
         result->SetContent("application/json", "{\"error\" : \"Bad Request\"}");
         return result;
     }
 
-    if(url == "login")
-    {
+    if(url == "login") {
         return HandleLogin(request, method, result);
     }
 
@@ -94,11 +110,10 @@ HttpResponse* AuthResource::Process(HttpRequest& request, const std::string& url
 
     LOG(DEBUG) << url << " Api Call Get with " << arg << " apiKey " << apiKey;
 
-    if(!_globalFunctions->IsApiKeyOk(apiKey)) 
-    {
+    if(!_globalFunctions->IsApiKeyOk(apiKey)) {
         result->SetContent("application/json", "{\"error\" : \"UNAUTHORIZED\"}");
         result->SetCode(HTTP_STATUS_UNAUTHORIZED);
-        return result; 
+        return result;
     }
 
     if(arg.size() > 0) {
@@ -110,11 +125,10 @@ HttpResponse* AuthResource::Process(HttpRequest& request, const std::string& url
         result->SetContent("application/json", "{\"parameter\" : \"value\"}");
     }
 
-    if(method == "POST")
-    {
+    if(method == "POST") {
         LOG(DEBUG) << "Body " << request.GetBody();
         result->SetCode(201);
     }
 
-    return result;  
+    return result;
 }
