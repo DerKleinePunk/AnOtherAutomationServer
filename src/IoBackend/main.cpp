@@ -145,7 +145,7 @@ int main(int argc, char** argv)
         LOG(ERROR) << "RegisterResource failed";
     }
 
-    if(!ownWebServer->RegisterResource("/api/test/*", new ApiResource(&globalFunctions))) {
+    if(!ownWebServer->RegisterResource("/api/system/*", new ApiResource(&globalFunctions))) {
         LOG(ERROR) << "RegisterResource failed";
     }
 

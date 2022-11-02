@@ -42,6 +42,7 @@ public:
     void RegisterForEvent(const SystemEvent event, EventDelegate function, const std::string name);
 
     std::string ScanAccessPoints(const std::string& interfaceName = "");
+    bool ConnectAccessPoint(const std::string& connectionName, const std::string& password, const std::string& interfaceName = "");
 
     void SetInternalVariable(const std::string& name, const std::string& value);
     std::string GetInternalVariable(const std::string& name) const;

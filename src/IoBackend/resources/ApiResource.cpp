@@ -33,9 +33,24 @@ HttpResponse* ApiResource::Process(HttpRequest& request, const std::string& url,
         return result; 
     }
 
-    if(url == "system/wlan" && method == "GET") {
+    if(url == "wlan" && method == "GET") {
         result->SetContent("application/json", _globalFunctions->ScanAccessPoints());
         result->SetCode(200);
+        return result; 
+    }
+
+    if(url == "wlan" && method == "PUT") {
+        unsigned int resultCode = 404;
+        const auto connectionName = request.GetParameter(std::string("connectionName"));
+        const auto passwort = request.GetParameter(std::string("passwort"));
+        if(_globalFunctions->ConnectAccessPoint(connectionName, passwort))
+        {
+            result->SetContent("application/json", "{\"result\" : \"ok\"}");
+            resultCode = 200;
+        } else {
+            result->SetContent("application/json", "{\"result\" : \"error\"}");
+        }
+        result->SetCode(resultCode);
         return result; 
     }
 

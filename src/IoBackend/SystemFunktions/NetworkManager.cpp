@@ -21,7 +21,9 @@ void to_json(json& j, const AccessPointInfo& p)
         { "Freg", p.Freg }, 
         { "Mode", p.Mode },
         { "Ssid", p.Ssid },
-        { "Strength", p.Strength}
+        { "Strength", p.Strength},
+        { "Security", p.Security},
+        { "DBusPath", p.DBusPath}
     };
 }
 
@@ -167,7 +169,6 @@ void NetworkManager::BuildAccessPointInfo(NMAccessPoint* ap, std::vector<AccessP
 
     freq_str      = g_strdup_printf("%u MHz", freq);
     bitrate_str   = g_strdup_printf("%u Mbit/s", bitrate / 1000);
-    //strength_str  = g_strdup_printf("%u", strength);
     wpa_flags_str = ap_wpa_rsn_flags_to_string(wpa_flags);
     rsn_flags_str = ap_wpa_rsn_flags_to_string(rsn_flags);
 
@@ -198,25 +199,14 @@ void NetworkManager::BuildAccessPointInfo(NMAccessPoint* ap, std::vector<AccessP
     info.Freg = freq_str;
     info.Bitrate = bitrate_str;
     info.Strength = strength;
-
-    //printf("SSID:       %s\n", ssid_str);
-    /*printf("BSSID:      %s\n", hwaddr);
-    printf("Mode:       %s\n",
-           mode == NM_802_11_MODE_ADHOC   ? "Ad-Hoc"
-           : mode == NM_802_11_MODE_INFRA ? "Infrastructure"
-                                          : "Unknown");*/
-    //printf("Freq:       %s\n", freq_str);
-    //printf("Bitrate:    %s\n", bitrate_str);
-    //printf("Strength:   %s\n", strength_str);
-    printf("Security:   %s\n", security_str->str);
-    printf("WPA flags:  %s\n", wpa_flags_str);
-    printf("RSN flags:  %s\n", rsn_flags_str);
-    printf("D-Bus path: %s\n\n", nm_object_get_path(NM_OBJECT(ap)));
+    info.Security = security_str->str;
+    //printf("WPA flags:  %s\n", wpa_flags_str);
+    //printf("RSN flags:  %s\n", rsn_flags_str);
+    info.DBusPath = nm_object_get_path(NM_OBJECT(ap));
 
     g_free(ssid_str);
     g_free(freq_str);
     g_free(bitrate_str);
-    //g_free(strength_str);
     g_free(wpa_flags_str);
     g_free(rsn_flags_str);
     g_string_free(security_str, TRUE);
@@ -332,7 +322,7 @@ bool NetworkManager::ConnectAccessPoint(const std::string& connectionName, const
     if(_client == nullptr) {
         if(!CreateClient()){
             LOG(ERROR) << "Error Creating NMClient";
-            return {};
+            return false;
         }
     }
 

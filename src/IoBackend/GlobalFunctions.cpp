@@ -322,6 +322,18 @@ std::string GlobalFunctions::ScanAccessPoints(const std::string& interfaceName)
     return result.dump();
 }
 
+/**
+ * @brief Connect Wifi Access Point
+ *
+ * @param connectionName Network Name
+ * @param password password
+ * @param interfaceName empty for all
+ */
+bool GlobalFunctions::ConnectAccessPoint(const std::string& connectionName, const std::string& password, const std::string& interfaceName)
+{
+    return _networkManager->ConnectAccessPoint(connectionName, password, interfaceName);
+}
+
 void GlobalFunctions::SetInternalVariable(const std::string& name, const std::string& value)
 {
     LOG(DEBUG) << "SetInternalVariable " << name << " to " << value;
