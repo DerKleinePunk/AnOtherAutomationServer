@@ -160,3 +160,9 @@ https://www.raspberry-pi-geek.com/Archive/2015/12/Controlling-the-Raspberry-Pi-w
 https://mechatronicsblog.com/flutter-on-raspberry-pi-with-flutter-pi/
 [flutter-pi](https://github.com/ardera/flutter-pi)
 [reTerminal-build-UI-using-Flutter](https://wiki.seeedstudio.com/reTerminal-build-UI-using-Flutter/)
+
+## Create Doku
+https://wiki.jlab.org/epsciwiki/images/a/aa/HostingDocsOnGithub.pdf
+https://stackoverflow.com/questions/13368350/use-the-readme-md-file-as-main-page-in-doxygen
+https://docs.espressif.com/projects/esp-idf/en/v4.0.3/contribute/documenting-code.html
+https://docs.github.com/en/pages/setting-up-a-github-pages-site-with-jekyll/creating-a-github-pages-site-with-jekyll
