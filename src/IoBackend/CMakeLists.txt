@@ -43,7 +43,13 @@ set(MAINFONTSOURCE "${MAINFOLDER}/src/IoBackend/webpage/404.html")
 add_custom_command(TARGET ${project_BIN} POST_BUILD # Adds a post-build event to MyTest
                                         COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
                                         "${MAINFONTSOURCE}"      # <--this is in-file
-                                        $<TARGET_FILE_DIR:${project_BIN}>/webpage/404.html) 
+                                        $<TARGET_FILE_DIR:${project_BIN}>/webpage/404.html)
+
+set(MAINFONTSOURCE "${MAINFOLDER}/src/IoBackend/webpage/blockypage.html")
+add_custom_command(TARGET ${project_BIN} POST_BUILD # Adds a post-build event to MyTest
+                                        COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
+                                        "${MAINFONTSOURCE}"      # <--this is in-file
+                                        $<TARGET_FILE_DIR:${project_BIN}>/webpage/blockypage.html) 
                                               
 set(MAINFONTSOURCE "${MAINFOLDER}/src/IoBackend/webpage/scripts/websocket.js")
 add_custom_command(TARGET ${project_BIN} POST_BUILD # Adds a post-build event to MyTest
