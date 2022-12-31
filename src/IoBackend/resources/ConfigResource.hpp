@@ -7,6 +7,7 @@ class ConfigResource : public HttpResource
 {
 private:
     GlobalFunctions* _globalFunctions;
+    HttpResponse* HandleBlockly(HttpRequest& request, const std::string& method, HttpResponse* result, const std::string& pageName);
 
 public:
     ConfigResource(GlobalFunctions* globalFunctions);

@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Blockly Demo: Resizable Blockly (Part 2)</title>
+  <title>Blockly Flow Definition</title>
   <script src="/blockly/blockly_compressed.js"></script>
   <script src="/blockly/blocks_compressed.js"></script>
   <script src="/blockly/python_compressed.js"></script>
@@ -43,6 +43,8 @@
     <tr>
       <td>
         <p><a href="index.html">Home</a> Flow für die Hausautomation erfassen.</p>
+        <button id="saveButton" onclick="saveIt()">Speichern</button>
+        <button id="loadButton" onclick="loadIt()">Laden</button>
       </td>
     </tr>
     <tr>
@@ -142,6 +144,35 @@
     }
     workSpace.addChangeListener(updateCode);
 
+    function saveIt() {
+      const workspaceLocal = Blockly.common.getMainWorkspace();
+      const blocklyFlow = Blockly.serialization.workspaces.save(workspaceLocal);
+      var xhttp = new XMLHttpRequest();
+      xhttp.open("POST", "/api/config/blockly", true);
+      xhttp.setRequestHeader("X-API-KEY", "12345678");
+      xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+      var requestBody = {};
+      requestBody["fileName"] = "main.bkly";
+      requestBody["flow"] = JSON.stringify(blocklyFlow);
+      xhttp.send(JSON.stringify(requestBody));
+    }
+
+    function loadIt() {
+      var xhttp = new XMLHttpRequest();
+      xhttp.open("GET", "/api/config/blockly?fileName=main.bkly", true);
+      xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+          const workspaceLocal = Blockly.common.getMainWorkspace();
+          var flow = JSON.parse(this.responseText);
+          Blockly.serialization.workspaces.load(flow, workspaceLocal);
+        }
+        if (this.readyState == 4 && this.status == 404) {
+          document.getElementById("getResponse").innerHTML = "Not Found";
+        }
+      };
+      xhttp.setRequestHeader("X-API-KEY", "12345678");
+      xhttp.send();
+    }
   </script>
 </body>
 
