@@ -149,6 +149,18 @@ server=208.67.222.222
 
 In short, I offer DHCP and DNS on wlan0 (integrated) and eth0 (network port). DNS is proxied to 8.8.8.8 (Google) or 1.1.1.1 (Cloudflare) or 208.67.222.222 (OpenDNS).
 
+## Bios Update
+
+[updating-the-bootloader](https://www.raspberrypi.com/documentation/computers/raspberry-pi.html#updating-the-bootloader)
+
+```bash
+sudo rpi-eeprom-update
+```
+
+```bash
+sudo rpi-eeprom-update -a
+```
+
 ## Todo
 
 Docker as a non-root user
