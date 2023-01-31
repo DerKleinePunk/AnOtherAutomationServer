@@ -15,6 +15,7 @@ Das sind Config Files wie ich sie mir überlegt habe man könnte auch alles in e
 ```bash
 sudo nano /etc/mosquitto/conf.d/logging.conf
 sudo nano /etc/mosquitto/conf.d/listener.conf
+sudo nano /etc/mosquitto/conf.d/security.conf
 ```
 
 ### logging.conf
@@ -24,15 +25,41 @@ sudo nano /etc/mosquitto/conf.d/listener.conf
 #log_type warning
 log_type all
 log_dest stdout
+log_dest /media/hddIntern/mqtt/mosquitto.log
 ```
 
 ### listener.conf
 
 ```text
 listener 1883
-allow_anonymous true
-# password_file /etc/mosquitto/password_file
+allow_anonymous false
+persistence true
+persistence_location /media/hddIntern/mqtt/
 ```
+
+### security
+
+```text
+allow_zero_length_clientid false
+password_file /media/hddIntern/mqtt/password_file
+```
+
+User anlegen
+
+```bash
+sudo mosquitto_passwd -c /media/hddIntern/mqtt/passwd HomeMqtt
+```
+
+Leserechte für alle auf der passwort datei
+```bash
+chmod a+r password_file
+chown -R pi:users /media/hddIntern/mqtt
+sudo usermod -aG users root
+```
+### Config Testen
+
+sudo mosquitto -v -c /etc/mosquitto/mosquitto.conf
+sudo journalctl --unit mosquitto -f
 
 ## Clear mosquitto
 
