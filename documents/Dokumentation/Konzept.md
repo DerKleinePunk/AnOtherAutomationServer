@@ -1,22 +1,18 @@
 # Das Konzept / die Hinter diesem Projekt
 
-## Das Problem
+## Die Probleme
 
-Es gibt eine vielfallt an Sensoren und Aktoren im Fahrzeug bzw im Haus. Von günstig bis Teuer aber auf ganze Systeme wie zum Beispiel Victron Venus.
+Es gibt eine vielfallt an Sensoren und Aktoren im Fahrzeug bzw im Haus. Von günstig bis Teuer aber auch ganze Systeme wie zum Beispiel Victron Venus.
 ...
 Aber auch eine Menge Menschen die das nutzen wollen / würden aber Entweder sind sie Teuer oder sind Komplex leider trifft das auf viel Opensource Projekte
-zu. Installieren ist oft schwierig oder es für dann wieder zu einem geschlossen System. Zum Beispiel HA.
+zu. Installieren ist oft schwierig oder es für dann wieder zu einem geschlossen System. Zum Bespiel HA OS.
 ...
-Auch sind Systeme wie wie HA oder NodeRed nicht wirklich für den Einsatz im Wohnmobil gedacht. Es fehlen die Funktionen die Man nach meinen Gedanken braucht
-in einem Mobilen System.
-Nutzen der Lokalen GPIO ist durch das Docker System behindert / nicht möglich. Im Haus kein Thema da am PI eher nichts Angeschlossen ist.
-Das automatische Herrunter fahren wenn Zündung oder Batterie Spannung.
-Dynamisch Unterstüzen von wechseln WLAN Verbindungen
+Nutzen der Lokalen GPIO.
+Das automatische Herrunter fahren wenn Zündung aus oder Batterie Spannung zu niedrig.
+Dynamisch Unterstüzen von Wechseln WLAN Verbindungen
 Datensicherung für Händy Fotos
 Wohnmobil Sensoren / Aktoren 
-Locals Display klar kann man den Chrome im Fullscreen laufen lassen aber das geht Ordentlich auf die Performens
-Aber vielleich rede ich mir das auch alles ein um Zurecht fertigen das ich selbe mache.
-Es soll jedenfalls kein Abwertung von HA oder NodeRed sein. Ich ziehe meine Hut vor der Software als solches.
+Locals Display sprich am PI Angeschlosses Display
 
 ## Das Konzept der Software
 
