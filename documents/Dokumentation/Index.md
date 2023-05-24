@@ -8,3 +8,5 @@
 * [Api](SoftwareApi.md)
 * [DatabaseSchema](DatabaseSchema.md)
 * [Docker](Docker.md)
+* [ESPHome](ESPHome.md)
+
