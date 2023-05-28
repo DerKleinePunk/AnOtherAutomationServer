@@ -51,5 +51,7 @@ public:
 
     std::vector<AutomationPage> GetAutomationPages();
     AutomationElements GetAutomationElements(const std::string& pageName);
+
+    void ScanDevices(const std::string serviceType);
 };
 

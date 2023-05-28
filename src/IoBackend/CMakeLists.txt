@@ -26,6 +26,7 @@ TARGET_LINK_LIBRARIES(${project_BIN} PRIVATE ${MOSQUITTO_LIBRARIES} ${GLIB_LDFLA
 TARGET_LINK_LIBRARIES(${project_BIN} PRIVATE websockets GSL)
 TARGET_LINK_LIBRARIES(${project_BIN} PRIVATE "stdc++fs" "uuid")
 TARGET_LINK_LIBRARIES(${project_BIN} PRIVATE "curl")
+TARGET_LINK_LIBRARIES(${project_BIN} PRIVATE "avahi-common" "avahi-client")
 
 set(MAINFONTSOURCE "${MAINFOLDER}/src/IoBackend/loggerIoBackend.conf")
 add_custom_command(TARGET ${project_BIN} POST_BUILD # Adds a post-build event to MyTest

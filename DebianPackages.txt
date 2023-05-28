@@ -8,3 +8,4 @@ libssl-dev
 uuid-dev
 libmosquitto-dev
 libcurl4-openssl-dev
+libavahi-client-dev

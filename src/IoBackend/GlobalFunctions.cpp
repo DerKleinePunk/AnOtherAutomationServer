@@ -475,3 +475,13 @@ AutomationElements GlobalFunctions::GetAutomationElements(const std::string& pag
     delete query;
     return elements;
 }
+
+/**
+ * @brief Scan Devices with mDNS
+ *
+ * @param interfaceName empty for all
+ */
+void GlobalFunctions::ScanDevices(const std::string serviceType)
+{
+    _networkManager->ScanDevices(serviceType);
+}

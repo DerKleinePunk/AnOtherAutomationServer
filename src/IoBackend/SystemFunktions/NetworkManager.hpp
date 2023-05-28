@@ -5,6 +5,7 @@
 #include <vector>
 #include <NetworkManager.h>
 #include "../../common/json/json.hpp"
+#include "../Protocols/ZeroConf/mDnsClient.hpp"
 
 using json = nlohmann::json;
 
@@ -36,7 +37,7 @@ class NetworkManager
 {
 private:
     NMClient* _client;
-
+    mDnsClient* _mdnsClient;
     bool CreateClient();
     void BuildWifiDeviceInfo(NMDevice *device, std::vector<DeviceInfo>& resultInfo);
     void BuildAccessPointInfo(NMAccessPoint *ap, std::vector<AccessPointInfo>& accessPoints);
@@ -53,4 +54,5 @@ public:
     std::vector<DeviceInfo> ScanAccessPoints(const std::string& interfaceName = "");
 
     bool ConnectAccessPoint(const std::string& connectionName, const std::string& password, const std::string& interfaceName = "");
+    void ScanDevices(const std::string serviceType);
 };

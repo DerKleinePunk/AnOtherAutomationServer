@@ -278,12 +278,17 @@ NetworkManager::NetworkManager(/* args */)
 {
     el::Loggers::getLogger(ELPP_DEFAULT_LOGGER);
     _client = nullptr;
+    _mdnsClient = nullptr;
 }
 
 NetworkManager::~NetworkManager()
 {
     if(_client != nullptr) {
         g_object_unref(_client);
+    }
+
+    if(_mdnsClient != nullptr) {
+        delete _mdnsClient;
     }
 }
 
@@ -486,4 +491,13 @@ bool NetworkManager::ConnectAccessPoint(const std::string& connectionName, const
    
 
     return false;
+}
+
+void NetworkManager::ScanDevices(const std::string serviceType)
+{
+    if(_mdnsClient == nullptr) {
+        _mdnsClient = new mDnsClient();
+    }
+
+    _mdnsClient->ScanNetwork(serviceType);
 }

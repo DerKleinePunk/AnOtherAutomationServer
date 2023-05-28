@@ -61,6 +61,7 @@ void WriteFunktionText()
     std::cout << "s1 Connect AccessPoint" << std::endl;
     std::cout << "t0 write mqtt test" << std::endl;
     std::cout << "i0 show internal vars" << std::endl;
+    std::cout << "scan use mDns" << std::endl;
 }
 
 int main(int argc, char** argv)
@@ -192,6 +193,9 @@ int main(int argc, char** argv)
                 connector->Publish("cmnd/tasmota_852612/POWER", "TOGGLE");
             } else if(input == "i0") {
                 globalFunctions.ShowInternalVars();
+            } else if(input == "scan") {
+                globalFunctions.ScanDevices("_http._tcp");
+                globalFunctions.ScanDevices("_esphomelib");
             } else {
                 std::cout << input << " command not found" << std::endl;
             }
