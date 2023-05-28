@@ -310,10 +310,10 @@ class DashboardState extends State<Dashboard> {
   }
 
   void _onPLayerState(PlayerState state) {
-    if (state == PlayerState.STOPPED) {
+    if (state == PlayerState.stopped) {
       _isPlaying = false;
       setState(() {});
-    } else if (state == PlayerState.PLAYING) {
+    } else if (state == PlayerState.playing) {
       _isPlaying = true;
       setState(() {});
     }

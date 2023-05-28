@@ -12,19 +12,18 @@ typedef SetStateCallback = void Function(String idSet, String idGet, bool value)
 class Panels {
   static getSwitchPanel(String title, String id, String setParameter, String valueParameter, GetStateCallback getcallback,
       SetStateCallback setCallback) {
-    return SwitchPanel(title, id, getcallback, setCallback, setParameter, valueParameter);
+    return SwitchPanel(title, getcallback, setCallback, setParameter, valueParameter);
   }
 }
 
 class SwitchPanel extends StatelessWidget {
   final String _title;
-  final String _id;
   final GetStateCallback _getcallback;
   final SetStateCallback _setcallback;
   final String _setParameter;
   final String _valueParameter;
 
-  const SwitchPanel(this._title, this._id, this._getcallback, this._setcallback, this._setParameter, this._valueParameter,
+  const SwitchPanel(this._title, this._getcallback, this._setcallback, this._setParameter, this._valueParameter,
       {Key? key})
       : super(key: key);
 

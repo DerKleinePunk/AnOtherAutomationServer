@@ -37,7 +37,7 @@ class LoginBootStep extends BootstrapStep {
       } else {
         details = _getAuthDetails(prefs);
       }
-      if (serverUrl != null && details!.present) {
+      if (serverUrl != null && details.present) {
         CoreClientHelper.initClient(serverUrl,
             username: details.user, password: details.password);
       }

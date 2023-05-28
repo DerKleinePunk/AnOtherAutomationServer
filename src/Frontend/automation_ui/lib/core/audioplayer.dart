@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:convert';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -11,7 +10,6 @@ class AudioPlayerService {
   final ServerClient _serverClient;
   late AudioPlayer _audioPlayer;
   late AudioPlayer _audioPlayerNotification;
-  late AudioCache _audioCache;
   int _maxduration = 0;
   int _currentDuration = 0;
   int _maxdurationNotification = 0;
@@ -24,34 +22,24 @@ class AudioPlayerService {
   AudioPlayerService(this._serverClient);
 
   init() {
+    AudioLogger.logLevel = AudioLogLevel.info;
+
     _serverClient.addListenerMessage(_onWebSocketMessage);
-    _audioPlayer = AudioPlayer(
-        mode: PlayerMode.MEDIA_PLAYER, playerId: 'mneHomeAppPLayer');
-    _audioPlayerNotification = AudioPlayer(
-        mode: PlayerMode.MEDIA_PLAYER,
-        playerId: 'mneHomeAppPLayerNotification');
-    _audioPlayer
-        .setReleaseMode(ReleaseMode.STOP); // set release mode so that it never
-    _audioCache = AudioCache(fixedPlayer: _audioPlayerNotification);
-    if (!kIsWeb) {
-      // Calls to Platform.isIOS fails on web
-      if (Platform.isIOS) {
-        _audioCache.fixedPlayer?.notificationService.startHeadlessService();
-      }
-    }
-    Logger.changeLogLevel(LogLevel.INFO);
+    _audioPlayer = AudioPlayer(playerId: 'mneHomeAppPLayer');
+    _audioPlayerNotification = AudioPlayer(playerId: 'mneHomeAppPLayerNotification');
+    _audioPlayer.setReleaseMode(ReleaseMode.stop); // set release mode so that it never
 
     _audioPlayer.onDurationChanged.listen((Duration d) {
       _maxduration = d.inMilliseconds;
       debugPrint("_maxduration $_maxduration");
     });
 
-    _audioPlayer.onAudioPositionChanged.listen((Duration d) {
+    _audioPlayer.onPositionChanged.listen((Duration d) {
       _currentDuration = d.inMilliseconds;
       _updateDuration();
     });
 
-    _audioPlayerNotification.onAudioPositionChanged.listen((Duration d) {
+    _audioPlayerNotification.onPositionChanged.listen((Duration d) {
       _currentDurationNotification = d.inMilliseconds;
       _updateDurationNotification();
     });
@@ -59,16 +47,16 @@ class AudioPlayerService {
     _audioPlayer.onPlayerStateChanged.listen((PlayerState s) {
       debugPrint('Current player state: $s');
       switch (s) {
-        case PlayerState.STOPPED:
+        case PlayerState.stopped:
           _audioPlayerStopped();
           break;
-        case PlayerState.PLAYING:
+        case PlayerState.playing:
           _audioPlayerPlaying();
           break;
-        case PlayerState.PAUSED:
+        case PlayerState.paused:
           _audioPlayerPaused();
           break;
-        case PlayerState.COMPLETED:
+        case PlayerState.completed:
           // TODO: Handle this case.
           break;
       }
@@ -77,31 +65,31 @@ class AudioPlayerService {
     _audioPlayerNotification.onPlayerStateChanged.listen((PlayerState s) {
       debugPrint('Current player state: $s');
       switch (s) {
-        case PlayerState.STOPPED:
+        case PlayerState.stopped:
           _audioPlayerNotificationStopped();
           break;
-        case PlayerState.PLAYING:
+        case PlayerState.playing:
           // TODO: Handle this case.
           break;
-        case PlayerState.PAUSED:
+        case PlayerState.paused:
           _audioPlayerNotificationPaused();
           break;
-        case PlayerState.COMPLETED:
+        case PlayerState.completed:
           // TODO: Handle this case.
           break;
       }
     });
 
-    _audioPlayer.onPlayerCompletion.listen((event) {
+    _audioPlayer.onPlayerComplete.listen((event) {
       debugPrint("PlayerCompletion");
     });
 
-    _audioPlayer.onPlayerError.listen((msg) {
-      debugPrint('audioPlayer error : $msg');
+    _audioPlayer.onLog.listen((msg) {
+      debugPrint('audioPlayer Log : $msg');
     });
 
-    _audioPlayerNotification.onPlayerError.listen((msg) {
-      debugPrint('audioPlayerNotification error : $msg');
+    _audioPlayerNotification.onLog.listen((msg) {
+      debugPrint('audioPlayerNotification log : $msg');
     });
   }
 
@@ -117,35 +105,18 @@ class AudioPlayerService {
 
   void _playNotification() async {
     debugPrint("_playNotification");
-    final uri =
-        await _audioCache.load("http://localhost:8000/rainforest-ambient.mp3");
-
-    if (_audioPlayer.state == PlayerState.PLAYING) {
-      _audioPlayer.setVolume(0.5);
-    }
-
-    _maxdurationNotification = 0;
-    await _audioCache.play(uri.toString(), isNotification: true);
-
+    
+    await _audioPlayerNotification.play(UrlSource("http://localhost:8000/rainforest-ambient.mp3"));
+    
     debugPrint("playing sound notification");
   }
 
   void play(String audioFile) async {
-    int result = await _audioPlayer.setUrl(audioFile);
-    if (result == 1) {
-      debugPrint("Sound loading successfull");
-    } else {
-      debugPrint("Error loading sound");
-    }
-
+    await _audioPlayer.play(UrlSource(audioFile));
+    
     _maxduration = 0;
     _audioPlayer.setVolume(1);
-    result = await _audioPlayer.resume();
-    if (result == 1) {
-      debugPrint("Sound playing successfull");
-    } else {
-      debugPrint("Error while playing sound");
-    }
+    await _audioPlayer.resume();
   }
 
   void dispose() {
@@ -158,7 +129,8 @@ class AudioPlayerService {
 
   void _updateDuration() async {
     if (_maxduration == 0) {
-      _maxduration = await _audioPlayer.getDuration();
+      var length = await _audioPlayer.getDuration();
+      _maxduration = length!.inMilliseconds;
     }
     double ready = ((_currentDuration / _maxduration) * 100);
     debugPrint("played $ready");
@@ -169,14 +141,15 @@ class AudioPlayerService {
 
   void _updateDurationNotification() async {
     if (_maxdurationNotification == 0) {
-      _maxdurationNotification = await _audioPlayerNotification.getDuration();
+      var length = await _audioPlayerNotification.getDuration();
+      _maxdurationNotification = length!.inMilliseconds;
     }
     double ready =
         ((_currentDurationNotification / _maxdurationNotification) * 100);
     debugPrint("played Notification $ready");
     if (ready == 100) {
       await _audioPlayerNotification.stop();
-      if (_audioPlayer.state == PlayerState.PLAYING) {
+      if (_audioPlayer.state == PlayerState.playing) {
         _audioPlayer.setVolume(1);
       }
     }
@@ -185,32 +158,32 @@ class AudioPlayerService {
   void _audioPlayerNotificationStopped() async {
     _maxdurationNotification = 0;
     for (var callback in _listenersPlayerNotification) {
-      callback(PlayerState.STOPPED);
+      callback(PlayerState.stopped);
     }
   }
 
   void _audioPlayerNotificationPaused() async {
     for (var callback in _listenersPlayerNotification) {
-      callback(PlayerState.PAUSED);
+      callback(PlayerState.paused);
     }
   }
 
   void _audioPlayerPlaying() async {
     for (var callback in _listenersPlayer) {
-      callback(PlayerState.PLAYING);
+      callback(PlayerState.playing);
     }
   }
 
   void _audioPlayerStopped() async {
     _maxduration = 0;
     for (var callback in _listenersPlayer) {
-      callback(PlayerState.STOPPED);
+      callback(PlayerState.stopped);
     }
   }
 
   void _audioPlayerPaused() async {
     for (var callback in _listenersPlayer) {
-      callback(PlayerState.PAUSED);
+      callback(PlayerState.paused);
     }
   }
 
@@ -223,9 +196,6 @@ class AudioPlayerService {
   }
 
   void pause() async {
-    int result = await _audioPlayer.pause();
-    if (result != 0) {
-      debugPrint("error pause audioPlayer");
-    }
+    await _audioPlayer.pause();
   }
 }

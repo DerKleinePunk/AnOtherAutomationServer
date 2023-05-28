@@ -96,7 +96,7 @@ class LoginFormState extends State<LoginForm> {
               children: [
                 Text(
                   UILocalizations.of(context)!.titleLogin,
-                  style: Theme.of(context).textTheme.headline4,
+                  style: Theme.of(context).textTheme.headlineMedium,
                 ),
                 TextFormField(
                   decoration: const InputDecoration(
