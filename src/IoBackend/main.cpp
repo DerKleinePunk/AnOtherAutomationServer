@@ -195,7 +195,7 @@ int main(int argc, char** argv)
                 globalFunctions.ShowInternalVars();
             } else if(input == "scan") {
                 globalFunctions.ScanDevices("_http._tcp");
-                globalFunctions.ScanDevices("_esphomelib");
+                globalFunctions.ScanDevices("_esphomelib._tcp");
             } else {
                 std::cout << input << " command not found" << std::endl;
             }

@@ -9,3 +9,4 @@
 * [DatabaseSchema](DatabaseSchema.md)
 * [Docker](Docker.md)
 * [ESPHome](ESPHome.md)
+* [ZeroConf](ZeroConf.md)

@@ -4,6 +4,7 @@
 
 ```bash
 esphome dashboard D:/Projects/Privat/ESPHome
+esphome dashboard /home/punky/develop/ESPHome
 ```
 
 ## Develop
