@@ -55,4 +55,5 @@ public:
 
     bool ConnectAccessPoint(const std::string& connectionName, const std::string& password, const std::string& interfaceName = "");
     void ScanDevices(const std::string serviceType);
+
 };

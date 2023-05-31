@@ -21,6 +21,8 @@
 #include "resources/ConfigResource.hpp"
 #include "resources/MqttResource.hpp"
 #include "resources/TestResource.hpp"
+#include "Protocols/ESPHome/ESPHomeNativApi.hpp"
+
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -196,6 +198,10 @@ int main(int argc, char** argv)
             } else if(input == "scan") {
                 globalFunctions.ScanDevices("_http._tcp");
                 globalFunctions.ScanDevices("_esphomelib._tcp");
+            } else if(input == "con") {
+                auto connection = new ESPHomeNativApi();
+                connection->Connect("192.168.2.231");
+                delete connection;
             } else {
                 std::cout << input << " command not found" << std::endl;
             }
