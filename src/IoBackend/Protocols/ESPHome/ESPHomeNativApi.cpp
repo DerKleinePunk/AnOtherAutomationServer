@@ -43,8 +43,8 @@ int ESPHomeNativApi::Connect(const std::string ip, unsigned short port)
         return -1;
     }
 
-    char buff[1024];
-    bzero(buff, sizeof(buff));
+    //char buff[1024];
+    //bzero(buff, sizeof(buff));
     //  * A zero byte.
     //  * VarInt denoting the size of the message object. (type is not part of this)
     //  * VarInt denoting the type of message.
@@ -53,27 +53,37 @@ int ESPHomeNativApi::Connect(const std::string ip, unsigned short port)
     request.set_api_version_major(1);
     request.set_api_version_minor(7);
     request.set_client_info("MNE-BACkend");
-    std::string request_s;
-    request.SerializeToString(&request_s);
+
+    auto size = request.ByteSizeLong();
+    auto reqestBuffer = new char[size];
+
+    request.SerializeToArray(reqestBuffer, size);
+
     //request.encode();
 
+    char buff[1024] = {0x00,0x1b,0x01,0x0A,0x15,0x45,0x53,0x50,0x48,0x6f,0x6d,0x65,0x20,0x4c,0x6f,0x67,0x73,0x20,0x32,0x30,0x32,0x33,0x2e,0x35,0x2e,0x34,0x10,0x01,0x18,0x07};
+
+    /*uint16_t messageType = 1;
     int length = request_s.size();
-    buff[1] = length;
-    buff[2] = 1;
+    buff[0] = 0x00;
+    buff[1] = length >> 8; //Message Len
+    buff[2] = length;
+    buff[3] = messageType >> 8; //Message Type
+    buff[4] = messageType;
 
     for (int i=0;i<length;++i) {
-        buff[i+3] = request_s[i];
-    }
+        buff[i+5] = request_s[i];
+    }*/
 
-    send(_socket_fd, buff, length + 2, 0);
-
-    valread = read(_socket_fd, buff, 1024);
-    buff[valread] = 0;
-    printf("From Server : %s", buff);
+    send(_socket_fd, buff, 30, 0);
 
     valread = read(_socket_fd, buff, 1024);
-    buff[valread] = 0;
-    printf("From Server : %s", buff);
+    std::string buffer(buff, valread);
+    printf("From Server : %s\n", utils::GetPrintAbleString(buffer).c_str());
+
+    valread = read(_socket_fd, buff, 1024);
+    std::string buffer2(buff, valread);
+    printf("From Server : %s\n", utils::GetPrintAbleString(buffer2).c_str());
 
     close(_socket_fd);
 
