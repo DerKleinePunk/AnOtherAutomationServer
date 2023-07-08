@@ -87,8 +87,8 @@ class DashboardState extends State<Dashboard> {
             )
           ]));
         }
-        return Center(
-            child: Column(children: const <Widget>[
+        return const Center(
+            child: Column(children: <Widget>[
           SizedBox(
             width: 80,
             height: 80,

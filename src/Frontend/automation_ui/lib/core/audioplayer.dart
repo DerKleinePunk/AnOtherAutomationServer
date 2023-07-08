@@ -59,6 +59,9 @@ class AudioPlayerService {
         case PlayerState.completed:
           // TODO: Handle this case.
           break;
+        case PlayerState.disposed:
+          // TODO: Handle this case.
+          break;
       }
     });
 
@@ -75,6 +78,9 @@ class AudioPlayerService {
           _audioPlayerNotificationPaused();
           break;
         case PlayerState.completed:
+          // TODO: Handle this case.
+          break;
+        case PlayerState.disposed:
           // TODO: Handle this case.
           break;
       }
