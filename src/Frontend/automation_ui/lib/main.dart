@@ -81,13 +81,8 @@ class MyApp extends StatelessWidget {
           initialRoute: 'dashboard',
           onGenerateRoute: AppRouter.generateRoute,
           themeMode: themeProvider.themeMode,
-          theme: ThemeData(
-            useMaterial3: true,
-            //colorScheme: lightColorScheme,
-          ),
-          darkTheme:
-              ThemeData(useMaterial3: true //colorScheme: darkColorScheme),
-                  ),
+          theme: ThemeData.light(useMaterial3: true),
+          darkTheme: ThemeData.dark(useMaterial3: true),
         );
       },
     );
