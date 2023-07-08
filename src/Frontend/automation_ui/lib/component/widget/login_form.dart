@@ -1,9 +1,9 @@
 import 'dart:math';
-
+import 'package:flutter/material.dart';
 import '../../bloc/login_bloc.dart';
 import '../../component/bootstrap/bootstrap_controller.dart';
 import '../../main.dart';
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -175,7 +175,7 @@ class LoginFormState extends State<LoginForm> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    NeumorphicButton(
+                    OutlinedButton(
                       onPressed: () {
                         if (_formKey.currentState?.validate() ?? false) {
                           _formKey.currentState?.save();
@@ -193,7 +193,7 @@ class LoginFormState extends State<LoginForm> {
                       },
                       child: const Text('Login'),
                     ),
-                    NeumorphicButton(
+                    OutlinedButton(
                       onPressed: () {
                         Navigator.of(context).pushNamed('cors');
                       },

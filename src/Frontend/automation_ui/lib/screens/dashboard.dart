@@ -5,10 +5,10 @@ import '../component/widget/third_party/adaptive_scaffold.dart';
 import '../component/widget/automation_form.dart';
 import '../component/widget/settings_form.dart';
 import '../core/automation_panel_controller.dart';
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:provider/provider.dart';
 import '../models/chat_message_model.dart';
 import '../models/panel_page_changed.dart';
+import 'package:flutter/material.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
@@ -240,7 +240,7 @@ class DashboardState extends State<Dashboard> {
                   )),
                   Container(
                       margin: const EdgeInsets.all(10),
-                      child: NeumorphicButton(
+                      child: OutlinedButton(
                           child: const Icon(Icons.send),
                           onPressed: () {
                             if (_msgtext.text != "") {
@@ -253,7 +253,7 @@ class DashboardState extends State<Dashboard> {
                           })),
                   Container(
                       margin: const EdgeInsets.all(10),
-                      child: NeumorphicButton(
+                      child: OutlinedButton(
                           child: Icon(!_isPlaying
                               ? Icons.play_circle
                               : Icons.stop_circle),

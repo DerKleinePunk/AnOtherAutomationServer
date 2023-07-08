@@ -2,8 +2,8 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'package:flutter/material.dart';
 import '../../../core/extensions.dart';
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 
 /// See bottomNavigationBarItem or NavigationRailDestination
 class AdaptiveScaffoldDestination {
@@ -53,7 +53,7 @@ class AdaptiveScaffoldState extends State<AdaptiveScaffold> {
       return Row(
         children: [
           Drawer(
-            backgroundColor: NeumorphicTheme.baseColor(context),
+            //backgroundColor: NeumorphicTheme.baseColor(context),
             child: Column(
               children: [
                 DrawerHeader(
@@ -79,10 +79,10 @@ class AdaptiveScaffoldState extends State<AdaptiveScaffold> {
           ),
           Expanded(
             child: Scaffold(
-              appBar: NeumorphicAppBar(
+              appBar: AppBar(
                 title: widget.title,
                 actions: widget.actions,
-                color: NeumorphicTheme.baseColor(context),
+                //color: NeumorphicTheme.baseColor(context),
               ),
               body: widget.body,
               floatingActionButton: widget.floatingActionButton,
@@ -95,10 +95,11 @@ class AdaptiveScaffoldState extends State<AdaptiveScaffold> {
     // Show a navigation rail
     if (widget.isMediumScreen(context)) {
       return Scaffold(
-        appBar: NeumorphicAppBar(
+        appBar: AppBar(
             title: widget.title,
             actions: widget.actions,
-            color: NeumorphicTheme.baseColor(context)),
+            //color: NeumorphicTheme.baseColor(context)
+            ),
         body: Row(
           children: [
             NavigationRail(
@@ -113,7 +114,7 @@ class AdaptiveScaffoldState extends State<AdaptiveScaffold> {
               ],
               selectedIndex: widget.currentIndex,
               onDestinationSelected: widget.onNavigationIndexChange ?? (_) {},
-              backgroundColor: NeumorphicTheme.baseColor(context),
+              //backgroundColor: NeumorphicTheme.baseColor(context),
             ),
             VerticalDivider(
               width: 1,
@@ -131,12 +132,13 @@ class AdaptiveScaffoldState extends State<AdaptiveScaffold> {
     // Show a bottom app bar
     return Scaffold(
       body: widget.body,
-      appBar: NeumorphicAppBar(
+      appBar: AppBar(
           title: widget.title,
           actions: widget.actions,
-          color: NeumorphicTheme.baseColor(context)),
+          //color: NeumorphicTheme.baseColor(context)
+          ),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: NeumorphicTheme.baseColor(context),
+        //backgroundColor: NeumorphicTheme.baseColor(context),
         items: [
           ...widget.destinations.map(
             (d) => BottomNavigationBarItem(

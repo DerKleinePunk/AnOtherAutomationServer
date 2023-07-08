@@ -1,17 +1,18 @@
 import 'dart:io';
 import 'package:automation_ui/core/router.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:window_size/window_size.dart';
 import 'package:provider/provider.dart';
 
 import 'models/chat_message_model.dart';
 import 'models/panel_value_model.dart';
 import 'models/panel_page_changed.dart';
+import 'theme_provider.dart';
 
 late SharedPreferences preferences;
 
@@ -34,7 +35,7 @@ void setupWindow() {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  setupWindow();//Only used in Desktop App
+  setupWindow(); //Only used in Desktop App
   var packageInfo = await PackageInfo.fromPlatform();
   var version =
       "${packageInfo.packageName} ${packageInfo.version} (${packageInfo.buildNumber})";
@@ -59,35 +60,36 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-         ChangeNotifierProvider(create: (context) => ChatMessageList()),
-         ChangeNotifierProvider(create: (context) => PanelValueMap()),
-         ChangeNotifierProvider(create: (context) => PanelChangedMap())
+        ChangeNotifierProvider(create: (context) => ChatMessageList()),
+        ChangeNotifierProvider(create: (context) => PanelValueMap()),
+        ChangeNotifierProvider(create: (context) => PanelChangedMap()),
+        ChangeNotifierProvider(create: (context) => ThemeProvider())
       ],
-      child: NeumorphicApp(
-        onGenerateTitle: (context) {
-          return UILocalizations.of(context)!.appTitle;
-        },
-        localizationsDelegates: const [
-          UILocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: UILocalizations.supportedLocales,
-        initialRoute: 'dashboard',
-        onGenerateRoute: AppRouter.generateRoute,
-        themeMode: ThemeMode.dark,
-        theme: const NeumorphicThemeData(
-          baseColor: Color(0xFFFFFFFF),
-          lightSource: LightSource.topLeft,
-          depth: 10,
-        ),
-        darkTheme: const NeumorphicThemeData(
-          baseColor: Color(0xFF3E3E3E),
-          lightSource: LightSource.topLeft,
-          depth: 6,
-        ),
-      ),
+      builder: (context, _) {
+        final themeProvider = Provider.of<ThemeProvider>(context);
+        return MaterialApp(
+          onGenerateTitle: (context) {
+            return UILocalizations.of(context)!.appTitle;
+          },
+          localizationsDelegates: const [
+            UILocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: UILocalizations.supportedLocales,
+          initialRoute: 'dashboard',
+          onGenerateRoute: AppRouter.generateRoute,
+          themeMode: themeProvider.themeMode,
+          theme: ThemeData(
+            useMaterial3: true,
+            //colorScheme: lightColorScheme,
+          ),
+          darkTheme:
+              ThemeData(useMaterial3: true //colorScheme: darkColorScheme),
+                  ),
+        );
+      },
     );
   }
 }

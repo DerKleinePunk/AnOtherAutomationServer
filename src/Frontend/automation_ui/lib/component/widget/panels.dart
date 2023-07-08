@@ -1,4 +1,4 @@
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:enum_to_string/enum_to_string.dart';
 
@@ -36,7 +36,8 @@ class SwitchPanel extends StatelessWidget {
         isOn = false;
       }
       return InkWell(
-        child: Neumorphic(
+        //Todo find new way
+        /*child: Neumorphic(
             style: NeumorphicStyle(
                 shape: NeumorphicShape.concave,
                 boxShape:
@@ -55,7 +56,7 @@ class SwitchPanel extends StatelessWidget {
               Visibility(
                   visible: value.getValue(_valueParameter) == "WAIT",
                   child: const CircularProgressIndicator(color: Colors.blue))
-            ])),
+            ])),*/
         onTap: () {
           _setcallback(_setParameter, _valueParameter, !isOn);
         },

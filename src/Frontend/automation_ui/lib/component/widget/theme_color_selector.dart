@@ -1,4 +1,4 @@
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:flutter/material.dart';
 import '../../core/client_helper.dart';
 import 'color_selector.dart';
 
@@ -35,11 +35,11 @@ class ThemeColorSelectorState extends State<ThemeColorSelector> {
   }
 
   void _onDialogClosed() {
-    NeumorphicTheme.update(
+    /*NeumorphicTheme.update(
         widget.customContext,
         (current) => current!.copyWith(
             baseColor: CoreClientHelper.getClient()
                 .getUserSettings()
-                .getBaseColor()));
+                .getBaseColor()));*/
   }
 }
