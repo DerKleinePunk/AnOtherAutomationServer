@@ -7,12 +7,19 @@ import '../../models/panel_value_model.dart';
 enum SwitchPanelValue { on, off, waiting }
 
 typedef GetStateCallback = SwitchPanelValue Function(String id);
-typedef SetStateCallback = void Function(String idSet, String idGet, bool value);
+typedef SetStateCallback = void Function(
+    String idSet, String idGet, bool value);
 
 class Panels {
-  static getSwitchPanel(String title, String id, String setParameter, String valueParameter, GetStateCallback getcallback,
+  static getSwitchPanel(
+      String title,
+      String id,
+      String setParameter,
+      String valueParameter,
+      GetStateCallback getcallback,
       SetStateCallback setCallback) {
-    return SwitchPanel(title, getcallback, setCallback, setParameter, valueParameter);
+    return SwitchPanel(
+        title, getcallback, setCallback, setParameter, valueParameter);
   }
 }
 
@@ -23,7 +30,8 @@ class SwitchPanel extends StatelessWidget {
   final String _setParameter;
   final String _valueParameter;
 
-  const SwitchPanel(this._title, this._getcallback, this._setcallback, this._setParameter, this._valueParameter,
+  const SwitchPanel(this._title, this._getcallback, this._setcallback,
+      this._setParameter, this._valueParameter,
       {Key? key})
       : super(key: key);
 
@@ -36,7 +44,47 @@ class SwitchPanel extends StatelessWidget {
         isOn = false;
       }
       return InkWell(
-        //Todo find new way
+        child: Container(
+          decoration: BoxDecoration(
+              color: isOn ? Colors.amber : Colors.white,
+              borderRadius: BorderRadius.circular(50),
+              border: Border.all(width: 3),
+              boxShadow: isOn
+                  ? [
+                      BoxShadow(
+                        color: Colors.grey.shade50,
+                        offset: const Offset(4, 4),
+                        blurRadius: 15,
+                        spreadRadius: 1,
+                      ),
+                      const BoxShadow(
+                        color: Colors.white,
+                        offset: Offset(-4, -4),
+                        blurRadius: 15,
+                        spreadRadius: 1,
+                      )
+                    ]
+                  : null //[const BoxShadow()]
+                  ),
+          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Text(_title,
+                style: Theme.of(context).textTheme.headlineMedium),
+            Text(EnumToString.convertToString(switchValue),
+                style: Theme.of(context).textTheme.headlineMedium),
+            Visibility(
+                visible: value.getValue(_valueParameter) == "WAIT",
+                child: const CircularProgressIndicator(color: Colors.blue))
+          ]),
+        ),
+        onTap: () {
+          _setcallback(_setParameter, _valueParameter, !isOn);
+        },
+      );
+    });
+  }
+}
+
+//Todo find new way
         /*child: Neumorphic(
             style: NeumorphicStyle(
                 shape: NeumorphicShape.concave,
@@ -57,11 +105,3 @@ class SwitchPanel extends StatelessWidget {
                   visible: value.getValue(_valueParameter) == "WAIT",
                   child: const CircularProgressIndicator(color: Colors.blue))
             ])),*/
-        onTap: () {
-          _setcallback(_setParameter, _valueParameter, !isOn);
-        },
-      );
-    });
-  }
-}
-

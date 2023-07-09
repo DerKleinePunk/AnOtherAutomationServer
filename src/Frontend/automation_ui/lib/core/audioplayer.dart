@@ -93,7 +93,7 @@ class AudioPlayerService {
     _audioPlayer.onLog.listen((msg) {
       debugPrint('audioPlayer Log : $msg');
     });
-
+ 
     _audioPlayerNotification.onLog.listen((msg) {
       debugPrint('audioPlayerNotification log : $msg');
     });
@@ -118,7 +118,12 @@ class AudioPlayerService {
   }
 
   void play(String audioFile) async {
-    await _audioPlayer.play(UrlSource(audioFile));
+    try {
+      await _audioPlayer.play(UrlSource(audioFile));
+    } on AudioPlayerException catch (exp) {
+      debugPrint(exp.toString());
+      return;
+    }
     
     _maxduration = 0;
     _audioPlayer.setVolume(1);

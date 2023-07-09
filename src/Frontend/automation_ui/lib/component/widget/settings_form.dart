@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import '../../theme_provider.dart';
 import 'theme_color_selector.dart';
 
-//TODO https://github.com/Idean/Flutter-Neumorphic/blob/54ed5895d831d39943dc53ef0fcdc275bb49cf16/example/lib/lib/ThemeConfigurator.dart
 //TODO Save as User settings
 
 class SettingsForm extends StatelessWidget {
@@ -24,9 +23,9 @@ class SettingsForm extends StatelessWidget {
         OutlinedButton(
           onPressed: () {
             if (themeProvider.isDarkMode) {
-              themeProvider.themeMode = ThemeMode.light;
+              themeProvider.toggleTheme(false);
             } else {
-              themeProvider.themeMode = ThemeMode.dark;
+              themeProvider.toggleTheme(true);
             }
           },
           child: Text(buttonText),
